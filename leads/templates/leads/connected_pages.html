@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connected Facebook Pages - Facebook Leads Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .table-container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .badge-connected {
+            background-color: #198754;
+            color: white;
+            font-size: 0.85em;
+            padding: 0.5em 0.8em;
+        }
+        .no-pages {
+            text-align: center;
+            padding: 40px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+        .table td {
+            vertical-align: middle;
+        }
+        .disconnect-btn {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'leads:dashboard' %}">Facebook Leads Dashboard</a>
+            <div class="d-flex align-items-center">
+                <span class="user-info">Welcome, {{ user.username }}</span>
+                <a href="{% url 'leads:logout' %}" class="btn btn-outline-danger">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <h1>Connected Facebook Pages</h1>
+            <a href="{% url 'leads:facebook_connect' %}" class="btn btn-primary">Connect New Page</a>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show mt-3" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% if page_connections %}
+            <div class="table-container">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Page Name</th>
+                            <th>Page ID</th>
+                            <th>Connected</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for connection in page_connections %}
+                            <tr>
+                                <td>{{ connection.page_name }}</td>
+                                <td><code>{{ connection.page_id }}</code></td>
+                                <td>
+                                    <span class="badge badge-connected">
+                                        {{ connection.connected_at|date:"M j, Y" }}
+                                        <small>{{ connection.connected_at|date:"g:i A" }}</small>
+                                    </span>
+                                </td>
+                                <td>
+                                    <form method="post" action="{% url 'leads:disconnect_page' connection.page_id %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-outline-danger btn-sm disconnect-btn" 
+                                                onclick="return confirm('Are you sure you want to disconnect {{ connection.page_name }}?')">
+                                            Disconnect
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="no-pages">
+                <h3>No Facebook Pages Connected</h3>
+                <p class="text-muted">Connect your Facebook pages to start receiving leads.</p>
+                <a href="{% url 'leads:facebook_connect' %}" class="btn btn-primary mt-3">Connect Your First Page</a>
+            </div>
+        {% endif %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

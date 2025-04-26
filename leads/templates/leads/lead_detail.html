@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lead Details - Facebook Leads Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .detail-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .badge-spam {
+            background-color: #dc3545;
+            color: white;
+        }
+        .badge-valid {
+            background-color: #198754;
+            color: white;
+        }
+        .badge-invalid {
+            background-color: #6c757d;
+            color: white;
+        }
+        .field-label {
+            font-weight: 600;
+            color: #495057;
+        }
+        .custom-fields {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        .score-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+        }
+        .score-circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0 auto;
+        }
+        .score-high {
+            background-color: #dc3545;
+            color: white;
+        }
+        .score-medium {
+            background-color: #ffc107;
+            color: black;
+        }
+        .score-low {
+            background-color: #198754;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'leads:dashboard' %}">Facebook Leads Dashboard</a>
+            <div class="d-flex align-items-center">
+                <span class="user-info">Welcome, {{ user.username }}</span>
+                <a href="{% url 'leads:logout' %}" class="btn btn-outline-danger">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <h1>Lead Details</h1>
+            <a href="{% url 'leads:dashboard' %}" class="btn btn-outline-secondary">Back to Dashboard</a>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show mt-3" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="detail-card">
+            <div class="row">
+                <div class="col-md-6">
+                    <h2 class="h4 mb-4">{{ lead.full_name }}</h2>
+                    
+                    <div class="mb-3">
+                        <span class="field-label">Status:</span>
+                        {% if is_spam %}
+                            <span class="badge badge-spam">Spam</span>
+                        {% else %}
+                            <span class="badge badge-valid">Valid</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <span class="field-label">Email:</span>
+                        <span>{{ lead.email }}</span>
+                        {% if is_valid_email %}
+                            <span class="badge badge-valid">Valid</span>
+                        {% else %}
+                            <span class="badge badge-invalid">Invalid</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <span class="field-label">Phone:</span>
+                        <span>{{ lead.phone }}</span>
+                        {% if is_valid_phone %}
+                            <span class="badge badge-valid">Valid</span>
+                        {% else %}
+                            <span class="badge badge-invalid">Invalid</span>
+                        {% endif %}
+                    </div>
+
+                    {% if lead.message %}
+                        <div class="mb-3">
+                            <span class="field-label">Message:</span>
+                            <p class="mt-2">{{ lead.message }}</p>
+                        </div>
+                    {% endif %}
+
+                    <div class="mt-4">
+                        <form method="post" action="{% url 'leads:toggle_lead_spam' lead.pk %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn {% if is_spam %}btn-success{% else %}btn-danger{% endif %}" 
+                                    onclick="return confirm('Are you sure you want to mark this lead as {% if is_spam %}valid{% else %}spam{% endif %}?')">
+                                Mark as {% if is_spam %}Valid{% else %}Spam{% endif %}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="score-section">
+                        <h3 class="h5 mb-3">Scoring Details</h3>
+                        
+                        <div class="text-center mb-4">
+                            <div class="score-circle {% if lead.gpt_score > 0.7 %}score-high{% elif lead.gpt_score > 0.3 %}score-medium{% else %}score-low{% endif %}">
+                                {{ lead.gpt_score|floatformat:0 }}%
+                            </div>
+                            <p class="mt-2 text-muted">GPT Score</p>
+                        </div>
+
+                        {% if lead.gpt_reason %}
+                            <div class="mb-3">
+                                <span class="field-label">Reason:</span>
+                                <p class="mt-2">{{ lead.gpt_reason }}</p>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    {% if lead.custom_fields %}
+                        <div class="custom-fields">
+                            <h3 class="h5 mb-3">Custom Fields</h3>
+                            {% for key, value in lead.custom_fields.items %}
+                                <div class="mb-2">
+                                    <span class="field-label">{{ key }}:</span>
+                                    <span>{{ value }}</span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <span class="field-label">Received:</span>
+                <span>{{ lead.received_at|date:"F j, Y, g:i a" }}</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 
