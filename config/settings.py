@@ -27,7 +27,12 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'default-secret-key-for-dev')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+ALLOWED_HOSTS = [
+    'leadfilter-production.up.railway.app',
+    '.railway.app',
+    'localhost',
+    '127.0.0.1',
+]
 
 # CSRF settings for secure requests
 CSRF_TRUSTED_ORIGINS = [f'https://{host}' for host in ALLOWED_HOSTS if host]
