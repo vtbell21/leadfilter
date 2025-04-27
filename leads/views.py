@@ -471,17 +471,22 @@ def facebook_callback(request):
 @login_required
 def select_facebook_page(request):
     """Display available Facebook pages for selection."""
-    # Get pages data from session
-    pages = request.session.get('facebook_pages', [])
-    
+    try:
+        # Get pages data from session
+        pages = request.session.get('facebook_pages', [])
+        if not isinstance(pages, list):
+            pages = []
+    except Exception as e:
+        logger.error(f"Error accessing facebook_pages in session: {str(e)}")
+        pages = []
+
     if not pages:
         messages.error(request, 'No Facebook pages data found. Please try connecting again.')
         return redirect('leads:dashboard')
-    
+
     context = {
         'pages': pages
     }
-    
     return render(request, 'leads/select_facebook_page.html', context)
 
 @login_required

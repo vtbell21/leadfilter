@@ -11,21 +11,29 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
-from dotenv import load_dotenv
 import environ
 import os
 
-env = environ.Env()
-environ.Env.read_env()
+# Initialize environ
+env = environ.Env(
+    DEBUG=(bool, False),
+    DJANGO_SECRET_KEY=(str, 'default-secret-key-for-dev'),
+    FACEBOOK_APP_ID=(str, None),
+    FACEBOOK_APP_SECRET=(str, None),
+    OPENAI_API_KEY=(str, None),
+)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Read .env file if it exists
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'default-secret-key-for-dev')
+SECRET_KEY = env('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', 'False') == 'True'
+DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = [
     'leadfilter-production.up.railway.app',
@@ -86,10 +94,10 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': env.db(
+        'DATABASE_URL',
+        default='sqlite:///' + str(BASE_DIR / 'db.sqlite3')
+    )
 }
 
 
@@ -155,11 +163,14 @@ CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [f'https://{host}' for host in ALLOWED_HOSTS if host]
 
 # Facebook API settings
-FACEBOOK_APP_ID = os.environ.get('FACEBOOK_APP_ID')
-FACEBOOK_APP_SECRET = os.environ.get('FACEBOOK_APP_SECRET')
+FACEBOOK_APP_ID = env('FACEBOOK_APP_ID')
+FACEBOOK_APP_SECRET = env('FACEBOOK_APP_SECRET')
 
 # OpenAI settings
-OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
+OPENAI_API_KEY = env('OPENAI_API_KEY')
 
 # Whitenoise storage for static files
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# Use database-backed sessions (Postgres)
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
