@@ -335,18 +335,36 @@ def facebook_connect(request):
         'redirect_uri': request.build_absolute_uri('/facebook/callback/'),
         'scope': 'pages_show_list,leads_retrieval,pages_manage_metadata,pages_read_engagement',
         'response_type': 'code',
-        'state': b64encode(str(request.user.id).encode()).decode()  # Encode user ID for security
+        'state': b64encode(str(request.user.id).encode()).decode(),  # Encode user ID for security
+        'auth_type': 'rerequest',  # Force re-authentication
+        'display': 'popup',  # Use popup display
     }
     
     # Build the Facebook OAuth URL
     facebook_oauth_url = f"https://www.facebook.com/v19.0/dialog/oauth?{urlencode(params)}"
     
     logger.info(f"Redirecting user {request.user.id} to Facebook OAuth: {facebook_oauth_url}")
+    
+    # Clear any existing Facebook sessions in our app
+    for key in list(request.session.keys()):
+        if key.startswith('facebook_'):
+            del request.session[key]
+    request.session.modified = True
+    
     return redirect(facebook_oauth_url)
 
 @login_required
 def facebook_callback(request):
     """Handle Facebook OAuth callback and fetch user's pages."""
+    # Check for error response from Facebook
+    if 'error' in request.GET:
+        error = request.GET.get('error')
+        error_reason = request.GET.get('error_reason', '')
+        error_description = request.GET.get('error_description', '')
+        logger.error(f"Facebook OAuth error: {error} - {error_reason} - {error_description}")
+        messages.error(request, f"Facebook connection failed: {error_description}")
+        return redirect('leads:dashboard')
+
     # Get the authorization code from the request
     code = request.GET.get('code')
     state = request.GET.get('state')
@@ -374,6 +392,12 @@ def facebook_callback(request):
         token_response = requests.get(token_url, params=token_params)
         token_response.raise_for_status()
         token_data = token_response.json()
+        
+        if 'error' in token_data:
+            logger.error(f"Facebook token error: {token_data['error']}")
+            messages.error(request, 'Error obtaining Facebook access token')
+            return redirect('leads:dashboard')
+            
         access_token = token_data['access_token']
         
         # Fetch user's pages
@@ -385,6 +409,10 @@ def facebook_callback(request):
         pages_response = requests.get(pages_url, params=pages_params)
         pages_response.raise_for_status()
         pages_data = pages_response.json()
+        
+        if not pages_data.get('data'):
+            messages.warning(request, 'No Facebook Pages found. Make sure you have admin access to at least one Facebook Page.')
+            return redirect('leads:dashboard')
         
         # Store pages data in session
         request.session['facebook_pages'] = pages_data.get('data', [])
@@ -398,11 +426,11 @@ def facebook_callback(request):
         
     except requests.RequestException as e:
         logger.error(f"Error in Facebook OAuth callback: {str(e)}")
-        messages.error(request, 'Error connecting to Facebook')
+        messages.error(request, 'Error connecting to Facebook. Please try again.')
         return redirect('leads:dashboard')
     except Exception as e:
         logger.error(f"Unexpected error in Facebook callback: {str(e)}")
-        messages.error(request, 'An unexpected error occurred')
+        messages.error(request, 'An unexpected error occurred. Please try again.')
         return redirect('leads:dashboard')
 
 @login_required
