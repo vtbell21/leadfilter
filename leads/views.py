@@ -279,48 +279,57 @@ def logout_view(request):
 def lead_dashboard(request):
     """Display a dashboard of valid and spam leads for the authenticated user."""
     try:
+        # Get Facebook page connection status first
+        try:
+            facebook_page = FacebookPageConnection.objects.filter(user=request.user).first()
+            if facebook_page:
+                logger.info(f"User {request.user.id} has connected page: {facebook_page.page_name} ({facebook_page.page_id})")
+            else:
+                logger.info(f"User {request.user.id} has no connected Facebook pages")
+        except Exception as e:
+            logger.error(f"Error getting Facebook page connection: {str(e)}")
+            facebook_page = None
+        
         # Get all leads for the current user ordered by received_at (newest first)
-        all_leads = FacebookLead.objects.filter(user=request.user).order_by('-received_at')
-        
-        # Get Facebook page connection status
-        facebook_page = FacebookPageConnection.objects.filter(user=request.user).first()
-        if facebook_page:
-            logger.info(f"User {request.user.id} has connected page: {facebook_page.page_name} ({facebook_page.page_id})")
-        else:
-            logger.info(f"User {request.user.id} has no connected Facebook pages")
-        
-        # Separate leads into valid and spam
-        valid_leads = all_leads.filter(is_spam=False)
-        spam_leads = all_leads.filter(is_spam=True)
-        
-        # Paginate both lists
-        valid_paginator = Paginator(valid_leads, 25)
-        spam_paginator = Paginator(spam_leads, 25)
-        
-        # Get current page numbers from request
-        valid_page = request.GET.get('valid_page', 1)
-        spam_page = request.GET.get('spam_page', 1)
-        
-        # Get the page objects
-        valid_leads_page = valid_paginator.get_page(valid_page)
-        spam_leads_page = spam_paginator.get_page(spam_page)
-        
-        # Get counts for the dashboard
-        total_leads = all_leads.count()
-        valid_count = valid_leads.count()
-        spam_count = spam_leads.count()
-        
-        # Calculate spam rate
-        spam_rate = round((spam_count / total_leads * 100) if total_leads > 0 else 0, 1)
+        try:
+            all_leads = FacebookLead.objects.filter(user=request.user).order_by('-received_at')
+            valid_leads = all_leads.filter(is_spam=False)
+            spam_leads = all_leads.filter(is_spam=True)
+            
+            # Get counts for the dashboard
+            total_leads = all_leads.count()
+            valid_count = valid_leads.count()
+            spam_count = spam_leads.count()
+            spam_rate = round((spam_count / total_leads * 100) if total_leads > 0 else 0, 1)
+            
+            # Paginate both lists
+            valid_paginator = Paginator(valid_leads, 25)
+            spam_paginator = Paginator(spam_leads, 25)
+            
+            # Get current page numbers from request
+            valid_page = request.GET.get('valid_page', 1)
+            spam_page = request.GET.get('spam_page', 1)
+            
+            # Get the page objects
+            valid_leads_page = valid_paginator.get_page(valid_page)
+            spam_leads_page = spam_paginator.get_page(spam_page)
+        except Exception as e:
+            logger.error(f"Error getting leads data: {str(e)}")
+            valid_leads_page = []
+            spam_leads_page = []
+            total_leads = 0
+            valid_count = 0
+            spam_count = 0
+            spam_rate = 0
         
         context = {
+            'facebook_page': facebook_page,
             'valid_leads': valid_leads_page,
             'spam_leads': spam_leads_page,
             'total_leads': total_leads,
             'valid_count': valid_count,
             'spam_count': spam_count,
             'spam_rate': spam_rate,
-            'facebook_page': facebook_page,
         }
         
         return render(request, 'leads/leads_dashboard.html', context)
