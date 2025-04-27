@@ -442,10 +442,26 @@ def save_facebook_page(request):
         page_id = request.POST.get('page_id')
         page_name = request.POST.get('page_name')
         page_access_token = request.POST.get('page_access_token')
+        force_reassign = request.POST.get('force_reassign') == 'true'
         
         if not all([page_id, page_name, page_access_token]):
             messages.error(request, 'Missing required page information')
             return redirect('leads:dashboard')
+        
+        # Check if page is already connected to another user
+        existing_connection = FacebookPageConnection.objects.filter(page_id=page_id).exclude(user=request.user).first()
+        if existing_connection and not force_reassign:
+            # Store connection attempt info in session for potential reassignment
+            request.session['pending_page_connection'] = {
+                'page_id': page_id,
+                'page_name': page_name,
+                'page_access_token': page_access_token,
+                'current_owner': existing_connection.user.username
+            }
+            messages.warning(request, 
+                f'This page is already connected to another account ({existing_connection.user.username}). '
+                'Please disconnect it first or use force reassign option.')
+            return redirect('leads:handle_page_conflict')
         
         # Create or update the page connection
         page_connection, created = FacebookPageConnection.objects.update_or_create(
@@ -456,6 +472,12 @@ def save_facebook_page(request):
                 'page_access_token': page_access_token
             }
         )
+        
+        # Log the connection/reconnection
+        if created:
+            logger.info(f"User {request.user.id} connected new page {page_name} ({page_id})")
+        else:
+            logger.info(f"User {request.user.id} reconnected existing page {page_name} ({page_id})")
         
         # Subscribe the page to the webhook
         subscribe_url = f'https://graph.facebook.com/v19.0/{page_id}/subscribed_apps'
@@ -481,6 +503,21 @@ def save_facebook_page(request):
         logger.error(f"Unexpected error saving page: {str(e)}")
         messages.error(request, 'An unexpected error occurred')
         return redirect('leads:dashboard')
+
+@login_required
+def handle_page_conflict(request):
+    """Handle cases where a Facebook page is already connected to another account."""
+    pending_connection = request.session.get('pending_page_connection')
+    if not pending_connection:
+        messages.error(request, 'No pending page connection found')
+        return redirect('leads:dashboard')
+    
+    context = {
+        'page_name': pending_connection['page_name'],
+        'current_owner': pending_connection['current_owner'],
+    }
+    
+    return render(request, 'leads/handle_page_conflict.html', context)
 
 @login_required
 def connected_pages_view(request):

@@ -15,6 +15,7 @@ urlpatterns = [
     path('facebook/save-page/', views.save_facebook_page, name='save_facebook_page'),
     path('connected-pages/', views.connected_pages_view, name='connected_pages'),
     path('connected-pages/disconnect/<str:page_id>/', views.disconnect_page_view, name='disconnect_page'),
+    path('connected-pages/conflict/<str:page_id>/', views.page_conflict_view, name='page_conflict'),
     path('leads/<int:pk>/', views.lead_detail_view, name='lead_detail'),
     path('leads/<int:pk>/toggle-spam/', views.toggle_lead_spam, name='toggle_lead_spam'),
     path('leads/export/', views.export_clean_leads, name='export_clean_leads'),
