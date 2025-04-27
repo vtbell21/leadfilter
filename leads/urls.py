@@ -18,4 +18,6 @@ urlpatterns = [
     path('leads/<int:pk>/', views.lead_detail_view, name='lead_detail'),
     path('leads/<int:pk>/toggle-spam/', views.toggle_lead_spam, name='toggle_lead_spam'),
     path('leads/export/', views.export_clean_leads, name='export_clean_leads'),
+    path('privacy/', views.privacy_policy, name='privacy_policy'),
+    path('terms/', views.terms_of_service, name='terms_of_service'),
 ] 

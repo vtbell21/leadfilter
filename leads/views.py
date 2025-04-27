@@ -281,6 +281,9 @@ def lead_dashboard(request):
     # Get all leads for the current user ordered by received_at (newest first)
     all_leads = FacebookLead.objects.filter(user=request.user).order_by('-received_at')
     
+    # Get Facebook page connection status
+    facebook_page = FacebookPageConnection.objects.filter(user=request.user).first()
+    
     # Separate leads into valid and spam
     valid_leads = all_leads.filter(is_spam=False)
     spam_leads = all_leads.filter(is_spam=True)
@@ -312,6 +315,7 @@ def lead_dashboard(request):
         'valid_count': valid_count,
         'spam_count': spam_count,
         'spam_rate': spam_rate,
+        'facebook_page': facebook_page,
     }
     
     return render(request, 'leads/leads_dashboard.html', context)
@@ -495,12 +499,12 @@ def disconnect_page_view(request, page_id):
         logger.info(f"Successfully disconnected page {page_name} ({page_id})")
         
         messages.success(request, f'Successfully disconnected {page_name}')
-        return redirect('leads:connected_pages')
+        return redirect('leads:dashboard')
         
     except Exception as e:
         logger.error(f"Error disconnecting page: {str(e)}")
         messages.error(request, 'An error occurred while disconnecting the page')
-        return redirect('leads:connected_pages')
+        return redirect('leads:dashboard')
 
 @login_required
 def lead_detail_view(request, pk):
@@ -597,3 +601,9 @@ def export_clean_leads(request):
                 (f" from {start_date} to {end_date}" if start_date or end_date else ""))
     
     return response
+
+def privacy_policy(request):
+    return render(request, 'leads/privacy.html')
+
+def terms_of_service(request):
+    return render(request, 'leads/terms.html')
