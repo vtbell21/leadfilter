@@ -278,47 +278,66 @@ def logout_view(request):
 @login_required(login_url='leads:login')
 def lead_dashboard(request):
     """Display a dashboard of valid and spam leads for the authenticated user."""
-    # Get all leads for the current user ordered by received_at (newest first)
-    all_leads = FacebookLead.objects.filter(user=request.user).order_by('-received_at')
-    
-    # Get Facebook page connection status
-    facebook_page = FacebookPageConnection.objects.filter(user=request.user).first()
-    
-    # Separate leads into valid and spam
-    valid_leads = all_leads.filter(is_spam=False)
-    spam_leads = all_leads.filter(is_spam=True)
-    
-    # Paginate both lists
-    valid_paginator = Paginator(valid_leads, 25)
-    spam_paginator = Paginator(spam_leads, 25)
-    
-    # Get current page numbers from request
-    valid_page = request.GET.get('valid_page', 1)
-    spam_page = request.GET.get('spam_page', 1)
-    
-    # Get the page objects
-    valid_leads_page = valid_paginator.get_page(valid_page)
-    spam_leads_page = spam_paginator.get_page(spam_page)
-    
-    # Get counts for the dashboard
-    total_leads = all_leads.count()
-    valid_count = valid_leads.count()
-    spam_count = spam_leads.count()
-    
-    # Calculate spam rate
-    spam_rate = round((spam_count / total_leads * 100) if total_leads > 0 else 0, 1)
-    
-    context = {
-        'valid_leads': valid_leads_page,
-        'spam_leads': spam_leads_page,
-        'total_leads': total_leads,
-        'valid_count': valid_count,
-        'spam_count': spam_count,
-        'spam_rate': spam_rate,
-        'facebook_page': facebook_page,
-    }
-    
-    return render(request, 'leads/leads_dashboard.html', context)
+    try:
+        # Get all leads for the current user ordered by received_at (newest first)
+        all_leads = FacebookLead.objects.filter(user=request.user).order_by('-received_at')
+        
+        # Get Facebook page connection status
+        facebook_page = FacebookPageConnection.objects.filter(user=request.user).first()
+        if facebook_page:
+            logger.info(f"User {request.user.id} has connected page: {facebook_page.page_name} ({facebook_page.page_id})")
+        else:
+            logger.info(f"User {request.user.id} has no connected Facebook pages")
+        
+        # Separate leads into valid and spam
+        valid_leads = all_leads.filter(is_spam=False)
+        spam_leads = all_leads.filter(is_spam=True)
+        
+        # Paginate both lists
+        valid_paginator = Paginator(valid_leads, 25)
+        spam_paginator = Paginator(spam_leads, 25)
+        
+        # Get current page numbers from request
+        valid_page = request.GET.get('valid_page', 1)
+        spam_page = request.GET.get('spam_page', 1)
+        
+        # Get the page objects
+        valid_leads_page = valid_paginator.get_page(valid_page)
+        spam_leads_page = spam_paginator.get_page(spam_page)
+        
+        # Get counts for the dashboard
+        total_leads = all_leads.count()
+        valid_count = valid_leads.count()
+        spam_count = spam_leads.count()
+        
+        # Calculate spam rate
+        spam_rate = round((spam_count / total_leads * 100) if total_leads > 0 else 0, 1)
+        
+        context = {
+            'valid_leads': valid_leads_page,
+            'spam_leads': spam_leads_page,
+            'total_leads': total_leads,
+            'valid_count': valid_count,
+            'spam_count': spam_count,
+            'spam_rate': spam_rate,
+            'facebook_page': facebook_page,
+        }
+        
+        return render(request, 'leads/leads_dashboard.html', context)
+        
+    except Exception as e:
+        logger.error(f"Error in dashboard view: {str(e)}")
+        messages.error(request, 'An error occurred while loading the dashboard')
+        context = {
+            'facebook_page': None,
+            'valid_leads': [],
+            'spam_leads': [],
+            'total_leads': 0,
+            'valid_count': 0,
+            'spam_count': 0,
+            'spam_rate': 0,
+        }
+        return render(request, 'leads/leads_dashboard.html', context)
 
 def homepage(request):
     """Render the homepage with a link to the leads dashboard."""
@@ -403,7 +422,8 @@ def facebook_callback(request):
         # Fetch user's pages
         pages_url = 'https://graph.facebook.com/me/accounts'
         pages_params = {
-            'access_token': access_token
+            'access_token': access_token,
+            'fields': 'id,name,access_token'  # Explicitly request these fields
         }
         
         pages_response = requests.get(pages_url, params=pages_params)
@@ -414,9 +434,15 @@ def facebook_callback(request):
             messages.warning(request, 'No Facebook Pages found. Make sure you have admin access to at least one Facebook Page.')
             return redirect('leads:dashboard')
         
+        # Log the pages data for debugging
+        logger.info(f"Retrieved {len(pages_data['data'])} pages for user {request.user.id}")
+        for page in pages_data['data']:
+            logger.info(f"Page info - ID: {page.get('id')}, Name: {page.get('name')}")
+        
         # Store pages data in session
-        request.session['facebook_pages'] = pages_data.get('data', [])
+        request.session['facebook_pages'] = pages_data['data']
         request.session['facebook_access_token'] = access_token
+        request.session.modified = True  # Ensure session is saved
         
         # Log successful connection
         logger.info(f"User {request.user.id} successfully connected Facebook account")
@@ -460,13 +486,22 @@ def save_facebook_page(request):
         page_access_token = request.POST.get('page_access_token')
         force_reassign = request.POST.get('force_reassign') == 'true'
         
+        # Log the received data (excluding sensitive token)
+        logger.info(f"Attempting to save page - ID: {page_id}, Name: {page_name}")
+        
         if not all([page_id, page_name, page_access_token]):
+            missing = []
+            if not page_id: missing.append('page_id')
+            if not page_name: missing.append('page_name')
+            if not page_access_token: missing.append('page_access_token')
+            logger.error(f"Missing required page information: {', '.join(missing)}")
             messages.error(request, 'Missing required page information')
             return redirect('leads:dashboard')
         
         # Check if page is already connected to another user
         existing_connection = FacebookPageConnection.objects.filter(page_id=page_id).exclude(user=request.user).first()
         if existing_connection and not force_reassign:
+            logger.warning(f"Page {page_id} is already connected to user {existing_connection.user.id}")
             # Store connection attempt info in session for potential reassignment
             request.session['pending_page_connection'] = {
                 'page_id': page_id,
@@ -474,43 +509,55 @@ def save_facebook_page(request):
                 'page_access_token': page_access_token,
                 'current_owner': existing_connection.user.username
             }
+            request.session.modified = True
             messages.warning(request, 
                 f'This page is already connected to another account ({existing_connection.user.username}). '
                 'Please disconnect it first or use force reassign option.')
             return redirect('leads:handle_page_conflict')
         
-        # Create or update the page connection
-        page_connection, created = FacebookPageConnection.objects.update_or_create(
-            page_id=page_id,
-            defaults={
-                'user': request.user,
-                'page_name': page_name,
-                'page_access_token': page_access_token
+        try:
+            # Create or update the page connection
+            page_connection, created = FacebookPageConnection.objects.update_or_create(
+                page_id=page_id,
+                defaults={
+                    'user': request.user,
+                    'page_name': page_name,
+                    'page_access_token': page_access_token
+                }
+            )
+            
+            # Log the connection/reconnection
+            if created:
+                logger.info(f"User {request.user.id} connected new page {page_name} ({page_id})")
+            else:
+                logger.info(f"User {request.user.id} reconnected existing page {page_name} ({page_id})")
+            
+            # Subscribe the page to the webhook
+            subscribe_url = f'https://graph.facebook.com/v19.0/{page_id}/subscribed_apps'
+            subscribe_params = {
+                'access_token': page_access_token,
+                'subscribed_fields': 'leadgen'
             }
-        )
-        
-        # Log the connection/reconnection
-        if created:
-            logger.info(f"User {request.user.id} connected new page {page_name} ({page_id})")
-        else:
-            logger.info(f"User {request.user.id} reconnected existing page {page_name} ({page_id})")
-        
-        # Subscribe the page to the webhook
-        subscribe_url = f'https://graph.facebook.com/v19.0/{page_id}/subscribed_apps'
-        subscribe_params = {
-            'access_token': page_access_token,
-            'subscribed_fields': 'leadgen'
-        }
-        
-        subscribe_response = requests.post(subscribe_url, params=subscribe_params)
-        subscribe_response.raise_for_status()
-        
-        # Log the successful subscription
-        logger.info(f"Successfully subscribed page {page_name} ({page_id}) to webhook")
-        
-        messages.success(request, f'Successfully connected to {page_name}')
-        return redirect('leads:dashboard')
-        
+            
+            subscribe_response = requests.post(subscribe_url, params=subscribe_params)
+            subscribe_response.raise_for_status()
+            
+            # Verify the page was actually saved
+            saved_connection = FacebookPageConnection.objects.filter(page_id=page_id, user=request.user).first()
+            if not saved_connection:
+                raise Exception("Page connection was not saved successfully")
+            
+            # Log the successful subscription
+            logger.info(f"Successfully subscribed page {page_name} ({page_id}) to webhook")
+            
+            messages.success(request, f'Successfully connected to {page_name}')
+            return redirect('leads:dashboard')
+            
+        except FacebookPageConnection.DoesNotExist:
+            logger.error(f"Failed to save page connection for page {page_id}")
+            messages.error(request, 'Failed to save page connection')
+            return redirect('leads:dashboard')
+            
     except requests.RequestException as e:
         logger.error(f"Error subscribing page to webhook: {str(e)}")
         messages.error(request, 'Error connecting to Facebook page')
