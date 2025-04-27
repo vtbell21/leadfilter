@@ -12,6 +12,7 @@ urlpatterns = [
     path('signup/', views.signup, name='signup'),
     path('facebook/connect/', views.facebook_connect, name='facebook_connect'),
     path('facebook/callback/', views.facebook_callback, name='facebook_callback'),
+    path('facebook/select-page/', views.select_facebook_page, name='select_facebook_page'),
     path('facebook/save-page/', views.save_facebook_page, name='save_facebook_page'),
     path('connected-pages/', views.connected_pages_view, name='connected_pages'),
     path('connected-pages/disconnect/<str:page_id>/', views.disconnect_page_view, name='disconnect_page'),

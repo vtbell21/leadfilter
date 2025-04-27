@@ -434,6 +434,22 @@ def facebook_callback(request):
         return redirect('leads:dashboard')
 
 @login_required
+def select_facebook_page(request):
+    """Display available Facebook pages for selection."""
+    # Get pages data from session
+    pages = request.session.get('facebook_pages', [])
+    
+    if not pages:
+        messages.error(request, 'No Facebook pages data found. Please try connecting again.')
+        return redirect('leads:dashboard')
+    
+    context = {
+        'pages': pages
+    }
+    
+    return render(request, 'leads/select_facebook_page.html', context)
+
+@login_required
 @require_http_methods(["POST"])
 def save_facebook_page(request):
     """Save the selected Facebook page and subscribe it to the webhook."""
