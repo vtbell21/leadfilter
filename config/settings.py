@@ -187,7 +187,7 @@ STRIPE_WEBHOOK_SECRET = env('STRIPE_WEBHOOK_SECRET', default=None)
 HUBSPOT_CLIENT_ID = os.environ.get('HUBSPOT_CLIENT_ID')
 HUBSPOT_CLIENT_SECRET = os.environ.get('HUBSPOT_CLIENT_SECRET')
 HUBSPOT_REDIRECT_URI = 'https://leadfilter-production.up.railway.app/hubspot/callback/'
-HUBSPOT_SCOPES = 'contacts%20oauth'
+HUBSPOT_SCOPES = 'crm.objects.contacts.read%20crm.objects.contacts.write%20oauth'
 
 # Whitenoise storage for static files
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
