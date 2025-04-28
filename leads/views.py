@@ -778,10 +778,11 @@ def integrations_view(request):
 
 @login_required
 def hubspot_connect(request):
+    # HubSpot OAuth URL with required scopes
     auth_url = (
-        f"https://app.hubspot.com/oauth/authorize"
+        "https://app.hubspot.com/oauth/authorize"
         f"?client_id={settings.HUBSPOT_CLIENT_ID}"
-        f"&scope={settings.HUBSPOT_SCOPES}"
+        f"&scope={settings.HUBSPOT_SCOPES}"  # Using pre-formatted scope string with URL-encoded spaces
         f"&redirect_uri={settings.HUBSPOT_REDIRECT_URI}"
     )
     return redirect(auth_url)
