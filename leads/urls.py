@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from leads.views_stripe import create_checkout_session
 
 app_name = 'leads'
 
@@ -22,4 +23,6 @@ urlpatterns = [
     path('leads/export/', views.export_clean_leads, name='export_clean_leads'),
     path('privacy/', views.privacy_policy, name='privacy_policy'),
     path('terms/', views.terms_of_service, name='terms_of_service'),
+    path('create-checkout-session/', create_checkout_session, name='create_checkout_session'),
+    path('pricing/', views.pricing_view, name='pricing'),
 ] 
