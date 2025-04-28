@@ -16,10 +16,15 @@ class UserProfile(models.Model):
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
         UserProfile.objects.create(user=instance)
+    else:
+        # If the user already exists, ensure they have a profile
+        UserProfile.objects.get_or_create(user=instance)
 
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
-    instance.profile.save()
+    # Get or create the profile before saving
+    profile, created = UserProfile.objects.get_or_create(user=instance)
+    profile.save()
 
 # Create your models here.
 
