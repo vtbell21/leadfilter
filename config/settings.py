@@ -24,6 +24,9 @@ env = environ.Env(
     FACEBOOK_APP_ID=(str, None),
     FACEBOOK_APP_SECRET=(str, None),
     OPENAI_API_KEY=(str, None),
+    STRIPE_SECRET_KEY=(str, None),
+    STRIPE_PUBLISHABLE_KEY=(str, None),
+    STRIPE_WEBHOOK_SECRET=(str, None),
 )
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -172,6 +175,11 @@ FACEBOOK_APP_SECRET = env('FACEBOOK_APP_SECRET')
 
 # OpenAI settings
 OPENAI_API_KEY = env('OPENAI_API_KEY')
+
+# Stripe settings
+STRIPE_SECRET_KEY = env('STRIPE_SECRET_KEY', default=None)
+STRIPE_PUBLISHABLE_KEY = env('STRIPE_PUBLISHABLE_KEY', default=None)
+STRIPE_WEBHOOK_SECRET = env('STRIPE_WEBHOOK_SECRET', default=None)
 
 # Whitenoise storage for static files
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
