@@ -27,6 +27,8 @@ env = environ.Env(
     STRIPE_SECRET_KEY=(str, None),
     STRIPE_PUBLISHABLE_KEY=(str, None),
     STRIPE_WEBHOOK_SECRET=(str, None),
+    HUBSPOT_CLIENT_ID=(str, None),
+    HUBSPOT_CLIENT_SECRET=(str, None),
 )
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -180,6 +182,11 @@ OPENAI_API_KEY = env('OPENAI_API_KEY')
 STRIPE_SECRET_KEY = env('STRIPE_SECRET_KEY', default=None)
 STRIPE_PUBLISHABLE_KEY = env('STRIPE_PUBLISHABLE_KEY', default=None)
 STRIPE_WEBHOOK_SECRET = env('STRIPE_WEBHOOK_SECRET', default=None)
+
+# HubSpot settings
+HUBSPOT_CLIENT_ID = env('HUBSPOT_CLIENT_ID')
+HUBSPOT_CLIENT_SECRET = env('HUBSPOT_CLIENT_SECRET')
+HUBSPOT_REDIRECT_URI = f"https://{ALLOWED_HOSTS[0]}/hubspot/callback/" if not DEBUG else "http://localhost:8001/hubspot/callback/"
 
 # Whitenoise storage for static files
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
