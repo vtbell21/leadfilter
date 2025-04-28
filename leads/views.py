@@ -781,6 +781,7 @@ def hubspot_connect(request):
     scopes = [
         "crm.objects.contacts.read",
         "crm.objects.contacts.write",
+        "oauth"
     ]
     scope_str = "%20".join(scopes)  # HubSpot expects scopes separated by %20 (space)
     
