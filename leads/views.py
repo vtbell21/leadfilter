@@ -765,3 +765,10 @@ def pricing_view(request):
         'stripe_publishable_key': settings.STRIPE_PUBLISHABLE_KEY
     }
     return render(request, 'leads/pricing.html', context)
+
+@login_required
+def integrations_view(request):
+    context = {
+        'hubspot_connected': bool(request.user.profile.hubspot_access_token),
+    }
+    return render(request, 'leads/integrations.html', context)

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Integrations</h2>
+
+    <div class="card mt-4">
+        <div class="card-body">
+            <h4>HubSpot</h4>
+            {% if hubspot_connected %}
+                <p>Status: <span class="text-success">Connected ✅</span></p>
+                <a href="#" class="btn btn-secondary disabled">Connected</a>
+            {% else %}
+                <p>Status: <span class="text-danger">Not Connected ❌</span></p>
+                <a href="{% url 'leads:hubspot_connect' %}" class="btn btn-primary">Connect HubSpot</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Future integrations can go below -->
+    <!-- Example:
+    <div class="card mt-4">
+        <div class="card-body">
+            <h4>Salesforce</h4>
+            <p>Status: Not Connected ❌</p>
+            <a href="#" class="btn btn-primary">Coming Soon</a>
+        </div>
+    </div>
+    -->
+
+</div>
+{% endblock %} 

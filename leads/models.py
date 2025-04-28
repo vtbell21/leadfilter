@@ -1,5 +1,14 @@
 from django.db import models
 from django.contrib.auth.models import User
+from .hubspot_utils import create_hubspot_contact
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    hubspot_access_token = models.TextField(blank=True, null=True)
+    hubspot_refresh_token = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.user.username}'s profile"
 
 # Create your models here.
 
@@ -24,6 +33,14 @@ class FacebookLead(models.Model):
 
     class Meta:
         ordering = ['-received_at']
+
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None
+        super().save(*args, **kwargs)
+        
+        # If this is a new lead and it's not spam, send to HubSpot
+        if is_new and not self.is_spam and self.user and hasattr(self.user, 'hubspot_access_token'):
+            create_hubspot_contact(self.user, self)
 
 class FacebookPageConnection(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='facebook_pages')
