@@ -11,7 +11,7 @@ import logging
 import requests
 from django.conf import settings
 import pprint
-from .models import FacebookLead, FacebookPageConnection
+from .models import FacebookLead, FacebookPageConnection, UserProfile
 from base64 import b64encode, b64decode
 from django.core.paginator import Paginator
 from urllib.parse import urlencode
@@ -768,7 +768,10 @@ def pricing_view(request):
 
 @login_required
 def integrations_view(request):
+    # Get or create the user's profile
+    profile, created = UserProfile.objects.get_or_create(user=request.user)
+    
     context = {
-        'hubspot_connected': bool(request.user.profile.hubspot_access_token),
+        'hubspot_connected': bool(profile.hubspot_access_token),
     }
     return render(request, 'leads/integrations.html', context)
