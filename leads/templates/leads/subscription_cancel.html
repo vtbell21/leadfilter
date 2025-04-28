@@ -1,0 +1,26 @@
+{% extends "leads/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <div class="card shadow-sm">
+                <div class="card-body p-5">
+                    <i class="bi bi-x-circle text-danger display-1 mb-4"></i>
+                    <h1 class="mb-4">Subscription Cancelled</h1>
+                    <p class="lead mb-4">The subscription process was cancelled. No charges have been made to your account.</p>
+                    <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
+                        <a href="{% url 'leads:pricing' %}" class="btn btn-primary btn-lg">
+                            Try Again
+                        </a>
+                        <a href="{% url 'leads:dashboard' %}" class="btn btn-outline-secondary btn-lg">
+                            Return to Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
