@@ -24,10 +24,17 @@ def create_hubspot_contact(user, lead):
 
 @login_required
 def hubspot_connect(request):
+    scopes = [
+        "crm.objects.contacts.read",
+        "crm.objects.contacts.write",
+        "oauth",
+    ]
+    scope_str = "%20".join(scopes)  # Join with %20 for URL
+
     auth_url = (
         f"https://app.hubspot.com/oauth/authorize"
         f"?client_id={settings.HUBSPOT_CLIENT_ID}"
-        f"&scope=crm.objects.contacts.write"
+        f"&scope={scope_str}"
         f"&redirect_uri={settings.HUBSPOT_REDIRECT_URI}"
     )
     return redirect(auth_url)
