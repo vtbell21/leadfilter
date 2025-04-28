@@ -778,11 +778,17 @@ def integrations_view(request):
 
 @login_required
 def hubspot_connect(request):
-    # HubSpot OAuth URL with required scopes
+    scopes = [
+        "crm.objects.contacts.read",
+        "crm.objects.contacts.write",
+        "oauth",  # IMPORTANT: include oauth scope
+    ]
+    scope_str = "%20".join(scopes)  # HubSpot expects scopes separated by %20 (space)
+
     auth_url = (
-        "https://app.hubspot.com/oauth/authorize"
+        f"https://app.hubspot.com/oauth/authorize"
         f"?client_id={settings.HUBSPOT_CLIENT_ID}"
-        f"&scope={settings.HUBSPOT_SCOPES}"  # Using pre-formatted scope string with URL-encoded spaces
+        f"&scope={scope_str}"
         f"&redirect_uri={settings.HUBSPOT_REDIRECT_URI}"
     )
     return redirect(auth_url)
