@@ -1,7 +1,7 @@
 from django.urls import path
 from . import views
 from leads.views_stripe import create_checkout_session
-from leads.views_hubspot import hubspot_connect, hubspot_callback
+from leads.views_hubspot import hubspot_connect, hubspot_callback, hubspot_connected_success
 from leads.views import integrations_view
 
 app_name = 'leads'
@@ -29,5 +29,6 @@ urlpatterns = [
     path('pricing/', views.pricing_view, name='pricing'),
     path('hubspot/connect/', hubspot_connect, name='hubspot_connect'),
     path('hubspot/callback/', hubspot_callback, name='hubspot_callback'),
+    path('hubspot/connected/', hubspot_connected_success, name='hubspot_connected_success'),
     path('integrations/', integrations_view, name='integrations'),
 ] 
