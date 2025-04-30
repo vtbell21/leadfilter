@@ -1,528 +1,486 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spam Guard</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <style>
-        .nav-tabs .nav-link {
-            color: #495057;
-        }
-        .nav-tabs .nav-link.active {
-            font-weight: bold;
-        }
-        .table th {
-            background-color: #f8f9fa;
-        }
-        .valid-icon {
-            color: #28a745;
-        }
-        .invalid-icon {
-            color: #dc3545;
-        }
-        .spam-row {
-            background-color: #fff3f3;
-        }
-        .spam-row:hover {
-            background-color: #ffe6e6;
-        }
-        .pagination {
-            margin-top: 20px;
-        }
-        .high-risk {
-            background-color: #ffebee !important;
-        }
-        .high-risk:hover {
-            background-color: #ffe0e3 !important;
-        }
-        .spam-badge {
-            font-size: 0.8em;
-            padding: 0.3em 0.6em;
-            margin-left: 0.5em;
-        }
-        .gpt-score {
-            font-weight: bold;
-        }
-        .gpt-reason {
-            font-size: 0.85em;
-            color: #666;
-            margin-top: 0.2em;
-        }
-        .message-text {
-            font-size: 0.9em;
-            color: #333;
-            white-space: pre-line;
-        }
-        .custom-fields {
-            font-size: 0.85em;
-            color: #666;
-            margin-top: 0.5em;
-        }
-        .custom-fields-toggle {
-            cursor: pointer;
-            color: #0d6efd;
-            text-decoration: underline;
-            font-size: 0.85em;
-        }
-        .custom-fields-content {
-            background-color: #f8f9fa;
-            padding: 0.5em;
-            border-radius: 4px;
-            margin-top: 0.3em;
-        }
-        .navbar {
-            margin-bottom: 20px;
-        }
-        .user-info {
-            margin-right: 15px;
-        }
-        .connect-btn {
-            margin-right: 15px;
-        }
-        .table-container {
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            padding: 20px;
-            margin-top: 20px;
-        }
-        .badge-spam {
-            background-color: #dc3545;
-            color: white;
-        }
-        .badge-valid {
-            background-color: #198754;
-            color: white;
-        }
-        .badge-invalid {
-            background-color: #6c757d;
-            color: white;
-        }
-        .table th {
-            background-color: #f8f9fa;
-            font-weight: 600;
-        }
-        .table td {
-            vertical-align: middle;
-        }
-        .lead-link {
-            color: #0d6efd;
-            text-decoration: none;
-        }
-        .lead-link:hover {
-            text-decoration: underline;
-        }
-        .download-btn {
-            margin-left: 10px;
-        }
-        .date-filters {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        .date-input {
-            width: 150px;
-        }
-        .footer-links {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.9);
-            text-align: center;
-            font-size: 0.8em;
-            border-top: 1px solid #eee;
-        }
-        .footer-links a {
-            color: #6c757d;
-            text-decoration: none;
-            margin: 0 10px;
-        }
-        .footer-links a:hover {
-            color: #0d6efd;
-            text-decoration: underline;
-        }
-        .facebook-status {
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .facebook-status .status-text {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .facebook-status .status-icon {
-            font-size: 1.2em;
-        }
-        .facebook-status .page-name {
-            font-weight: 500;
-        }
-        .facebook-status .disconnect-btn {
-            font-size: 0.9em;
-        }
-        .status-connected {
-            color: #198754;
-        }
-        .status-disconnected {
-            color: #dc3545;
-        }
-    </style>
-    <!-- Bootstrap JS and Popper.js for tooltips -->
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
-</head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="{% url 'leads:dashboard' %}">Spam Guard</a>
-            <div class="d-flex align-items-center">
-                <a href="{% url 'leads:facebook_connect' %}" class="btn btn-primary connect-btn">
-                    <i class="bi bi-facebook"></i> Connect Facebook
-                </a>
-                <span class="user-info">Welcome, {{ user.username }}</span>
-                <a href="{% url 'leads:logout' %}" class="btn btn-outline-danger">Logout</a>
-            </div>
-        </div>
-    </nav>
+{% extends "leads/base.html" %}
+{% load static %}
 
-    <div class="container-fluid py-4">
-        <h1 class="mb-4">Spam Guard</h1>
-        
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endfor %}
-        {% endif %}
-        
-        <!-- Facebook Connection Status -->
-        <div class="facebook-status">
-            {% if facebook_page %}
-                <div class="status-text">
-                    <span class="status-icon status-connected">✅</span>
-                    <span>Connected to <span class="page-name">{{ facebook_page.page_name }}</span></span>
-                </div>
-                <form action="{% url 'leads:disconnect_page' facebook_page.page_id %}" method="post" style="display: inline;">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-outline-danger btn-sm disconnect-btn" 
-                            onclick="return confirm('Are you sure you want to disconnect this Facebook Page? This will stop receiving new leads from this page.')">
-                        Disconnect Page
-                    </button>
-                </form>
-            {% else %}
-                <div class="status-text">
-                    <span class="status-icon status-disconnected">❌</span>
-                    <span>No Facebook Page connected</span>
-                </div>
-                <a href="{% url 'leads:facebook_connect' %}" class="btn btn-primary btn-sm">
-                    Connect Facebook Page
-                </a>
-            {% endif %}
-        </div>
-        
-        <!-- Stats Cards -->
-        <div class="row mb-4">
-            <div class="col-md-3">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Total Leads</h5>
-                        <p class="card-text display-6">{{ total_leads }}</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Valid Leads</h5>
-                        <p class="card-text display-6">{{ valid_count }}</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Spam Leads</h5>
-                        <p class="card-text display-6">{{ spam_count }}</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Spam Rate</h5>
-                        <p class="card-text display-6">
-                            {{ spam_rate }}%
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Tabs Navigation -->
-        <ul class="nav nav-tabs mb-4" id="leadsTab" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="valid-tab" data-bs-toggle="tab" data-bs-target="#valid" type="button" role="tab">
-                    Valid Leads ({{ valid_count }})
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="spam-tab" data-bs-toggle="tab" data-bs-target="#spam" type="button" role="tab">
-                    Spam Leads ({{ spam_count }})
-                </button>
-            </li>
-            <li class="nav-item">
-                <a href="{% url 'leads:integrations' %}" class="nav-link">
-                    <i class="bi bi-gear"></i> Integrations
-                </a>
-            </li>
-        </ul>
-
-        <!-- Tab Content -->
-        <div class="tab-content" id="leadsTabContent">
-            <!-- Valid Leads Tab -->
-            <div class="tab-pane fade show active" id="valid" role="tabpanel">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h3 class="h5 mb-0">Valid Leads</h3>
-                    <div class="date-filters">
-                        <input type="text" class="form-control date-input" id="startDate" placeholder="Start Date">
-                        <input type="text" class="form-control date-input" id="endDate" placeholder="End Date">
-                        <a href="#" class="btn btn-success download-btn" id="exportBtn">
-                            <i class="bi bi-download"></i> Download Valid Leads (CSV)
-                        </a>
-                    </div>
-                </div>
-                <div class="table-container">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Phone</th>
-                                <th>Score</th>
-                                <th>Received</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for lead in valid_leads %}
-                                <tr>
-                                    <td>
-                                        <a href="{% url 'leads:lead_detail' lead.pk %}" class="lead-link">
-                                            {{ lead.full_name }}
-                                        </a>
-                                    </td>
-                                    <td>
-                                        {{ lead.email }}
-                                        {% if lead.is_valid_email %}
-                                            <span class="badge badge-valid">Valid</span>
-                                        {% else %}
-                                            <span class="badge badge-invalid">Invalid</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {{ lead.phone }}
-                                        {% if lead.is_valid_phone %}
-                                            <span class="badge badge-valid">Valid</span>
-                                        {% else %}
-                                            <span class="badge badge-invalid">Invalid</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        <span class="gpt-score">{{ lead.gpt_score|floatformat:2 }}</span>
-                                        {% if lead.gpt_reason %}
-                                            <div class="gpt-reason">{{ lead.gpt_reason }}</div>
-                                        {% endif %}
-                                    </td>
-                                    <td>{{ lead.received_at|date:"M j, Y" }}</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                    
-                    <!-- Pagination for Valid Leads -->
-                    {% if valid_leads.has_other_pages %}
-                        <nav aria-label="Valid leads pagination">
-                            <ul class="pagination justify-content-center">
-                                {% if valid_leads.has_previous %}
-                                    <li class="page-item">
-                                        <a class="page-link" href="?valid_page={{ valid_leads.previous_page_number }}&spam_page={{ spam_leads.number }}">Previous</a>
-                                    </li>
-                                {% endif %}
-                                
-                                {% for num in valid_leads.paginator.page_range %}
-                                    <li class="page-item {% if valid_leads.number == num %}active{% endif %}">
-                                        <a class="page-link" href="?valid_page={{ num }}&spam_page={{ spam_leads.number }}">{{ num }}</a>
-                                    </li>
-                                {% endfor %}
-                                
-                                {% if valid_leads.has_next %}
-                                    <li class="page-item">
-                                        <a class="page-link" href="?valid_page={{ valid_leads.next_page_number }}&spam_page={{ spam_leads.number }}">Next</a>
-                                    </li>
-                                {% endif %}
-                            </ul>
-                        </nav>
-                    {% endif %}
-                </div>
-            </div>
-
-            <!-- Spam Leads Tab -->
-            <div class="tab-pane fade" id="spam" role="tabpanel">
-                <div class="table-container">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Phone</th>
-                                <th>Score</th>
-                                <th>Received</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for lead in spam_leads %}
-                                <tr class="{% if lead.gpt_score > 0.7 %}high-risk{% endif %}">
-                                    <td>
-                                        <a href="{% url 'leads:lead_detail' lead.pk %}" class="lead-link">
-                                            {{ lead.full_name }}
-                                        </a>
-                                    </td>
-                                    <td>
-                                        {{ lead.email }}
-                                        {% if lead.is_valid_email %}
-                                            <span class="badge badge-valid">Valid</span>
-                                        {% else %}
-                                            <span class="badge badge-invalid">Invalid</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {{ lead.phone }}
-                                        {% if lead.is_valid_phone %}
-                                            <span class="badge badge-valid">Valid</span>
-                                        {% else %}
-                                            <span class="badge badge-invalid">Invalid</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        <span class="gpt-score">{{ lead.gpt_score|floatformat:2 }}</span>
-                                        {% if lead.gpt_reason %}
-                                            <div class="gpt-reason">{{ lead.gpt_reason }}</div>
-                                        {% endif %}
-                                    </td>
-                                    <td>{{ lead.received_at|date:"M j, Y" }}</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                    
-                    <!-- Pagination for Spam Leads -->
-                    {% if spam_leads.has_other_pages %}
-                        <nav aria-label="Spam leads pagination">
-                            <ul class="pagination justify-content-center">
-                                {% if spam_leads.has_previous %}
-                                    <li class="page-item">
-                                        <a class="page-link" href="?valid_page={{ valid_leads.number }}&spam_page={{ spam_leads.previous_page_number }}">Previous</a>
-                                    </li>
-                                {% endif %}
-                                
-                                {% for num in spam_leads.paginator.page_range %}
-                                    <li class="page-item {% if spam_leads.number == num %}active{% endif %}">
-                                        <a class="page-link" href="?valid_page={{ valid_leads.number }}&spam_page={{ num }}">{{ num }}</a>
-                                    </li>
-                                {% endfor %}
-                                
-                                {% if spam_leads.has_next %}
-                                    <li class="page-item">
-                                        <a class="page-link" href="?valid_page={{ valid_leads.number }}&spam_page={{ spam_leads.next_page_number }}">Next</a>
-                                    </li>
-                                {% endif %}
-                            </ul>
-                        </nav>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Footer Links -->
-    <div class="footer-links">
-        <a href="{% url 'leads:privacy_policy' %}">Privacy Policy</a>
-        <a href="{% url 'leads:terms_of_service' %}">Terms of Service</a>
-    </div>
-
-    <!-- Initialize tooltips -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            try {
-                var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-                var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-                    return new bootstrap.Tooltip(tooltipTriggerEl)
-                })
-            } catch (error) {
-                console.error('Error initializing tooltips:', error);
-            }
-        });
-    </script>
-
-    <!-- Load Bootstrap and Flatpickr -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+{% block content %}
+<div class="container-fluid py-4">
+    <h1 class="mb-4">Spam Guard Dashboard</h1>
     
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            try {
-                // Initialize date pickers
-                if (document.getElementById('startDate')) {
-                    flatpickr("#startDate", {
-                        dateFormat: "Y-m-d",
-                        allowInput: true
-                    });
-                }
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+    
+    <!-- Facebook Connection Status -->
+    <div class="facebook-status">
+        {% if facebook_page %}
+            <div class="status-text">
+                <span class="status-icon status-connected">✅</span>
+                <span>Connected to <span class="page-name">{{ facebook_page.page_name }}</span></span>
+            </div>
+            <form action="{% url 'leads:disconnect_page' facebook_page.page_id %}" method="post" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-danger btn-sm disconnect-btn" 
+                        onclick="return confirm('Are you sure you want to disconnect this Facebook Page? This will stop receiving new leads from this page.')">
+                    Disconnect Page
+                </button>
+            </form>
+        {% else %}
+            <div class="status-text">
+                <span class="status-icon status-disconnected">❌</span>
+                <span>No Facebook Page connected</span>
+            </div>
+            <a href="{% url 'leads:facebook_connect' %}" class="btn btn-primary btn-sm">
+                Connect Facebook Page
+            </a>
+        {% endif %}
+    </div>
+    
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Total Leads</h5>
+                    <p class="card-text display-6">{{ total_leads }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Valid Leads</h5>
+                    <p class="card-text display-6">{{ valid_count }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Spam Leads</h5>
+                    <p class="card-text display-6">{{ spam_count }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Spam Rate</h5>
+                    <p class="card-text display-6">
+                        {{ spam_rate }}%
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs Navigation -->
+    <ul class="nav nav-tabs mb-4" id="leadsTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="valid-tab" data-bs-toggle="tab" data-bs-target="#valid" type="button" role="tab">
+                Valid Leads ({{ valid_count }})
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="spam-tab" data-bs-toggle="tab" data-bs-target="#spam" type="button" role="tab">
+                Spam Leads ({{ spam_count }})
+            </button>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'leads:integrations' %}" class="nav-link">
+                <i class="bi bi-gear"></i> Integrations
+            </a>
+        </li>
+    </ul>
+
+    <!-- Tab Content -->
+    <div class="tab-content" id="leadsTabContent">
+        <!-- Valid Leads Tab -->
+        <div class="tab-pane fade show active" id="valid" role="tabpanel">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3 class="h5 mb-0">Valid Leads</h3>
+                <div class="date-filters">
+                    <input type="text" class="form-control date-input" id="startDate" placeholder="Start Date">
+                    <input type="text" class="form-control date-input" id="endDate" placeholder="End Date">
+                    <a href="#" class="btn btn-success download-btn" id="exportBtn">
+                        <i class="bi bi-download"></i> Download Valid Leads (CSV)
+                    </a>
+                </div>
+            </div>
+            <div class="table-container">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Score</th>
+                            <th>Received</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for lead in valid_leads %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'leads:lead_detail' lead.pk %}" class="lead-link">
+                                        {{ lead.full_name }}
+                                    </a>
+                                </td>
+                                <td>
+                                    {{ lead.email }}
+                                    {% if lead.is_valid_email %}
+                                        <span class="badge badge-valid">Valid</span>
+                                    {% else %}
+                                        <span class="badge badge-invalid">Invalid</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {{ lead.phone }}
+                                    {% if lead.is_valid_phone %}
+                                        <span class="badge badge-valid">Valid</span>
+                                    {% else %}
+                                        <span class="badge badge-invalid">Invalid</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="gpt-score">{{ lead.gpt_score|floatformat:2 }}</span>
+                                    {% if lead.gpt_reason %}
+                                        <div class="gpt-reason">{{ lead.gpt_reason }}</div>
+                                    {% endif %}
+                                </td>
+                                <td>{{ lead.received_at|date:"M j, Y" }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
                 
-                if (document.getElementById('endDate')) {
-                    flatpickr("#endDate", {
-                        dateFormat: "Y-m-d",
-                        allowInput: true
-                    });
-                }
+                <!-- Pagination for Valid Leads -->
+                {% if valid_leads.has_other_pages %}
+                    <nav aria-label="Valid leads pagination">
+                        <ul class="pagination justify-content-center">
+                            {% if valid_leads.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?valid_page={{ valid_leads.previous_page_number }}&spam_page={{ spam_leads.number }}">Previous</a>
+                                </li>
+                            {% endif %}
+                            
+                            {% for num in valid_leads.paginator.page_range %}
+                                <li class="page-item {% if valid_leads.number == num %}active{% endif %}">
+                                    <a class="page-link" href="?valid_page={{ num }}&spam_page={{ spam_leads.number }}">{{ num }}</a>
+                                </li>
+                            {% endfor %}
+                            
+                            {% if valid_leads.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?valid_page={{ valid_leads.next_page_number }}&spam_page={{ spam_leads.number }}">Next</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Spam Leads Tab -->
+        <div class="tab-pane fade" id="spam" role="tabpanel">
+            <div class="table-container">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Score</th>
+                            <th>Received</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for lead in spam_leads %}
+                            <tr class="{% if lead.gpt_score > 0.7 %}high-risk{% endif %}">
+                                <td>
+                                    <a href="{% url 'leads:lead_detail' lead.pk %}" class="lead-link">
+                                        {{ lead.full_name }}
+                                    </a>
+                                </td>
+                                <td>
+                                    {{ lead.email }}
+                                    {% if lead.is_valid_email %}
+                                        <span class="badge badge-valid">Valid</span>
+                                    {% else %}
+                                        <span class="badge badge-invalid">Invalid</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {{ lead.phone }}
+                                    {% if lead.is_valid_phone %}
+                                        <span class="badge badge-valid">Valid</span>
+                                    {% else %}
+                                        <span class="badge badge-invalid">Invalid</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="gpt-score">{{ lead.gpt_score|floatformat:2 }}</span>
+                                    {% if lead.gpt_reason %}
+                                        <div class="gpt-reason">{{ lead.gpt_reason }}</div>
+                                    {% endif %}
+                                </td>
+                                <td>{{ lead.received_at|date:"M j, Y" }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
                 
-                // Handle export button click
-                const exportBtn = document.getElementById('exportBtn');
-                if (exportBtn) {
-                    exportBtn.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        const startDate = document.getElementById('startDate')?.value || '';
-                        const endDate = document.getElementById('endDate')?.value || '';
-                        
-                        let url = "{% url 'leads:export_clean_leads' %}";
-                        const params = new URLSearchParams();
-                        
-                        if (startDate) params.append('start_date', startDate);
-                        if (endDate) params.append('end_date', endDate);
-                        
-                        if (params.toString()) {
-                            url += '?' + params.toString();
-                        }
-                        
-                        window.location.href = url;
-                    });
-                }
-            } catch (error) {
-                console.error('Error initializing dashboard:', error);
+                <!-- Pagination for Spam Leads -->
+                {% if spam_leads.has_other_pages %}
+                    <nav aria-label="Spam leads pagination">
+                        <ul class="pagination justify-content-center">
+                            {% if spam_leads.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?valid_page={{ valid_leads.number }}&spam_page={{ spam_leads.previous_page_number }}">Previous</a>
+                                </li>
+                            {% endif %}
+                            
+                            {% for num in spam_leads.paginator.page_range %}
+                                <li class="page-item {% if spam_leads.number == num %}active{% endif %}">
+                                    <a class="page-link" href="?valid_page={{ valid_leads.number }}&spam_page={{ num }}">{{ num }}</a>
+                                </li>
+                            {% endfor %}
+                            
+                            {% if spam_leads.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?valid_page={{ valid_leads.number }}&spam_page={{ spam_leads.next_page_number }}">Next</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<style>
+    .nav-tabs .nav-link {
+        color: #495057;
+    }
+    .nav-tabs .nav-link.active {
+        font-weight: bold;
+    }
+    .table th {
+        background-color: #f8f9fa;
+    }
+    .valid-icon {
+        color: #28a745;
+    }
+    .invalid-icon {
+        color: #dc3545;
+    }
+    .spam-row {
+        background-color: #fff3f3;
+    }
+    .spam-row:hover {
+        background-color: #ffe6e6;
+    }
+    .pagination {
+        margin-top: 20px;
+    }
+    .high-risk {
+        background-color: #ffebee !important;
+    }
+    .high-risk:hover {
+        background-color: #ffe0e3 !important;
+    }
+    .spam-badge {
+        font-size: 0.8em;
+        padding: 0.3em 0.6em;
+        margin-left: 0.5em;
+    }
+    .gpt-score {
+        font-weight: bold;
+    }
+    .gpt-reason {
+        font-size: 0.85em;
+        color: #666;
+        margin-top: 0.2em;
+    }
+    .message-text {
+        font-size: 0.9em;
+        color: #333;
+        white-space: pre-line;
+    }
+    .custom-fields {
+        font-size: 0.85em;
+        color: #666;
+        margin-top: 0.5em;
+    }
+    .custom-fields-toggle {
+        cursor: pointer;
+        color: #0d6efd;
+        text-decoration: underline;
+        font-size: 0.85em;
+    }
+    .custom-fields-content {
+        background-color: #f8f9fa;
+        padding: 0.5em;
+        border-radius: 4px;
+        margin-top: 0.3em;
+    }
+    .navbar {
+        margin-bottom: 20px;
+    }
+    .user-info {
+        margin-right: 15px;
+    }
+    .connect-btn {
+        margin-right: 15px;
+    }
+    .table-container {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        padding: 20px;
+        margin-top: 20px;
+    }
+    .badge-spam {
+        background-color: #dc3545;
+        color: white;
+    }
+    .badge-valid {
+        background-color: #198754;
+        color: white;
+    }
+    .badge-invalid {
+        background-color: #6c757d;
+        color: white;
+    }
+    .table th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+    }
+    .table td {
+        vertical-align: middle;
+    }
+    .lead-link {
+        color: #0d6efd;
+        text-decoration: none;
+    }
+    .lead-link:hover {
+        text-decoration: underline;
+    }
+    .download-btn {
+        margin-left: 10px;
+    }
+    .date-filters {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+    .date-input {
+        width: 150px;
+    }
+    .footer-links {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 10px;
+        background: rgba(255, 255, 255, 0.9);
+        text-align: center;
+        font-size: 0.8em;
+        border-top: 1px solid #eee;
+    }
+    .footer-links a {
+        color: #6c757d;
+        text-decoration: none;
+        margin: 0 10px;
+    }
+    .footer-links a:hover {
+        color: #0d6efd;
+        text-decoration: underline;
+    }
+    .facebook-status {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .facebook-status .status-text {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .facebook-status .status-icon {
+        font-size: 1.2em;
+    }
+    .facebook-status .page-name {
+        font-weight: 500;
+    }
+    .facebook-status .disconnect-btn {
+        font-size: 0.9em;
+    }
+    .status-connected {
+        color: #198754;
+    }
+    .status-disconnected {
+        color: #dc3545;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        try {
+            // Initialize date pickers
+            if (document.getElementById('startDate')) {
+                flatpickr("#startDate", {
+                    dateFormat: "Y-m-d",
+                    allowInput: true
+                });
             }
-        });
-    </script>
-</body>
-</html> 
+            
+            if (document.getElementById('endDate')) {
+                flatpickr("#endDate", {
+                    dateFormat: "Y-m-d",
+                    allowInput: true
+                });
+            }
+            
+            // Handle export button click
+            const exportBtn = document.getElementById('exportBtn');
+            if (exportBtn) {
+                exportBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const startDate = document.getElementById('startDate')?.value || '';
+                    const endDate = document.getElementById('endDate')?.value || '';
+                    
+                    let url = "{% url 'leads:export_clean_leads' %}";
+                    const params = new URLSearchParams();
+                    
+                    if (startDate) params.append('start_date', startDate);
+                    if (endDate) params.append('end_date', endDate);
+                    
+                    if (params.toString()) {
+                        url += '?' + params.toString();
+                    }
+                    
+                    window.location.href = url;
+                });
+            }
+        } catch (error) {
+            console.error('Error initializing dashboard:', error);
+        }
+    });
+</script>
+{% endblock %} 
