@@ -792,3 +792,6 @@ def hubspot_connect(request):
         f"&redirect_uri={settings.HUBSPOT_REDIRECT_URI}"
     )
     return redirect(auth_url)
+
+def about_view(request):
+    return render(request, 'leads/about.html')

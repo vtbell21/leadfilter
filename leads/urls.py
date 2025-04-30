@@ -25,6 +25,7 @@ urlpatterns = [
     path('leads/export/', views.export_clean_leads, name='export_clean_leads'),
     path('privacy/', views.privacy_policy, name='privacy_policy'),
     path('terms/', views.terms_of_service, name='terms_of_service'),
+    path('about/', views.about_view, name='about'),
     path('create-checkout-session/', create_checkout_session, name='create_checkout_session'),
     path('subscription/success/', subscription_success, name='subscription_success'),
     path('subscription/cancel/', subscription_cancel, name='subscription_cancel'),

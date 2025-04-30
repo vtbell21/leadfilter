@@ -1,0 +1,66 @@
+{% extends "leads/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body p-5">
+                    <h1 class="text-center mb-4">About Spam Guard</h1>
+                    
+                    <div class="mb-5">
+                        <h2 class="h4 mb-3">Our Mission</h2>
+                        <p class="lead">
+                            Spam Guard is dedicated to helping businesses protect their Facebook lead generation from spam and invalid submissions. 
+                            Our intelligent filtering system ensures that you only receive genuine, high-quality leads while automatically filtering out spam.
+                        </p>
+                    </div>
+
+                    <div class="mb-5">
+                        <h2 class="h4 mb-3">What We Do</h2>
+                        <ul class="list-unstyled">
+                            <li class="mb-3">
+                                <i class="bi bi-shield-check text-success me-2"></i>
+                                Advanced spam detection for Facebook leads
+                            </li>
+                            <li class="mb-3">
+                                <i class="bi bi-graph-up text-success me-2"></i>
+                                Real-time lead quality scoring
+                            </li>
+                            <li class="mb-3">
+                                <i class="bi bi-gear text-success me-2"></i>
+                                Integration with popular CRM platforms
+                            </li>
+                            <li class="mb-3">
+                                <i class="bi bi-clock text-success me-2"></i>
+                                24/7 automated lead filtering
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="mb-5">
+                        <h2 class="h4 mb-3">Contact Information</h2>
+                        <div class="d-flex flex-column gap-2">
+                            <div>
+                                <i class="bi bi-telephone me-2"></i>
+                                <a href="tel:971-272-2529" class="text-decoration-none">971-272-2529</a>
+                            </div>
+                            <div>
+                                <i class="bi bi-envelope me-2"></i>
+                                <a href="mailto:vtbell21@gmail.com" class="text-decoration-none">vtbell21@gmail.com</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-5">
+                        <a href="{% url 'leads:signup' %}" class="btn btn-primary btn-lg">
+                            Get Started
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
