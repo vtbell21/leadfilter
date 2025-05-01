@@ -48,6 +48,8 @@ ALLOWED_HOSTS = [
     '.railway.app',
     'localhost',
     '127.0.0.1',
+    'spamgaurd.com',
+    'www.spamgaurd.com',
 ]
 
 # CSRF settings for secure requests
