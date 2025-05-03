@@ -21,6 +21,7 @@ from django.utils.dateparse import parse_date
 import os
 from leads.services.gpt import score_lead_with_gpt
 from google_auth_oauthlib.flow import Flow
+from google.oauth2.credentials import Credentials
 
 logger = logging.getLogger(__name__)
 
@@ -818,3 +819,33 @@ def gmail_oauth_start(request):
     )
     request.session['oauth_state'] = state
     return redirect(authorization_url)
+
+def gmail_oauth_callback(request):
+    # Path to your client_secret.json file
+    client_secrets_file = os.path.join(os.path.dirname(__file__), 'client_secret.json')
+    state = request.session.get('oauth_state')
+    if not state:
+        return HttpResponse("Missing OAuth state.", status=400)
+
+    flow = Flow.from_client_secrets_file(
+        client_secrets_file=client_secrets_file,
+        scopes=['https://www.googleapis.com/auth/gmail.modify'],
+        state=state,
+        redirect_uri='https://spamguardai.com/gmail/oauth/callback'
+    )
+
+    # Build the full URL the user was redirected to
+    authorization_response = request.build_absolute_uri()
+    try:
+        flow.fetch_token(authorization_response=authorization_response)
+        credentials = flow.credentials
+        # Save credentials securely (here, as a file per user for demo; use DB in production)
+        user_id = request.user.id if request.user.is_authenticated else 'anon'
+        cred_path = os.path.join(os.path.dirname(__file__), f'gmail_token_{user_id}.json')
+        with open(cred_path, 'w') as token:
+            token.write(credentials.to_json())
+        messages.success(request, 'Gmail account connected successfully!')
+    except Exception as e:
+        logger.error(f"Error completing Gmail OAuth: {str(e)}")
+        messages.error(request, f'Gmail connection failed: {str(e)}')
+    return redirect('leads:dashboard')
