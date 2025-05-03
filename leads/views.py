@@ -22,7 +22,7 @@ import os
 from leads.services.gpt import score_lead_with_gpt
 from google_auth_oauthlib.flow import Flow
 from google.oauth2.credentials import Credentials
-from .forms import LeadRoutingSettingsForm
+from .forms import LeadRoutingSettingsForm, CustomUserCreationForm
 from leads.services.gmail import send_gmail_message
 
 logger = logging.getLogger(__name__)
@@ -269,14 +269,14 @@ def facebook_webhook(request):
 
 def signup(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
             login(request, user)
             messages.success(request, 'Account created successfully!')
             return redirect('leads:dashboard')
     else:
-        form = UserCreationForm()
+        form = CustomUserCreationForm()
     return render(request, 'leads/signup.html', {'form': form})
 
 def login_view(request):
