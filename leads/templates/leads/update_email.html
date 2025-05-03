@@ -1,0 +1,16 @@
+{% extends "leads/base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Update Email Address</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <div class="mb-3">
+            {{ form.email.label_tag }}
+            {{ form.email }}
+            {{ form.email.errors }}
+        </div>
+        <button type="submit" class="btn btn-primary">Update Email</button>
+    </form>
+</div>
+{% endblock %} 

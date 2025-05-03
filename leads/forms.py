@@ -26,4 +26,12 @@ class CustomUserCreationForm(UserCreationForm):
         user.email = self.cleaned_data["email"]
         if commit:
             user.save()
-        return user 
+        return user
+
+class EmailUpdateForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ["email"]
+        widgets = {
+            "email": forms.EmailInput(attrs={"class": "form-control"}),
+        } 

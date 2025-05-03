@@ -22,7 +22,7 @@ import os
 from leads.services.gpt import score_lead_with_gpt
 from google_auth_oauthlib.flow import Flow
 from google.oauth2.credentials import Credentials
-from .forms import LeadRoutingSettingsForm, CustomUserCreationForm
+from .forms import LeadRoutingSettingsForm, CustomUserCreationForm, EmailUpdateForm
 from leads.services.gmail import send_gmail_message
 
 logger = logging.getLogger(__name__)
@@ -894,3 +894,15 @@ def lead_routing_settings_view(request):
     else:
         form = LeadRoutingSettingsForm(instance=settings)
     return render(request, 'leads/lead_routing_settings.html', {'form': form})
+
+@login_required
+def update_email_view(request):
+    if request.method == 'POST':
+        form = EmailUpdateForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Email updated successfully!')
+            return redirect('leads:update_email')
+    else:
+        form = EmailUpdateForm(instance=request.user)
+    return render(request, 'leads/update_email.html', {'form': form})
