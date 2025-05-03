@@ -795,3 +795,7 @@ def hubspot_connect(request):
 
 def about_view(request):
     return render(request, 'leads/about.html')
+
+def gmail_callback(request):
+    # Placeholder for handling Gmail OAuth callback
+    return HttpResponse("Gmail OAuth callback received.")

@@ -34,4 +34,5 @@ urlpatterns = [
     path('hubspot/callback/', hubspot_callback, name='hubspot_callback'),
     path('hubspot/connected/', hubspot_connected_success, name='hubspot_connected_success'),
     path('integrations/', integrations_view, name='integrations'),
+    path('gmail/callback/', views.gmail_callback, name='gmail_callback'),
 ] 
