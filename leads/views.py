@@ -227,14 +227,15 @@ def facebook_webhook(request):
                     routing_settings = LeadRoutingSettings.objects.get(user=page_connection.user)
                     if routing_settings.send_to_gmail:
                         to_email = page_connection.user.email
-                        subject = f"New Facebook Lead: {'SPAM' if score_result['is_spam'] else 'Valid'}"
+                        subject = routing_settings.spam_lead_subject if score_result['is_spam'] else routing_settings.good_lead_subject
                         body_text = f"Lead details:\n\n" + "\n".join(f"{k}: {v}" for k, v in field_dict.items())
                         send_gmail_message(
                             page_connection.user,
                             to_email,
                             subject,
                             body_text,
-                            is_spam=(score_result['is_spam'] and routing_settings.spam_labeling_enabled)
+                            is_spam=(score_result['is_spam'] and routing_settings.spam_labeling_enabled),
+                            lead_details=field_dict
                         )
                 except LeadRoutingSettings.DoesNotExist:
                     pass

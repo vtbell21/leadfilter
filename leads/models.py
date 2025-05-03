@@ -72,3 +72,29 @@ class FacebookPageConnection(models.Model):
         ordering = ['-connected_at']
         verbose_name = 'Facebook Page Connection'
         verbose_name_plural = 'Facebook Page Connections'
+
+class GmailCredentials(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='gmail_credentials')
+    token = models.TextField()
+    refresh_token = models.TextField()
+    token_uri = models.CharField(max_length=255)
+    client_id = models.CharField(max_length=255)
+    client_secret = models.CharField(max_length=255)
+    scopes = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"GmailCredentials for {self.user.username}"
+
+class LeadRoutingSettings(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='lead_routing_settings')
+    send_to_gmail = models.BooleanField(default=False)
+    spam_labeling_enabled = models.BooleanField(default=True)
+    good_lead_subject = models.CharField(max_length=100, default="New Lead")
+    spam_lead_subject = models.CharField(max_length=100, default="Spam Lead")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"LeadRoutingSettings for {self.user.username}"
