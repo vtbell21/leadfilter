@@ -23,6 +23,7 @@ from leads.services.gpt import score_lead_with_gpt
 from google_auth_oauthlib.flow import Flow
 from google.oauth2.credentials import Credentials
 from .forms import LeadRoutingSettingsForm
+from leads.services.gmail import send_gmail_message
 
 logger = logging.getLogger(__name__)
 
@@ -220,6 +221,23 @@ def facebook_webhook(request):
                 phone = field_dict.get('phone', '')
                 is_valid_email = validate_email_zb(email) if email else False
                 is_valid_phone = validate_phone_twilio(phone) if phone else False
+                
+                # Check user lead routing settings
+                try:
+                    routing_settings = LeadRoutingSettings.objects.get(user=page_connection.user)
+                    if routing_settings.send_to_gmail:
+                        to_email = page_connection.user.email
+                        subject = f"New Facebook Lead: {'SPAM' if score_result['is_spam'] else 'Valid'}"
+                        body_text = f"Lead details:\n\n" + "\n".join(f"{k}: {v}" for k, v in field_dict.items())
+                        send_gmail_message(
+                            page_connection.user,
+                            to_email,
+                            subject,
+                            body_text,
+                            is_spam=(score_result['is_spam'] and routing_settings.spam_labeling_enabled)
+                        )
+                except LeadRoutingSettings.DoesNotExist:
+                    pass
                 
                 # Create and save the lead with GPT results
                 FacebookLead.objects.create(
