@@ -19,6 +19,7 @@ import csv
 from datetime import datetime
 from django.utils.dateparse import parse_date
 import os
+from leads.services.gpt import score_lead_with_gpt
 
 logger = logging.getLogger(__name__)
 
@@ -72,8 +73,6 @@ def score_lead(lead_data):
                 field_dict[field_name] = value  # Include in field_dict for GPT scoring
     
     try:
-        from services.gpt import score_lead_with_gpt
-        
         # Get GPT scoring result
         gpt_result = score_lead_with_gpt(field_dict)  # Pass all fields for scoring
         gpt_score = float(gpt_result['score'])
