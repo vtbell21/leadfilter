@@ -170,7 +170,7 @@ def facebook_webhook(request):
         verify_token = request.GET.get('hub.verify_token')
         challenge = request.GET.get('hub.challenge')
         
-        if mode == 'subscribe' and verify_token == "leadfilter123":
+        if mode == 'subscribe' and verify_token == "spamguard123":
             return HttpResponse(challenge, content_type='text/plain', status=200)
         else:
             return HttpResponse("Invalid verification token", status=403)
