@@ -4,7 +4,7 @@ from googleapiclient.discovery import build
 from google.oauth2.credentials import Credentials
 from leads.models import GmailCredentials
 
-def send_gmail_message(user, to_email, subject, body_text):
+def send_gmail_message(user, to_email, subject, body_text, is_spam=False):
     # 1. Load credentials from the database
     try:
         creds_obj = GmailCredentials.objects.filter(user=user).first()
@@ -33,9 +33,39 @@ def send_gmail_message(user, to_email, subject, body_text):
 
     # 4. Send the message via Gmail API
     service = build('gmail', 'v1', credentials=creds)
+
+    label_ids = []
+    if is_spam:
+        # Check if the label exists
+        label_name = "SpamGuard-Spam"
+        labels = service.users().labels().list(userId='me').execute().get('labels', [])
+        label_id = None
+        for label in labels:
+            if label['name'] == label_name:
+                label_id = label['id']
+                break
+        if not label_id:
+            # Create the label
+            label_obj = {
+                'name': label_name,
+                'labelListVisibility': 'labelShow',
+                'messageListVisibility': 'show',
+                'color': {
+                    'backgroundColor': '#ff0000',
+                    'textColor': '#ffffff'
+                }
+            }
+            created_label = service.users().labels().create(userId='me', body=label_obj).execute()
+            label_id = created_label['id']
+        label_ids.append(label_id)
+
+    send_body = {'raw': raw_message}
+    if label_ids:
+        send_body['labelIds'] = label_ids
+
     send_result = service.users().messages().send(
         userId='me',
-        body={'raw': raw_message}
+        body=send_body
     ).execute()
 
     return send_result 
