@@ -176,14 +176,15 @@ def facebook_webhook(request):
             return HttpResponse("Invalid verification token", status=403)
     
     elif request.method == "POST":
-        # Print the raw request body for debugging
-        print("\n=== Raw Request Body ===")
-        pprint.pprint(request.body.decode())
-        print("=======================\n")
+        # Log the raw request body
+        raw_body = request.body.decode('utf-8')
+        logger.info("=== Facebook Webhook POST Request ===")
+        logger.info(f"Raw request body: {raw_body}")
+        logger.info("===================================")
         
         try:
             # Parse the webhook payload
-            body = json.loads(request.body)
+            body = json.loads(raw_body)
             
             # Extract page_id and leadgen_id
             page_id = body['entry'][0]['id']
