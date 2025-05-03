@@ -20,6 +20,7 @@ from datetime import datetime
 from django.utils.dateparse import parse_date
 import os
 from leads.services.gpt import score_lead_with_gpt
+from google_auth_oauthlib.flow import Flow
 
 logger = logging.getLogger(__name__)
 
@@ -799,3 +800,21 @@ def about_view(request):
 def gmail_callback(request):
     # Placeholder for handling Gmail OAuth callback
     return HttpResponse("Gmail OAuth callback received.")
+
+def gmail_oauth_start(request):
+    # Path to your client_secret.json file
+    client_secrets_file = os.path.join(os.path.dirname(__file__), 'client_secret.json')
+
+    flow = Flow.from_client_secrets_file(
+        client_secrets_file=client_secrets_file,
+        scopes=['https://www.googleapis.com/auth/gmail.modify'],
+        redirect_uri='https://spamguardai.com/gmail/oauth/callback'
+    )
+
+    authorization_url, state = flow.authorization_url(
+        access_type='offline',
+        include_granted_scopes='true',
+        prompt='consent'
+    )
+    request.session['oauth_state'] = state
+    return redirect(authorization_url)
