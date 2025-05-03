@@ -3,6 +3,7 @@ from . import views
 from leads.views_stripe import create_checkout_session, subscription_success, subscription_cancel
 from leads.views_hubspot import hubspot_connect, hubspot_callback, hubspot_connected_success
 from leads.views import integrations_view
+from django.contrib.auth import views as auth_views
 
 app_name = 'leads'
 
@@ -38,4 +39,8 @@ urlpatterns = [
     path('gmail/oauth/start/', views.gmail_oauth_start, name='gmail_oauth_start'),
     path('settings/lead-routing/', views.lead_routing_settings_view, name='lead_routing_settings'),
     path('settings/email/', views.update_email_view, name='update_email'),
+    path('password_reset/', auth_views.PasswordResetView.as_view(template_name='leads/password_reset_form.html'), name='password_reset'),
+    path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(template_name='leads/password_reset_done.html'), name='password_reset_done'),
+    path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name='leads/password_reset_confirm.html'), name='password_reset_confirm'),
+    path('reset/done/', auth_views.PasswordResetCompleteView.as_view(template_name='leads/password_reset_complete.html'), name='password_reset_complete'),
 ] 
