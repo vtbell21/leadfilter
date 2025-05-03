@@ -37,6 +37,7 @@ urlpatterns = [
     path('integrations/', integrations_view, name='integrations'),
     path('gmail/callback/', views.gmail_callback, name='gmail_callback'),
     path('gmail/oauth/start/', views.gmail_oauth_start, name='gmail_oauth_start'),
+    path('gmail/oauth/callback/', views.gmail_oauth_callback, name='gmail_oauth_callback'),
     path('settings/lead-routing/', views.lead_routing_settings_view, name='lead_routing_settings'),
     path('settings/email/', views.update_email_view, name='update_email'),
     path('password_reset/', auth_views.PasswordResetView.as_view(template_name='leads/password_reset_form.html'), name='password_reset'),
