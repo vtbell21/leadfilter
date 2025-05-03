@@ -2,6 +2,7 @@ from email.mime.text import MIMEText
 import base64
 from googleapiclient.discovery import build
 from google.oauth2.credentials import Credentials
+from google.auth.transport.requests import Request
 from leads.models import GmailCredentials
 
 def send_gmail_message(user, to_email, subject, body_text, is_spam=False):
@@ -21,6 +22,18 @@ def send_gmail_message(user, to_email, subject, body_text, is_spam=False):
         client_secret=creds_obj.client_secret,
         scopes=creds_obj.scopes.split() if isinstance(creds_obj.scopes, str) else creds_obj.scopes,
     )
+
+    # Refresh the token if expired or about to expire
+    if creds.expired and creds.refresh_token:
+        creds.refresh(Request())
+        # Save the new token to the database
+        creds_obj.token = creds.token
+        creds_obj.refresh_token = creds.refresh_token
+        creds_obj.token_uri = creds.token_uri
+        creds_obj.client_id = creds.client_id
+        creds_obj.client_secret = creds.client_secret
+        creds_obj.scopes = " ".join(creds.scopes) if isinstance(creds.scopes, (list, tuple)) else creds.scopes
+        creds_obj.save()
 
     # 2. Build the message
     message = MIMEText(body_text)
