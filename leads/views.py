@@ -851,7 +851,7 @@ def save_gmail_credentials(user, credentials):
     GmailCredentials.objects.update_or_create(
         user=user,
         defaults={
-            'access_token': credentials.token,
+            'token': credentials.token,
             'refresh_token': credentials.refresh_token,
             'token_uri': credentials.token_uri,
             'client_id': credentials.client_id,
