@@ -11,7 +11,7 @@ import logging
 import requests
 from django.conf import settings
 import pprint
-from .models import FacebookLead, FacebookPageConnection, UserProfile
+from .models import FacebookLead, FacebookPageConnection, UserProfile, GmailCredentials, LeadRoutingSettings
 from base64 import b64encode, b64decode
 from django.core.paginator import Paginator
 from urllib.parse import urlencode
@@ -22,6 +22,7 @@ import os
 from leads.services.gpt import score_lead_with_gpt
 from google_auth_oauthlib.flow import Flow
 from google.oauth2.credentials import Credentials
+from .forms import LeadRoutingSettingsForm
 
 logger = logging.getLogger(__name__)
 
@@ -820,6 +821,19 @@ def gmail_oauth_start(request):
     request.session['oauth_state'] = state
     return redirect(authorization_url)
 
+def save_gmail_credentials(user, credentials):
+    GmailCredentials.objects.update_or_create(
+        user=user,
+        defaults={
+            'access_token': credentials.token,
+            'refresh_token': credentials.refresh_token,
+            'token_uri': credentials.token_uri,
+            'client_id': credentials.client_id,
+            'client_secret': credentials.client_secret,
+            'scopes': " ".join(credentials.scopes) if isinstance(credentials.scopes, (list, tuple)) else credentials.scopes,
+        }
+    )
+
 def gmail_oauth_callback(request):
     # Path to your client_secret.json file
     client_secrets_file = os.path.join(os.path.dirname(__file__), 'client_secret.json')
@@ -839,13 +853,25 @@ def gmail_oauth_callback(request):
     try:
         flow.fetch_token(authorization_response=authorization_response)
         credentials = flow.credentials
-        # Save credentials securely (here, as a file per user for demo; use DB in production)
-        user_id = request.user.id if request.user.is_authenticated else 'anon'
-        cred_path = os.path.join(os.path.dirname(__file__), f'gmail_token_{user_id}.json')
-        with open(cred_path, 'w') as token:
-            token.write(credentials.to_json())
-        messages.success(request, 'Gmail account connected successfully!')
+        # Save credentials to the database
+        if request.user.is_authenticated:
+            save_gmail_credentials(request.user, credentials)
+            messages.success(request, 'Gmail account connected successfully!')
+        else:
+            messages.error(request, 'User not authenticated. Cannot save Gmail credentials.')
     except Exception as e:
         logger.error(f"Error completing Gmail OAuth: {str(e)}")
         messages.error(request, f'Gmail connection failed: {str(e)}')
     return redirect('leads:dashboard')
+
+@login_required
+def lead_routing_settings_view(request):
+    settings, created = LeadRoutingSettings.objects.get_or_create(user=request.user)
+    if request.method == 'POST':
+        form = LeadRoutingSettingsForm(request.POST, instance=settings)
+        if form.is_valid():
+            form.save()
+            return redirect('leads:lead_routing_settings')
+    else:
+        form = LeadRoutingSettingsForm(instance=settings)
+    return render(request, 'leads/lead_routing_settings.html', {'form': form})

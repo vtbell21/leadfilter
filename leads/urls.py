@@ -36,4 +36,5 @@ urlpatterns = [
     path('integrations/', integrations_view, name='integrations'),
     path('gmail/callback/', views.gmail_callback, name='gmail_callback'),
     path('gmail/oauth/start/', views.gmail_oauth_start, name='gmail_oauth_start'),
+    path('settings/lead-routing/', views.lead_routing_settings_view, name='lead_routing_settings'),
 ] 
