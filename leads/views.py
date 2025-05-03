@@ -27,6 +27,14 @@ from leads.services.gmail import send_gmail_message
 
 logger = logging.getLogger(__name__)
 
+# Write client_secret.json from env var at import time
+secret_path = '/tmp/client_secret.json'
+if not os.path.exists(secret_path):
+    secret_json = os.environ.get('GOOGLE_CLIENT_SECRET_JSON')
+    if secret_json:
+        with open(secret_path, 'w') as f:
+            f.write(secret_json)
+
 def get_lead_data(leadgen_id, access_token):
     """Fetch lead data from Facebook Graph API using the provided access token."""
     try:
@@ -825,11 +833,8 @@ def gmail_callback(request):
     return HttpResponse("Gmail OAuth callback received.")
 
 def gmail_oauth_start(request):
-    # Path to your client_secret.json file
-    client_secrets_file = os.path.join(os.path.dirname(__file__), 'client_secret.json')
-
     flow = Flow.from_client_secrets_file(
-        client_secrets_file=client_secrets_file,
+        client_secrets_file='/tmp/client_secret.json',
         scopes=['https://www.googleapis.com/auth/gmail.modify'],
         redirect_uri='https://spamguardai.com/gmail/oauth/callback'
     )
@@ -856,25 +861,20 @@ def save_gmail_credentials(user, credentials):
     )
 
 def gmail_oauth_callback(request):
-    # Path to your client_secret.json file
-    client_secrets_file = os.path.join(os.path.dirname(__file__), 'client_secret.json')
     state = request.session.get('oauth_state')
     if not state:
         return HttpResponse("Missing OAuth state.", status=400)
-
     flow = Flow.from_client_secrets_file(
-        client_secrets_file=client_secrets_file,
+        client_secrets_file='/tmp/client_secret.json',
         scopes=['https://www.googleapis.com/auth/gmail.modify'],
         state=state,
         redirect_uri='https://spamguardai.com/gmail/oauth/callback'
     )
 
-    # Build the full URL the user was redirected to
     authorization_response = request.build_absolute_uri()
     try:
         flow.fetch_token(authorization_response=authorization_response)
         credentials = flow.credentials
-        # Save credentials to the database
         if request.user.is_authenticated:
             save_gmail_credentials(request.user, credentials)
             messages.success(request, 'Gmail account connected successfully!')
