@@ -4,6 +4,11 @@
 {% block content %}
 <div class="container-fluid py-4">
     <div class="d-flex justify-content-end mb-3">
+        {% if not request.user.gmail_credentials.exists %}
+            <a href="{% url 'leads:gmail_oauth_start' %}" class="btn btn-danger me-2">Connect Gmail</a>
+        {% else %}
+            <span class="badge bg-success me-2">Gmail Connected</span>
+        {% endif %}
         <a href="{% url 'leads:update_email' %}" class="btn btn-outline-secondary me-2">Change Email</a>
         <a href="{% url 'leads:lead_routing_settings' %}" class="btn btn-outline-secondary">Lead Routing Settings</a>
     </div>
