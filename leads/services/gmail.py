@@ -1,9 +1,13 @@
 from email.mime.text import MIMEText
 import base64
 from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
 from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
 from leads.models import GmailCredentials
+import logging
+
+logger = logging.getLogger(__name__)
 
 def send_gmail_message(user, to_email, subject, body_text, is_spam=False):
     # 1. Load credentials from the database
@@ -12,7 +16,8 @@ def send_gmail_message(user, to_email, subject, body_text, is_spam=False):
         if not creds_obj:
             raise Exception("No Gmail credentials found for this user.")
     except GmailCredentials.DoesNotExist:
-        raise Exception("No Gmail credentials found for this user.")
+        logger.error("No Gmail credentials found for user %s", user)
+        raise
 
     creds = Credentials(
         token=creds_obj.token,
@@ -25,15 +30,19 @@ def send_gmail_message(user, to_email, subject, body_text, is_spam=False):
 
     # Refresh the token if expired or about to expire
     if creds.expired and creds.refresh_token:
-        creds.refresh(Request())
-        # Save the new token to the database
-        creds_obj.token = creds.token
-        creds_obj.refresh_token = creds.refresh_token
-        creds_obj.token_uri = creds.token_uri
-        creds_obj.client_id = creds.client_id
-        creds_obj.client_secret = creds.client_secret
-        creds_obj.scopes = " ".join(creds.scopes) if isinstance(creds.scopes, (list, tuple)) else creds.scopes
-        creds_obj.save()
+        try:
+            creds.refresh(Request())
+            # Save the new token to the database
+            creds_obj.token = creds.token
+            creds_obj.refresh_token = creds.refresh_token
+            creds_obj.token_uri = creds.token_uri
+            creds_obj.client_id = creds.client_id
+            creds_obj.client_secret = creds.client_secret
+            creds_obj.scopes = " ".join(creds.scopes) if isinstance(creds.scopes, (list, tuple)) else creds.scopes
+            creds_obj.save()
+        except Exception as e:
+            logger.error(f"Failed to refresh Gmail token for user {user}: {e}")
+            raise
 
     # 2. Build the message
     message = MIMEText(body_text)
@@ -44,41 +53,60 @@ def send_gmail_message(user, to_email, subject, body_text, is_spam=False):
     # 3. Encode the message
     raw_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
 
-    # 4. Send the message via Gmail API
-    service = build('gmail', 'v1', credentials=creds)
+    try:
+        # 4. Send the message via Gmail API
+        service = build('gmail', 'v1', credentials=creds)
 
-    label_ids = []
-    if is_spam:
-        # Check if the label exists
-        label_name = "SpamGuard-Spam"
-        labels = service.users().labels().list(userId='me').execute().get('labels', [])
-        label_id = None
-        for label in labels:
-            if label['name'] == label_name:
-                label_id = label['id']
-                break
-        if not label_id:
-            # Create the label
-            label_obj = {
-                'name': label_name,
-                'labelListVisibility': 'labelShow',
-                'messageListVisibility': 'show',
-                'color': {
-                    'backgroundColor': '#ff0000',
-                    'textColor': '#ffffff'
+        label_ids = []
+        if is_spam:
+            # Check if the label exists
+            label_name = "SpamGuard-Spam"
+            try:
+                labels = service.users().labels().list(userId='me').execute().get('labels', [])
+            except HttpError as e:
+                logger.error(f"Failed to list Gmail labels for user {user}: {e}")
+                raise
+            label_id = None
+            for label in labels:
+                if label['name'] == label_name:
+                    label_id = label['id']
+                    break
+            if not label_id:
+                # Create the label
+                label_obj = {
+                    'name': label_name,
+                    'labelListVisibility': 'labelShow',
+                    'messageListVisibility': 'show',
+                    'color': {
+                        'backgroundColor': '#ff0000',
+                        'textColor': '#ffffff'
+                    }
                 }
-            }
-            created_label = service.users().labels().create(userId='me', body=label_obj).execute()
-            label_id = created_label['id']
-        label_ids.append(label_id)
+                try:
+                    created_label = service.users().labels().create(userId='me', body=label_obj).execute()
+                    label_id = created_label['id']
+                except HttpError as e:
+                    logger.error(f"Failed to create Gmail label for user {user}: {e}")
+                    raise
+            label_ids.append(label_id)
 
-    send_body = {'raw': raw_message}
-    if label_ids:
-        send_body['labelIds'] = label_ids
+        send_body = {'raw': raw_message}
+        if label_ids:
+            send_body['labelIds'] = label_ids
 
-    send_result = service.users().messages().send(
-        userId='me',
-        body=send_body
-    ).execute()
+        try:
+            send_result = service.users().messages().send(
+                userId='me',
+                body=send_body
+            ).execute()
+        except HttpError as e:
+            logger.error(f"Failed to send Gmail message for user {user}: {e}")
+            raise
 
-    return send_result 
+        return send_result
+    except HttpError as e:
+        logger.error(f"Gmail API error for user {user}: {e}")
+        raise
+    except Exception as e:
+        logger.error(f"Unexpected error sending Gmail message for user {user}: {e}")
+        raise 
