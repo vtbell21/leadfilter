@@ -286,7 +286,6 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            messages.success(request, 'Logged in successfully!')
             return redirect('leads:dashboard')
         else:
             messages.error(request, 'Invalid username or password.')
