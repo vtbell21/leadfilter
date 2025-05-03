@@ -222,25 +222,7 @@ def facebook_webhook(request):
                 is_valid_email = validate_email_zb(email) if email else False
                 is_valid_phone = validate_phone_twilio(phone) if phone else False
                 
-                # Check user lead routing settings
-                try:
-                    routing_settings = LeadRoutingSettings.objects.get(user=page_connection.user)
-                    if routing_settings.send_to_gmail:
-                        to_email = page_connection.user.email
-                        subject = routing_settings.spam_lead_subject if score_result['is_spam'] else routing_settings.good_lead_subject
-                        body_text = f"Lead details:\n\n" + "\n".join(f"{k}: {v}" for k, v in field_dict.items())
-                        send_gmail_message(
-                            page_connection.user,
-                            to_email,
-                            subject,
-                            body_text,
-                            is_spam=(score_result['is_spam'] and routing_settings.spam_labeling_enabled),
-                            lead_details=field_dict
-                        )
-                except LeadRoutingSettings.DoesNotExist:
-                    pass
-                
-                # Create and save the lead with GPT results
+                # Always save the lead
                 FacebookLead.objects.create(
                     user=page_connection.user,  # Associate with the page owner
                     leadgen_id=leadgen_id,
@@ -256,7 +238,28 @@ def facebook_webhook(request):
                     is_valid_email=is_valid_email,
                     is_valid_phone=is_valid_phone
                 )
-                logger.info(f"Saved lead {leadgen_id} to database for user {page_connection.user.id}")
+
+                # Only try to send to Gmail if enabled and credentials exist
+                try:
+                    routing_settings = LeadRoutingSettings.objects.get(user=page_connection.user)
+                    if routing_settings.send_to_gmail:
+                        has_gmail = GmailCredentials.objects.filter(user=page_connection.user).exists()
+                        if has_gmail:
+                            to_email = page_connection.user.email
+                            subject = routing_settings.spam_lead_subject if score_result['is_spam'] else routing_settings.good_lead_subject
+                            body_text = f"Lead details:\n\n" + "\n".join(f"{k}: {v}" for k, v in field_dict.items())
+                            send_gmail_message(
+                                page_connection.user,
+                                to_email,
+                                subject,
+                                body_text,
+                                is_spam=(score_result['is_spam'] and routing_settings.spam_labeling_enabled),
+                                lead_details=field_dict
+                            )
+                        else:
+                            logger.warning(f"No Gmail credentials found for user {page_connection.user}. Skipping email send.")
+                except LeadRoutingSettings.DoesNotExist:
+                    pass
             
             return HttpResponse("Event received", status=200)
             
