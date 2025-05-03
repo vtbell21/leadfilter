@@ -1,4 +1,5 @@
 from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 import base64
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
@@ -9,7 +10,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-def send_gmail_message(user, to_email, subject, body_text, is_spam=False):
+def send_gmail_message(user, to_email, subject, body_text, is_spam=False, lead_details=None):
     # 1. Load credentials from the database
     try:
         creds_obj = GmailCredentials.objects.filter(user=user).first()
@@ -44,14 +45,37 @@ def send_gmail_message(user, to_email, subject, body_text, is_spam=False):
             logger.error(f"Failed to refresh Gmail token for user {user}: {e}")
             raise
 
-    # 2. Build the message
-    message = MIMEText(body_text)
-    message['to'] = to_email
-    message['from'] = user.email
-    message['subject'] = subject
+    # 2. Build the HTML message
+    msg = MIMEMultipart('alternative')
+    msg['to'] = to_email
+    msg['from'] = user.email
+    msg['subject'] = subject
+
+    # Build HTML table for lead details if provided
+    html_table = ""
+    if lead_details and isinstance(lead_details, dict):
+        html_table = "<table style='border-collapse:collapse;width:100%;margin-top:10px;'>"
+        for k, v in lead_details.items():
+            html_table += f"<tr><td style='border:1px solid #ccc;padding:6px 12px;font-weight:bold;background:#f9f9f9'>{k}</td>"
+            html_table += f"<td style='border:1px solid #ccc;padding:6px 12px'>{v}</td></tr>"
+        html_table += "</table>"
+
+    html_body = f"""
+    <div style='font-family:sans-serif;'>
+        <h2 style='color:#333;margin-bottom:0'>{subject}</h2>
+        <p style='margin-top:0;color:#555;'>You have a new lead from Facebook.</p>
+        {html_table}
+        <div style='margin-top:20px;color:#888;font-size:0.9em;'>
+            <em>This message was sent automatically by Spam Guard.</em>
+        </div>
+    </div>
+    """
+    # Attach both plain text and HTML (for compatibility)
+    msg.attach(MIMEText(body_text, 'plain'))
+    msg.attach(MIMEText(html_body, 'html'))
 
     # 3. Encode the message
-    raw_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
+    raw_message = base64.urlsafe_b64encode(msg.as_bytes()).decode()
 
     try:
         # 4. Send the message via Gmail API
