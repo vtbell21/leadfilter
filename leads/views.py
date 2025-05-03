@@ -835,7 +835,10 @@ def gmail_callback(request):
 def gmail_oauth_start(request):
     flow = Flow.from_client_secrets_file(
         client_secrets_file='/tmp/client_secret.json',
-        scopes=['https://www.googleapis.com/auth/gmail.modify'],
+        scopes=[
+            'https://www.googleapis.com/auth/gmail.modify',
+            'https://www.googleapis.com/auth/gmail.send',
+        ],
         redirect_uri='https://spamguardai.com/gmail/oauth/callback'
     )
 
@@ -866,7 +869,10 @@ def gmail_oauth_callback(request):
         return HttpResponse("Missing OAuth state.", status=400)
     flow = Flow.from_client_secrets_file(
         client_secrets_file='/tmp/client_secret.json',
-        scopes=['https://www.googleapis.com/auth/gmail.modify'],
+        scopes=[
+            'https://www.googleapis.com/auth/gmail.modify',
+            'https://www.googleapis.com/auth/gmail.send',
+        ],
         state=state,
         redirect_uri='https://spamguardai.com/gmail/oauth/callback'
     )
