@@ -196,3 +196,5 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Use database-backed sessions (Postgres)
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+
+NUMVERIFY_API_KEY = os.environ.get('NUMVERIFY_API_KEY')
