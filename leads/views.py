@@ -266,6 +266,7 @@ def facebook_webhook(request):
                 logger.info(f"Lead scored as {'spam' if score_result['is_spam'] else 'not spam'}: {score_result['gpt_reason']}")
                 logger.info(f"Custom fields: {custom_fields}")
                 is_valid_email = validate_email_zb(email) if email else False
+                logger.info(f"About to validate phone: {phone}")
                 is_valid_phone = validate_phone_twilio(phone) if phone else False
                 lead = FacebookLead.objects.create(
                     user=page_connection.user,
