@@ -53,5 +53,5 @@ urlpatterns = [
     path('pipedrive/callback/', views_pipedrive.pipedrive_callback, name='pipedrive_callback'),
     path('pipedrive/disconnect/', views_pipedrive.pipedrive_disconnect, name='pipedrive_disconnect'),
     path('stripe/webhook/', stripe_webhook, name='stripe_webhook'),
-    path('stripe/cancel/', cancel_subscription, name='cancel_subscription'),
+    path('subscription/cancel-manual/', cancel_subscription, name='cancel_subscription'),
 ] 
