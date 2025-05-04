@@ -2,7 +2,7 @@ from django.urls import path
 from . import views
 from . import views_pipedrive
 from leads.views_stripe import create_checkout_session, subscription_success, subscription_cancel
-from leads.views_hubspot import hubspot_connect, hubspot_callback, hubspot_connected_success
+from leads.views_hubspot import hubspot_connect, hubspot_callback, hubspot_connected_success, hubspot_disconnect
 from leads.views import integrations_view
 from django.contrib.auth import views as auth_views
 
@@ -35,6 +35,7 @@ urlpatterns = [
     path('hubspot/connect/', hubspot_connect, name='hubspot_connect'),
     path('hubspot/callback/', hubspot_callback, name='hubspot_callback'),
     path('hubspot/connected/', hubspot_connected_success, name='hubspot_connected_success'),
+    path('hubspot/disconnect/', hubspot_disconnect, name='hubspot_disconnect'),
     path('integrations/', integrations_view, name='integrations'),
     path('gmail/callback/', views.gmail_callback, name='gmail_callback'),
     path('gmail/oauth/start/', views.gmail_oauth_start, name='gmail_oauth_start'),
@@ -50,4 +51,5 @@ urlpatterns = [
     path('validate-phone/', views.validate_phone_view, name='validate_phone'),
     path('pipedrive/connect/', views_pipedrive.pipedrive_connect, name='pipedrive_connect'),
     path('pipedrive/callback/', views_pipedrive.pipedrive_callback, name='pipedrive_callback'),
+    path('pipedrive/disconnect/', views_pipedrive.pipedrive_disconnect, name='pipedrive_disconnect'),
 ] 

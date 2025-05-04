@@ -52,4 +52,11 @@ def pipedrive_callback(request):
         messages.success(request, 'Successfully connected to Pipedrive!')
         return redirect('leads:integrations')
     else:
-        return JsonResponse({'error': 'Failed to get access token', 'details': response.text}, status=400) 
+        return JsonResponse({'error': 'Failed to get access token', 'details': response.text}, status=400)
+
+@login_required
+def pipedrive_disconnect(request):
+    profile, _ = UserProfile.objects.get_or_create(user=request.user)
+    profile.pipedrive_access_token = None
+    profile.save()
+    return redirect('leads:integrations') 

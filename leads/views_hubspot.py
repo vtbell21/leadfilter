@@ -75,4 +75,12 @@ def hubspot_callback(request):
 
 @login_required
 def hubspot_connected_success(request):
-    return render(request, 'leads/hubspot_connected.html') 
+    return render(request, 'leads/hubspot_connected.html')
+
+@login_required
+def hubspot_disconnect(request):
+    profile, _ = UserProfile.objects.get_or_create(user=request.user)
+    profile.hubspot_access_token = None
+    profile.hubspot_refresh_token = None
+    profile.save()
+    return redirect('leads:integrations') 
