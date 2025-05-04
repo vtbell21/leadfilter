@@ -284,6 +284,7 @@ def facebook_webhook(request):
                 logger.info(f"Custom fields: {custom_fields}")
                 is_valid_email = validate_email_zb(email) if email else False
                 logger.info(f"About to validate phone: {phone}")
+                logger.info(f"Raw phone before normalization: {phone}")
                 normalized_phone = normalize_phone_number(phone)
                 logger.info(f"Normalized phone: {normalized_phone}")
                 numverify_result = validate_phone_with_numverify(normalized_phone) if normalized_phone else None
