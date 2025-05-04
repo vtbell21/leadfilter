@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from . import views_pipedrive
 from leads.views_stripe import create_checkout_session, subscription_success, subscription_cancel
 from leads.views_hubspot import hubspot_connect, hubspot_callback, hubspot_connected_success
 from leads.views import integrations_view
@@ -47,4 +48,6 @@ urlpatterns = [
     path('settings/webhook/', views.webhook_settings_view, name='webhook_settings'),
     path('settings/webhook/test/', views.test_webhook, name='test_webhook'),
     path('validate-phone/', views.validate_phone_view, name='validate_phone'),
+    path('pipedrive/connect/', views_pipedrive.pipedrive_connect, name='pipedrive_connect'),
+    path('pipedrive/callback/', views_pipedrive.pipedrive_callback, name='pipedrive_callback'),
 ] 
