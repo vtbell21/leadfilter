@@ -1,7 +1,7 @@
 from django.urls import path
 from . import views
 from . import views_pipedrive
-from leads.views_stripe import create_checkout_session, subscription_success, subscription_cancel, stripe_webhook, cancel_subscription
+from leads.views_stripe import create_checkout_session, subscription_success, subscription_cancel, stripe_webhook, cancel_subscription, billing_portal
 from leads.views_hubspot import hubspot_connect, hubspot_callback, hubspot_connected_success, hubspot_disconnect
 from leads.views import integrations_view
 from django.contrib.auth import views as auth_views
