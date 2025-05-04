@@ -850,9 +850,10 @@ def pricing_view(request):
 def integrations_view(request):
     # Get or create the user's profile
     profile, created = UserProfile.objects.get_or_create(user=request.user)
-    
+    pipedrive_connected = bool(profile.pipedrive_access_token)
     context = {
         'hubspot_connected': bool(profile.hubspot_access_token),
+        'pipedrive_connected': pipedrive_connected,
     }
     return render(request, 'leads/integrations.html', context)
 

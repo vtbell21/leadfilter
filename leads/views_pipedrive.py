@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.utils import timezone
 from .models import UserProfile
+from django.contrib import messages
 
 @login_required
 def pipedrive_connect(request):
@@ -48,6 +49,7 @@ def pipedrive_callback(request):
         profile.pipedrive_token_expires_at = expires_at
         profile.save()
 
+        messages.success(request, 'Successfully connected to Pipedrive!')
         return redirect('leads:integrations')
     else:
         return JsonResponse({'error': 'Failed to get access token', 'details': response.text}, status=400) 
