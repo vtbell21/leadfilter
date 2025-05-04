@@ -117,6 +117,7 @@ def score_lead(lead_data):
 def validate_email_zb(email):
     """Validate email using ZeroBounce API."""
     try:
+        logger.info(f"Validating email with ZeroBounce: {email}")
         api_key = '60e2eac9bffc4a3fb7877db03629d88f'
         api_url = 'https://api.zerobounce.net/v2/validate'
         
@@ -129,9 +130,11 @@ def validate_email_zb(email):
         response = requests.get(api_url, params=params)
         response.raise_for_status()
         result = response.json()
-        
+        logger.info(f"ZeroBounce API response: {result}")
         # Check if email is valid (not disposable or invalid)
-        return result.get('status') in ['valid', 'catch-all']
+        is_valid = result.get('status') in ['valid', 'catch-all']
+        logger.info(f"Email validation result for {email}: {is_valid}")
+        return is_valid
         
     except requests.RequestException as e:
         logger.error(f"Error validating email with ZeroBounce: {str(e)}")
