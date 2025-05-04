@@ -950,22 +950,34 @@ def test_webhook(request):
     if not webhook_settings.webhook_url:
         return JsonResponse({'success': False, 'error': 'No webhook URL configured.'}, status=400)
 
-    sample_payload = {
-        'name': 'Sample Lead',
-        'email': 'sample@example.com',
-        'phone': '+1234567890',
-        'message': 'This is a test lead from Spam Guard.',
-        'timestamp': datetime.utcnow().isoformat() + 'Z',
-    }
+    from .models import FacebookLead
+    lead = FacebookLead.objects.filter(user=request.user).order_by('-received_at').first()
+    if lead:
+        payload = {
+            'name': lead.full_name,
+            'email': lead.email,
+            'phone': lead.phone,
+            'message': lead.message,
+            'timestamp': lead.received_at.isoformat() if lead.received_at else '',
+        }
+    else:
+        payload = {
+            'name': 'Sample Lead',
+            'email': 'sample@example.com',
+            'phone': '+1234567890',
+            'message': 'This is a test lead from Spam Guard.',
+            'timestamp': datetime.utcnow().isoformat() + 'Z',
+        }
+
     try:
         resp = requests.post(
             webhook_settings.webhook_url,
-            json=sample_payload,
+            json=payload,
             timeout=5
         )
         if resp.status_code >= 200 and resp.status_code < 300:
-            return JsonResponse({'success': True, 'message': f'Successfully sent test payload. Webhook responded with status {resp.status_code}.'})
+            return JsonResponse({'success': True, 'message': f'Successfully sent test payload. Webhook responded with status {resp.status_code}.', 'payload': payload})
         else:
-            return JsonResponse({'success': False, 'error': f'Webhook responded with status {resp.status_code}: {resp.text}'}, status=400)
+            return JsonResponse({'success': False, 'error': f'Webhook responded with status {resp.status_code}: {resp.text}', 'payload': payload}, status=400)
     except Exception as exc:
-        return JsonResponse({'success': False, 'error': f'Failed to POST to webhook: {exc}'}, status=400)
+        return JsonResponse({'success': False, 'error': f'Failed to POST to webhook: {exc}', 'payload': payload}, status=400)
