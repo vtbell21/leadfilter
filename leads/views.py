@@ -170,6 +170,20 @@ def validate_phone_twilio(phone_number):
         logger.error(f"Error validating phone with Twilio: {str(e)}")
         return False
 
+# Helper function to parse field_data
+
+def parse_field_data(field_data):
+    """
+    Convert a list of {name, values} dicts into a flat dict.
+    """
+    result = {}
+    for item in field_data:
+        name = item.get('name')
+        values = item.get('values', [])
+        if name and values:
+            result[name] = values[0] if len(values) == 1 else values
+    return result
+
 # Create your views here.
 
 @csrf_exempt
@@ -196,7 +210,9 @@ def facebook_webhook(request):
         try:
             body = json.loads(raw_body)
             page_id = body['entry'][0]['id']
-            leadgen_id = body['entry'][0]['changes'][0]['value']['leadgen_id']
+            lead_value = body['entry'][0]['changes'][0]['value']
+            leadgen_id = lead_value.get('leadgen_id')
+            field_data = lead_value.get('field_data')
             logger.info(f"Received webhook for page {page_id}, leadgen_id: {leadgen_id}")
             try:
                 page_connection = FacebookPageConnection.objects.get(page_id=page_id)
@@ -204,101 +220,58 @@ def facebook_webhook(request):
             except FacebookPageConnection.DoesNotExist:
                 logger.error(f"No page connection found for page_id: {page_id}")
                 return HttpResponse("Page not connected", status=404)
-            try:
-                lead_data = get_lead_data(leadgen_id, page_connection.page_access_token)
-            except Exception as e:
-                logger.warning(f"Failed to fetch lead from Facebook, using payload data: {e}")
+
+            # If field_data is present, use it directly
+            if field_data:
+                parsed_fields = parse_field_data(field_data)
+                logger.info(f"Parsed lead fields from field_data: {parsed_fields}")
+                logger.info("Data source: field_data (manual/test payload)")
+                data_source = 'field_data'
+            else:
+                # Fallback to fetching from Facebook API
                 try:
-                    lead_data = body['entry'][0]['changes'][0]['value']
-                    if 'field_data' not in lead_data:
-                        lead_data['field_data'] = []
-                        for field in ['full_name', 'name', 'email', 'phone', 'message']:
-                            if field in lead_data:
-                                lead_data['field_data'].append({
-                                    'name': field,
-                                    'values': [lead_data[field]]
-                                })
-                    logger.info(f"Processed payload data into lead_data: {lead_data}")
-                except Exception as payload_error:
-                    logger.error(f"Error processing payload data: {payload_error}")
-                    logger.error(f"Raw payload: {body}")
-                    return HttpResponse("Invalid payload structure", status=400)
-            if lead_data:
-                logger.info(f"Lead data to be processed: {lead_data}")
-                print("\n=== Lead Data ===")
-                pprint.pprint(lead_data)
-                print("=================\n")
-                
+                    lead_data = get_lead_data(leadgen_id, page_connection.page_access_token)
+                    logger.info(f"Fetched lead data from Facebook API: {lead_data}")
+                    logger.info("Data source: Facebook API")
+                    data_source = 'api'
+                    # Facebook API returns field_data as well
+                    parsed_fields = parse_field_data(lead_data.get('field_data', []))
+                except Exception as e:
+                    logger.error(f"Failed to fetch lead from Facebook: {e}")
+                    return HttpResponse("Failed to fetch lead from Facebook", status=400)
+
+            # Save the lead using the parsed fields
+            try:
+                full_name = parsed_fields.get('full_name') or parsed_fields.get('name', '')
+                email = parsed_fields.get('email', '')
+                phone = parsed_fields.get('phone_number', parsed_fields.get('phone', ''))
+                message = parsed_fields.get('message', '')
+                custom_fields = {k: v for k, v in parsed_fields.items() if k not in ['full_name', 'name', 'email', 'phone', 'phone_number', 'message']}
                 # Score the lead
-                score_result = score_lead(lead_data)
+                score_result = score_lead(parsed_fields)
                 logger.info(f"Lead scored as {'spam' if score_result['is_spam'] else 'not spam'}: {score_result['gpt_reason']}")
-                
-                # Extract field data
-                field_dict = score_result['field_data']
-                custom_fields = score_result['custom_fields']
-                
-                # Log the extracted fields
-                logger.info(f"Extracted fields: {field_dict}")
                 logger.info(f"Custom fields: {custom_fields}")
-                
-                # Validate email and phone
-                email = field_dict.get('email', '')
-                phone = field_dict.get('phone', '')
                 is_valid_email = validate_email_zb(email) if email else False
                 is_valid_phone = validate_phone_twilio(phone) if phone else False
-                
-                # Always save the lead
                 lead = FacebookLead.objects.create(
-                    user=page_connection.user,  # Associate with the page owner
+                    user=page_connection.user,
                     page=page_connection,
                     leadgen_id=leadgen_id,
-                    full_name=field_dict.get('full_name', '') or field_dict.get('name', ''),
+                    full_name=full_name,
                     email=email,
                     phone=phone,
-                    message=field_dict.get('message', ''),
+                    message=message,
                     custom_fields=custom_fields,
                     gpt_score=score_result['gpt_score'],
                     gpt_reason=score_result['gpt_reason'],
-                    total_score=score_result['total_score'],
                     is_spam=score_result['is_spam'],
                     is_valid_email=is_valid_email,
-                    is_valid_phone=is_valid_phone
+                    is_valid_phone=is_valid_phone,
                 )
-                logger.warning(f"Lead saved with ID: {lead.id}")
-
-                # Webhook: send leads if enabled for spam or non-spam
-                try:
-                    webhook_settings = WebhookSettings.objects.get(user=page_connection.user)
-                    if webhook_settings.webhook_url:
-                        should_send = (
-                            (not score_result['is_spam'] and webhook_settings.send_non_spam) or
-                            (score_result['is_spam'] and webhook_settings.send_spam)
-                        )
-                        if should_send:
-                            payload = {
-                                'name': field_dict.get('full_name', ''),
-                                'email': email,
-                                'phone': phone,
-                                'message': field_dict.get('message', ''),
-                                'timestamp': datetime.utcnow().isoformat() + 'Z',
-                            }
-                            logger.info(f"Attempting to POST to webhook: {webhook_settings.webhook_url} with payload: {payload}")
-                            try:
-                                response = requests.post(
-                                    webhook_settings.webhook_url,
-                                    json=payload,
-                                    timeout=5
-                                )
-                                logger.info(f"Webhook POST response: {response.status_code} {response.text}")
-                                if response.status_code >= 200 and response.status_code < 300:
-                                    messages.success(request, f'Successfully sent lead to webhook')
-                                else:
-                                    messages.error(request, f'Failed to send lead to webhook. Webhook responded with status {response.status_code}: {response.text}')
-                            except Exception as webhook_exc:
-                                logger.warning(f"Failed to POST to webhook for user {page_connection.user}: {webhook_exc}")
-                except WebhookSettings.DoesNotExist:
-                    pass
-            
+                logger.warning(f"Lead saved with ID: {lead.id} (source: {data_source})")
+            except Exception as save_error:
+                logger.error(f"Error saving lead: {save_error}")
+                return HttpResponse("Error saving lead", status=500)
             return HttpResponse("OK", status=200)
             
         except json.JSONDecodeError:
