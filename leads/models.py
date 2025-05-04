@@ -98,3 +98,12 @@ class LeadRoutingSettings(models.Model):
 
     def __str__(self):
         return f"LeadRoutingSettings for {self.user.username}"
+
+class WebhookSettings(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='webhook_settings')
+    webhook_url = models.URLField(blank=True, null=True)
+    send_non_spam = models.BooleanField(default=True)
+    send_spam = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"WebhookSettings for {self.user.username}"
