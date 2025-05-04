@@ -115,4 +115,17 @@ def cancel_subscription(request):
             messages.warning(request, 'No active subscription found.')
     except Exception as e:
         messages.error(request, f'Error canceling subscription: {e}')
-    return redirect('leads:dashboard') 
+    return redirect('leads:dashboard')
+
+@login_required
+def billing_portal(request):
+    profile = request.user.profile
+    if not profile.stripe_customer_id:
+        messages.error(request, 'No Stripe customer associated.')
+        return redirect('leads:dashboard')
+
+    session = stripe.billing_portal.Session.create(
+        customer=profile.stripe_customer_id,
+        return_url=request.build_absolute_uri(reverse('leads:dashboard')),
+    )
+    return redirect(session.url) 
