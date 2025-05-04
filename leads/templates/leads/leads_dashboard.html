@@ -133,7 +133,7 @@
                     </thead>
                     <tbody>
                         {% for lead in valid_leads %}
-                            <tr>
+                            <tr data-bs-toggle="collapse" data-bs-target="#lead-details-{{ lead.pk }}" aria-expanded="false" aria-controls="lead-details-{{ lead.pk }}">
                                 <td>
                                     <a href="{% url 'leads:lead_detail' lead.pk %}" class="lead-link">
                                         {{ lead.full_name }}
@@ -162,6 +162,22 @@
                                     {% endif %}
                                 </td>
                                 <td>{{ lead.received_at|date:"M j, Y" }}</td>
+                            </tr>
+                            <tr class="collapse" id="lead-details-{{ lead.pk }}">
+                                <td colspan="5">
+                                    {% if lead.message %}
+                                        <div class="message-text"><strong>Message:</strong> {{ lead.message }}</div>
+                                    {% endif %}
+                                    {% if lead.custom_fields %}
+                                        <div class="custom-fields"><strong>Custom Fields:</strong>
+                                            <ul>
+                                                {% for key, value in lead.custom_fields.items %}
+                                                    <li><strong>{{ key }}:</strong> {{ value }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                    {% endif %}
+                                </td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -209,7 +225,7 @@
                     </thead>
                     <tbody>
                         {% for lead in spam_leads %}
-                            <tr class="{% if lead.gpt_score > 0.7 %}high-risk{% endif %}">
+                            <tr class="{% if lead.gpt_score > 0.7 %}high-risk{% endif %}" data-bs-toggle="collapse" data-bs-target="#lead-details-{{ lead.pk }}" aria-expanded="false" aria-controls="lead-details-{{ lead.pk }}">
                                 <td>
                                     <a href="{% url 'leads:lead_detail' lead.pk %}" class="lead-link">
                                         {{ lead.full_name }}
@@ -238,6 +254,22 @@
                                     {% endif %}
                                 </td>
                                 <td>{{ lead.received_at|date:"M j, Y" }}</td>
+                            </tr>
+                            <tr class="collapse" id="lead-details-{{ lead.pk }}">
+                                <td colspan="5">
+                                    {% if lead.message %}
+                                        <div class="message-text"><strong>Message:</strong> {{ lead.message }}</div>
+                                    {% endif %}
+                                    {% if lead.custom_fields %}
+                                        <div class="custom-fields"><strong>Custom Fields:</strong>
+                                            <ul>
+                                                {% for key, value in lead.custom_fields.items %}
+                                                    <li><strong>{{ key }}:</strong> {{ value }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                    {% endif %}
+                                </td>
                             </tr>
                         {% endfor %}
                     </tbody>
