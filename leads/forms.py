@@ -1,5 +1,5 @@
 from django import forms
-from .models import LeadRoutingSettings
+from .models import LeadRoutingSettings, WebhookSettings
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
@@ -34,4 +34,14 @@ class EmailUpdateForm(forms.ModelForm):
         fields = ["email"]
         widgets = {
             "email": forms.EmailInput(attrs={"class": "form-control"}),
+        }
+
+class WebhookSettingsForm(forms.ModelForm):
+    class Meta:
+        model = WebhookSettings
+        fields = ['webhook_url', 'send_non_spam', 'send_spam']
+        widgets = {
+            'webhook_url': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'https://your-webhook-url.com/'}),
+            'send_non_spam': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'send_spam': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         } 

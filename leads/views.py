@@ -11,7 +11,7 @@ import logging
 import requests
 from django.conf import settings
 import pprint
-from .models import FacebookLead, FacebookPageConnection, UserProfile, GmailCredentials, LeadRoutingSettings
+from .models import FacebookLead, FacebookPageConnection, UserProfile, GmailCredentials, LeadRoutingSettings, WebhookSettings
 from base64 import b64encode, b64decode
 from django.core.paginator import Paginator
 from urllib.parse import urlencode
@@ -22,7 +22,7 @@ import os
 from leads.services.gpt import score_lead_with_gpt
 from google_auth_oauthlib.flow import Flow
 from google.oauth2.credentials import Credentials
-from .forms import LeadRoutingSettingsForm, CustomUserCreationForm, EmailUpdateForm
+from .forms import LeadRoutingSettingsForm, CustomUserCreationForm, EmailUpdateForm, WebhookSettingsForm
 from leads.services.gmail import send_gmail_message
 
 logger = logging.getLogger(__name__)
@@ -914,3 +914,23 @@ def update_email_view(request):
     else:
         form = EmailUpdateForm(instance=request.user)
     return render(request, 'leads/update_email.html', {'form': form})
+
+@login_required
+def webhook_settings_view(request):
+    try:
+        webhook_settings = request.user.webhook_settings
+    except WebhookSettings.DoesNotExist:
+        webhook_settings = None
+
+    if request.method == 'POST':
+        form = WebhookSettingsForm(request.POST, instance=webhook_settings)
+        if form.is_valid():
+            ws = form.save(commit=False)
+            ws.user = request.user
+            ws.save()
+            messages.success(request, 'Webhook settings updated!')
+            return redirect('leads:webhook_settings')
+    else:
+        form = WebhookSettingsForm(instance=webhook_settings)
+
+    return render(request, 'leads/webhook_settings.html', {'form': form})
