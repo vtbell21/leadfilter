@@ -93,10 +93,10 @@ def score_lead(lead_data):
     if phone_number:
         numverify_result = validate_phone_with_numverify(phone_number)
         logger.info(f"NumVerify result for {phone_number}: {numverify_result}")
-        if not numverify_result['valid']:
-            phone_spam_penalty += 0.3
-        if numverify_result.get('line_type') == 'voip' or not numverify_result.get('is_us_number', False):
-            phone_spam_penalty += 0.3
+        if not numverify_result['valid'] or numverify_result.get('line_type') == 'voip':
+            phone_spam_penalty += 0.4
+        if not numverify_result.get('is_us_number', False):
+            phone_spam_penalty += 0.2
 
     try:
         # Get GPT scoring result
