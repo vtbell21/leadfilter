@@ -24,7 +24,6 @@ from google_auth_oauthlib.flow import Flow
 from google.oauth2.credentials import Credentials
 from .forms import LeadRoutingSettingsForm, CustomUserCreationForm, EmailUpdateForm, WebhookSettingsForm
 from leads.services.gmail import send_gmail_message
-from leads.utils.phone_validation import validate_phone_with_numverify
 from django.contrib.admin.views.decorators import staff_member_required
 
 logger = logging.getLogger(__name__)
@@ -53,6 +52,7 @@ def get_lead_data(leadgen_id, access_token):
         return None
 
 def score_lead(lead_data):
+    from leads.utils.phone_validation import validate_phone_with_numverify
     """Evaluate if a lead is spam based on its data using GPT and phone validation."""
     if not lead_data or 'field_data' not in lead_data:
         return {
@@ -1021,6 +1021,7 @@ def test_webhook(request):
 @staff_member_required
 @require_http_methods(["GET"])
 def validate_phone_view(request):
+    from leads.utils.phone_validation import validate_phone_with_numverify
     phone = request.GET.get('phone', '')
     if not phone:
         return JsonResponse({'error': 'Missing phone parameter'}, status=400)
