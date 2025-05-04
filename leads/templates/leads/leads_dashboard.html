@@ -10,7 +10,8 @@
             <span class="badge bg-success me-2">Gmail Connected</span>
         {% endif %}
         <a href="{% url 'leads:update_email' %}" class="btn btn-outline-secondary me-2">Change Email</a>
-        <a href="{% url 'leads:lead_routing_settings' %}" class="btn btn-outline-secondary">Lead Routing Settings</a>
+        <a href="{% url 'leads:lead_routing_settings' %}" class="btn btn-outline-secondary me-2">Lead Routing Settings</a>
+        <a href="{% url 'leads:webhook_settings' %}" class="btn btn-outline-secondary">Webhook Settings</a>
     </div>
     <h1 class="mb-4">Spam Guard Dashboard</h1>
     
