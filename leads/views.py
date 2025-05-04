@@ -97,7 +97,8 @@ def score_lead(lead_data):
         else:
             numverify_result = {'valid': False, 'is_us_number': False, 'line_type': None}
         logger.info(f"NumVerify debug — raw: {phone_number}, normalized: {normalized}, result: {numverify_result}")
-        if not numverify_result['valid'] or numverify_result.get('line_type') == 'voip':
+        
+        if not numverify_result.get('valid', False) or numverify_result.get('line_type') == 'voip':
             phone_spam_penalty += 0.4
         if not numverify_result.get('is_us_number', False):
             phone_spam_penalty += 0.2
@@ -112,7 +113,7 @@ def score_lead(lead_data):
         total_score = gpt_score + phone_spam_penalty
         total_score = min(total_score, 1.0)  # Cap at 1.0
         is_spam = total_score > 0.7
-        
+        logger.info(f"Scoring debug — phone_spam_penalty: {phone_spam_penalty}, total_score: {total_score}, gpt_score: {gpt_score}, is_spam: {is_spam}")
         return {
             'total_score': total_score,
             'is_spam': is_spam,
