@@ -24,6 +24,7 @@ from google_auth_oauthlib.flow import Flow
 from google.oauth2.credentials import Credentials
 from .forms import LeadRoutingSettingsForm, CustomUserCreationForm, EmailUpdateForm, WebhookSettingsForm
 from leads.services.gmail import send_gmail_message
+from leads.utils.phone_validation import validate_phone_with_numverify
 
 logger = logging.getLogger(__name__)
 
@@ -51,7 +52,7 @@ def get_lead_data(leadgen_id, access_token):
         return None
 
 def score_lead(lead_data):
-    """Evaluate if a lead is spam based on its data using GPT."""
+    """Evaluate if a lead is spam based on its data using GPT and phone validation."""
     if not lead_data or 'field_data' not in lead_data:
         return {
             'total_score': 1.0,
@@ -83,7 +84,19 @@ def score_lead(lead_data):
             else:
                 custom_fields[field_name] = value
                 field_dict[field_name] = value  # Include in field_dict for GPT scoring
-    
+
+    # --- NumVerify phone validation ---
+    phone_number = field_dict.get('phone', '')
+    numverify_result = None
+    phone_spam_penalty = 0.0
+    if phone_number:
+        numverify_result = validate_phone_with_numverify(phone_number)
+        logger.info(f"NumVerify result for {phone_number}: {numverify_result}")
+        if not numverify_result['valid']:
+            phone_spam_penalty += 0.3
+        if numverify_result.get('line_type') == 'voip' or not numverify_result.get('is_us_number', False):
+            phone_spam_penalty += 0.3
+
     try:
         # Get GPT scoring result
         gpt_result = score_lead_with_gpt(field_dict)  # Pass all fields for scoring
@@ -91,8 +104,9 @@ def score_lead(lead_data):
         gpt_reason = gpt_result['reason']
         
         # Compute final results
-        total_score = gpt_score  # Can be extended to include other scores
-        is_spam = gpt_score > 0.7
+        total_score = gpt_score + phone_spam_penalty
+        total_score = min(total_score, 1.0)  # Cap at 1.0
+        is_spam = total_score > 0.7
         
         return {
             'total_score': total_score,
@@ -100,7 +114,8 @@ def score_lead(lead_data):
             'gpt_score': gpt_score,
             'gpt_reason': gpt_reason,
             'field_data': field_dict,
-            'custom_fields': custom_fields
+            'custom_fields': custom_fields,
+            'numverify_result': numverify_result,
         }
         
     except Exception as e:
@@ -111,7 +126,8 @@ def score_lead(lead_data):
             'gpt_score': 1.0,
             'gpt_reason': f'Error in GPT scoring: {str(e)}',
             'field_data': field_dict,
-            'custom_fields': custom_fields
+            'custom_fields': custom_fields,
+            'numverify_result': numverify_result,
         }
 
 def validate_email_zb(email):
