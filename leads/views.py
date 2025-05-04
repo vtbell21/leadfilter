@@ -252,7 +252,10 @@ def facebook_webhook(request):
                 message = parsed_fields.get('message', '')
                 custom_fields = {k: v for k, v in parsed_fields.items() if k not in ['full_name', 'name', 'email', 'phone', 'phone_number', 'message']}
                 # Score the lead
-                score_result = score_lead(parsed_fields)
+                if field_data:
+                    score_result = score_lead({'field_data': field_data})
+                else:
+                    score_result = score_lead(lead_data)
                 logger.info(f"Lead scored as {'spam' if score_result['is_spam'] else 'not spam'}: {score_result['gpt_reason']}")
                 logger.info(f"Custom fields: {custom_fields}")
                 is_valid_email = validate_email_zb(email) if email else False
