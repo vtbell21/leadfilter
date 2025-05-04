@@ -114,5 +114,5 @@ def cancel_subscription(request):
         else:
             messages.warning(request, 'No active subscription found.')
     except Exception as e:
-        messages.error(request, f'Error canceling subscription: {str(e)}')
+        messages.error(request, f'Error canceling subscription: {e}')
     return redirect('leads:dashboard') 
