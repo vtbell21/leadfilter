@@ -262,12 +262,18 @@ def facebook_webhook(request):
                             'message': field_dict.get('message', ''),
                             'timestamp': datetime.utcnow().isoformat() + 'Z',
                         }
+                        logger.info(f"Attempting to POST to webhook: {webhook_settings.webhook_url} with payload: {payload}")
                         try:
-                            requests.post(
+                            response = requests.post(
                                 webhook_settings.webhook_url,
                                 json=payload,
                                 timeout=5
                             )
+                            logger.info(f"Webhook POST response: {response.status_code} {response.text}")
+                            if response.status_code >= 200 and response.status_code < 300:
+                                messages.success(request, f'Successfully sent lead to webhook')
+                            else:
+                                messages.error(request, f'Failed to send lead to webhook. Webhook responded with status {response.status_code}: {response.text}')
                         except Exception as webhook_exc:
                             logger.warning(f"Failed to POST to webhook for user {page_connection.user}: {webhook_exc}")
                 except WebhookSettings.DoesNotExist:
@@ -969,15 +975,18 @@ def test_webhook(request):
             'timestamp': datetime.utcnow().isoformat() + 'Z',
         }
 
+    logger.info(f"[TEST] Attempting to POST to webhook: {webhook_settings.webhook_url} with payload: {payload}")
     try:
         resp = requests.post(
             webhook_settings.webhook_url,
             json=payload,
             timeout=5
         )
+        logger.info(f"[TEST] Webhook POST response: {resp.status_code} {resp.text}")
         if resp.status_code >= 200 and resp.status_code < 300:
             return JsonResponse({'success': True, 'message': f'Successfully sent test payload. Webhook responded with status {resp.status_code}.', 'payload': payload})
         else:
             return JsonResponse({'success': False, 'error': f'Webhook responded with status {resp.status_code}: {resp.text}', 'payload': payload}, status=400)
     except Exception as exc:
+        logger.warning(f"[TEST] Failed to POST to webhook: {exc}")
         return JsonResponse({'success': False, 'error': f'Failed to POST to webhook: {exc}', 'payload': payload}, status=400)
