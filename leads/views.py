@@ -52,7 +52,6 @@ def get_lead_data(leadgen_id, access_token):
         return None
 
 def score_lead(lead_data):
-    from leads.utils.phone_validation import validate_phone_with_numverify
     """Evaluate if a lead is spam based on its data using GPT and phone validation."""
     if not lead_data or 'field_data' not in lead_data:
         return {
@@ -91,6 +90,7 @@ def score_lead(lead_data):
     numverify_result = None
     phone_spam_penalty = 0.0
     if phone_number:
+        from leads.utils.phone_validation import validate_phone_with_numverify
         numverify_result = validate_phone_with_numverify(phone_number)
         logger.info(f"NumVerify result for {phone_number}: {numverify_result}")
         if not numverify_result['valid'] or numverify_result.get('line_type') == 'voip':
@@ -284,7 +284,9 @@ def facebook_webhook(request):
                 logger.info(f"Custom fields: {custom_fields}")
                 is_valid_email = validate_email_zb(email) if email else False
                 logger.info(f"About to validate phone: {phone}")
-                is_valid_phone = validate_phone_twilio(phone) if phone else False
+                from leads.utils.phone_validation import validate_phone_with_numverify
+                numverify_result = validate_phone_with_numverify(phone) if phone else None
+                is_valid_phone = numverify_result['valid'] if numverify_result else False
                 lead = FacebookLead.objects.create(
                     user=page_connection.user,
                     leadgen_id=leadgen_id,
@@ -1021,9 +1023,9 @@ def test_webhook(request):
 @staff_member_required
 @require_http_methods(["GET"])
 def validate_phone_view(request):
-    from leads.utils.phone_validation import validate_phone_with_numverify
     phone = request.GET.get('phone', '')
     if not phone:
         return JsonResponse({'error': 'Missing phone parameter'}, status=400)
+    from leads.utils.phone_validation import validate_phone_with_numverify
     result = validate_phone_with_numverify(phone)
     return JsonResponse(result)
