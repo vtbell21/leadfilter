@@ -198,3 +198,9 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
 NUMVERIFY_API_KEY = os.environ.get('NUMVERIFY_API_KEY')
+
+PIPEDRIVE_CLIENT_ID = os.getenv('PIPEDRIVE_CLIENT_ID')
+PIPEDRIVE_CLIENT_SECRET = os.getenv('PIPEDRIVE_CLIENT_SECRET')
+PIPEDRIVE_REDIRECT_URI = 'https://spamguardai.com/pipedrive/callback/'  # update for production
+
+print("PIPEDRIVE_CLIENT_ID:", os.getenv('PIPEDRIVE_CLIENT_ID'))
