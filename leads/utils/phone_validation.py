@@ -1,5 +1,20 @@
 import requests
 from django.conf import settings
+import phonenumbers
+from phonenumbers import NumberParseException, PhoneNumberFormat
+
+def normalize_phone_number(raw_number, default_region="US"):
+    """
+    Parse and validate a phone number. Return E.164 format if valid, else None.
+    """
+    try:
+        parsed = phonenumbers.parse(raw_number, default_region)
+        if phonenumbers.is_valid_number(parsed):
+            return phonenumbers.format_number(parsed, PhoneNumberFormat.E164)
+        else:
+            return None
+    except NumberParseException:
+        return None
 
 def validate_phone_with_numverify(phone_number):
     """
