@@ -25,6 +25,7 @@ from google.oauth2.credentials import Credentials
 from .forms import LeadRoutingSettingsForm, CustomUserCreationForm, EmailUpdateForm, WebhookSettingsForm
 from leads.services.gmail import send_gmail_message
 from django.contrib.admin.views.decorators import staff_member_required
+from leads.utils.phone_validation import validate_phone_with_numverify, normalize_phone_number
 
 logger = logging.getLogger(__name__)
 
@@ -90,7 +91,6 @@ def score_lead(lead_data):
     numverify_result = None
     phone_spam_penalty = 0.0
     if phone_number:
-        from leads.utils.phone_validation import validate_phone_with_numverify
         numverify_result = validate_phone_with_numverify(phone_number)
         logger.info(f"NumVerify result for {phone_number}: {numverify_result}")
         if not numverify_result['valid'] or numverify_result.get('line_type') == 'voip':
@@ -284,15 +284,18 @@ def facebook_webhook(request):
                 logger.info(f"Custom fields: {custom_fields}")
                 is_valid_email = validate_email_zb(email) if email else False
                 logger.info(f"About to validate phone: {phone}")
-                from leads.utils.phone_validation import validate_phone_with_numverify
-                numverify_result = validate_phone_with_numverify(phone) if phone else None
+                normalized_phone = normalize_phone_number(phone)
+                logger.info(f"Normalized phone: {normalized_phone}")
+                numverify_result = validate_phone_with_numverify(normalized_phone) if normalized_phone else None
+                logger.info(f"NumVerify result for {normalized_phone}: {numverify_result}")
                 is_valid_phone = numverify_result['valid'] if numverify_result else False
+                phone_to_save = normalized_phone if normalized_phone else phone
                 lead = FacebookLead.objects.create(
                     user=page_connection.user,
                     leadgen_id=leadgen_id,
                     full_name=full_name,
                     email=email,
-                    phone=phone,
+                    phone=phone_to_save,
                     message=message,
                     custom_fields=custom_fields,
                     gpt_score=score_result['gpt_score'],
