@@ -175,6 +175,7 @@ def validate_phone_twilio(phone_number):
 @csrf_exempt
 @require_http_methods(["GET", "POST"])
 def facebook_webhook(request):
+    logger.warning("facebook_webhook view was called")
     if request.method == "GET":
         # Handle verification
         mode = request.GET.get('hub.mode')
@@ -187,41 +188,30 @@ def facebook_webhook(request):
             return HttpResponse("Invalid verification token", status=403)
     
     elif request.method == "POST":
-        # Log the raw request body
         raw_body = request.body.decode('utf-8')
         logger.info("=== Facebook Webhook POST Request ===")
         logger.info(f"Raw request body: {raw_body}")
         logger.info("===================================")
         
         try:
-            # Parse the webhook payload
             body = json.loads(raw_body)
-            
-            # Extract page_id and leadgen_id
             page_id = body['entry'][0]['id']
             leadgen_id = body['entry'][0]['changes'][0]['value']['leadgen_id']
             logger.info(f"Received webhook for page {page_id}, leadgen_id: {leadgen_id}")
-            
-            # Look up the page connection
             try:
                 page_connection = FacebookPageConnection.objects.get(page_id=page_id)
-                logger.info(f"Found page connection for user: {page_connection.user.id}")
+                logger.warning(f"Found page connection for user: {page_connection.user.id}")
             except FacebookPageConnection.DoesNotExist:
                 logger.error(f"No page connection found for page_id: {page_id}")
                 return HttpResponse("Page not connected", status=404)
-            
-            # Try to get full lead data from Facebook, fall back to payload if it fails
             try:
                 lead_data = get_lead_data(leadgen_id, page_connection.page_access_token)
             except Exception as e:
                 logger.warning(f"Failed to fetch lead from Facebook, using payload data: {e}")
                 try:
-                    # Extract lead data from the payload
                     lead_data = body['entry'][0]['changes'][0]['value']
-                    # For test data, ensure required fields exist
                     if 'field_data' not in lead_data:
                         lead_data['field_data'] = []
-                        # Add any fields from the payload root level
                         for field in ['full_name', 'name', 'email', 'phone', 'message']:
                             if field in lead_data:
                                 lead_data['field_data'].append({
@@ -233,8 +223,8 @@ def facebook_webhook(request):
                     logger.error(f"Error processing payload data: {payload_error}")
                     logger.error(f"Raw payload: {body}")
                     return HttpResponse("Invalid payload structure", status=400)
-
             if lead_data:
+                logger.info(f"Lead data to be processed: {lead_data}")
                 print("\n=== Lead Data ===")
                 pprint.pprint(lead_data)
                 print("=================\n")
@@ -258,10 +248,11 @@ def facebook_webhook(request):
                 is_valid_phone = validate_phone_twilio(phone) if phone else False
                 
                 # Always save the lead
-                FacebookLead.objects.create(
+                lead = FacebookLead.objects.create(
                     user=page_connection.user,  # Associate with the page owner
+                    page=page_connection,
                     leadgen_id=leadgen_id,
-                    full_name=field_dict.get('full_name', ''),
+                    full_name=field_dict.get('full_name', '') or field_dict.get('name', ''),
                     email=email,
                     phone=phone,
                     message=field_dict.get('message', ''),
@@ -273,6 +264,7 @@ def facebook_webhook(request):
                     is_valid_email=is_valid_email,
                     is_valid_phone=is_valid_phone
                 )
+                logger.warning(f"Lead saved with ID: {lead.id}")
 
                 # Webhook: send leads if enabled for spam or non-spam
                 try:
@@ -307,7 +299,7 @@ def facebook_webhook(request):
                 except WebhookSettings.DoesNotExist:
                     pass
             
-            return HttpResponse("Event received", status=200)
+            return HttpResponse("OK", status=200)
             
         except json.JSONDecodeError:
             logger.error("Invalid JSON received from Facebook webhook")
@@ -315,6 +307,9 @@ def facebook_webhook(request):
         except (KeyError, IndexError) as e:
             logger.error(f"Error extracting data from webhook payload: {str(e)}")
             return HttpResponse("Invalid webhook payload", status=400)
+        except Exception as e:
+            logger.error(f"Unhandled error in webhook: {e}")
+            return HttpResponse("Internal server error", status=500)
 
 def signup(request):
     if request.method == 'POST':
