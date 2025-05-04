@@ -33,7 +33,7 @@ class FacebookLead(models.Model):
     leadgen_id = models.CharField(max_length=100, unique=True)
     full_name = models.CharField(max_length=255, blank=True)
     email = models.EmailField(blank=True)
-    phone = models.CharField(max_length=20, blank=True)
+    phone = models.CharField(max_length=50, blank=True)
     message = models.TextField(null=True, blank=True)
     custom_fields = models.JSONField(default=dict)
     gpt_score = models.FloatField(default=0.0)
