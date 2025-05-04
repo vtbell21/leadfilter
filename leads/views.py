@@ -255,7 +255,6 @@ def facebook_webhook(request):
                 is_valid_phone = validate_phone_twilio(phone) if phone else False
                 lead = FacebookLead.objects.create(
                     user=page_connection.user,
-                    page=page_connection,
                     leadgen_id=leadgen_id,
                     full_name=full_name,
                     email=email,
