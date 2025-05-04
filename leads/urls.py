@@ -45,4 +45,5 @@ urlpatterns = [
     path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name='leads/password_reset_confirm.html'), name='password_reset_confirm'),
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(template_name='leads/password_reset_complete.html'), name='password_reset_complete'),
     path('settings/webhook/', views.webhook_settings_view, name='webhook_settings'),
+    path('settings/webhook/test/', views.test_webhook, name='test_webhook'),
 ] 

@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_http_methods, require_POST
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.forms import UserCreationForm
@@ -938,3 +938,34 @@ def webhook_settings_view(request):
         form = WebhookSettingsForm(instance=webhook_settings)
 
     return render(request, 'leads/webhook_settings.html', {'form': form})
+
+@login_required
+@require_POST
+def test_webhook(request):
+    try:
+        webhook_settings = request.user.webhook_settings
+    except WebhookSettings.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'No webhook settings found for this user.'}, status=400)
+
+    if not webhook_settings.webhook_url:
+        return JsonResponse({'success': False, 'error': 'No webhook URL configured.'}, status=400)
+
+    sample_payload = {
+        'name': 'Sample Lead',
+        'email': 'sample@example.com',
+        'phone': '+1234567890',
+        'message': 'This is a test lead from Spam Guard.',
+        'timestamp': datetime.utcnow().isoformat() + 'Z',
+    }
+    try:
+        resp = requests.post(
+            webhook_settings.webhook_url,
+            json=sample_payload,
+            timeout=5
+        )
+        if resp.status_code >= 200 and resp.status_code < 300:
+            return JsonResponse({'success': True, 'message': f'Successfully sent test payload. Webhook responded with status {resp.status_code}.'})
+        else:
+            return JsonResponse({'success': False, 'error': f'Webhook responded with status {resp.status_code}: {resp.text}'}, status=400)
+    except Exception as exc:
+        return JsonResponse({'success': False, 'error': f'Failed to POST to webhook: {exc}'}, status=400)
