@@ -25,6 +25,7 @@ from google.oauth2.credentials import Credentials
 from .forms import LeadRoutingSettingsForm, CustomUserCreationForm, EmailUpdateForm, WebhookSettingsForm
 from leads.services.gmail import send_gmail_message
 from leads.utils.phone_validation import validate_phone_with_numverify
+from django.contrib.admin.views.decorators import staff_member_required
 
 logger = logging.getLogger(__name__)
 
@@ -1016,3 +1017,12 @@ def test_webhook(request):
     except Exception as exc:
         logger.warning(f"[TEST] Failed to POST to webhook: {exc}")
         return JsonResponse({'success': False, 'error': f'Failed to POST to webhook: {exc}', 'payload': payload}, status=400)
+
+@staff_member_required
+@require_http_methods(["GET"])
+def validate_phone_view(request):
+    phone = request.GET.get('phone', '')
+    if not phone:
+        return JsonResponse({'error': 'Missing phone parameter'}, status=400)
+    result = validate_phone_with_numverify(phone)
+    return JsonResponse(result)

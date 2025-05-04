@@ -46,4 +46,5 @@ urlpatterns = [
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(template_name='leads/password_reset_complete.html'), name='password_reset_complete'),
     path('settings/webhook/', views.webhook_settings_view, name='webhook_settings'),
     path('settings/webhook/test/', views.test_webhook, name='test_webhook'),
+    path('validate-phone/', views.validate_phone_view, name='validate_phone'),
 ] 
