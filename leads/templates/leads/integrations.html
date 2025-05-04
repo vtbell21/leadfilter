@@ -51,6 +51,47 @@
                 </div>
             </div>
 
+            <!-- Pipedrive Integration Card -->
+            <div class="card mb-4 integration-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h4 class="card-title mb-3">
+                                <img src="https://www.pipedrive.com/favicon.ico" 
+                                     alt="Pipedrive" class="integration-logo me-2" width="30">
+                                Pipedrive CRM
+                            </h4>
+                            <p class="card-text text-muted mb-4">
+                                Connect your Pipedrive CRM to automatically sync your leads. Streamline your sales process and keep your pipeline up to date with qualified leads.
+                            </p>
+                            <ul class="feature-list mb-4">
+                                <li><i class="bi bi-check-circle-fill text-success"></i> Automatic lead syncing</li>
+                                <li><i class="bi bi-check-circle-fill text-success"></i> Contact creation</li>
+                                <li><i class="bi bi-check-circle-fill text-success"></i> Deal/opportunity creation</li>
+                                <li><i class="bi bi-check-circle-fill text-success"></i> Real-time updates</li>
+                            </ul>
+                        </div>
+                        <div class="text-end" style="min-width: 200px;">
+                            {% if pipedrive_connected %}
+                                <div class="connection-status connected mb-3">
+                                    <i class="bi bi-check-circle-fill"></i> Connected
+                                </div>
+                                <button class="btn btn-outline-success" disabled>
+                                    <i class="bi bi-check-lg"></i> Connected to Pipedrive
+                                </button>
+                            {% else %}
+                                <div class="connection-status disconnected mb-3">
+                                    <i class="bi bi-x-circle-fill"></i> Not Connected
+                                </div>
+                                <a href="/pipedrive/connect/" class="btn btn-primary">
+                                    <i class="bi bi-plug-fill"></i> Connect Pipedrive
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Coming Soon Integrations -->
             <div class="card mb-4 integration-card disabled">
                 <div class="card-body">
@@ -64,32 +105,6 @@
                             <p class="card-text text-muted mb-4">
                                 Coming Soon: Connect your Salesforce account to sync leads and manage your sales pipeline 
                                 directly from your CRM.
-                            </p>
-                        </div>
-                        <div class="text-end" style="min-width: 200px;">
-                            <div class="connection-status coming-soon mb-3">
-                                <i class="bi bi-clock-fill"></i> Coming Soon
-                            </div>
-                            <button class="btn btn-secondary" disabled>
-                                <i class="bi bi-hourglass-split"></i> Coming Soon
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card mb-4 integration-card disabled">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <h4 class="card-title mb-3">
-                                <img src="https://www.pipedrive.com/favicon.ico" 
-                                     alt="Pipedrive" class="integration-logo me-2" width="30">
-                                Pipedrive
-                            </h4>
-                            <p class="card-text text-muted mb-4">
-                                Coming Soon: Integrate with Pipedrive to streamline your sales process and 
-                                automatically sync your qualified leads.
                             </p>
                         </div>
                         <div class="text-end" style="min-width: 200px;">
