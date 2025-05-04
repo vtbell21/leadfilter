@@ -247,35 +247,36 @@ def facebook_webhook(request):
                     is_valid_phone=is_valid_phone
                 )
 
-                # Webhook: send non-spam leads if enabled
+                # Webhook: send leads if enabled for spam or non-spam
                 try:
                     webhook_settings = WebhookSettings.objects.get(user=page_connection.user)
-                    if (
-                        webhook_settings.webhook_url and
-                        not score_result['is_spam'] and
-                        webhook_settings.send_non_spam
-                    ):
-                        payload = {
-                            'name': field_dict.get('full_name', ''),
-                            'email': email,
-                            'phone': phone,
-                            'message': field_dict.get('message', ''),
-                            'timestamp': datetime.utcnow().isoformat() + 'Z',
-                        }
-                        logger.info(f"Attempting to POST to webhook: {webhook_settings.webhook_url} with payload: {payload}")
-                        try:
-                            response = requests.post(
-                                webhook_settings.webhook_url,
-                                json=payload,
-                                timeout=5
-                            )
-                            logger.info(f"Webhook POST response: {response.status_code} {response.text}")
-                            if response.status_code >= 200 and response.status_code < 300:
-                                messages.success(request, f'Successfully sent lead to webhook')
-                            else:
-                                messages.error(request, f'Failed to send lead to webhook. Webhook responded with status {response.status_code}: {response.text}')
-                        except Exception as webhook_exc:
-                            logger.warning(f"Failed to POST to webhook for user {page_connection.user}: {webhook_exc}")
+                    if webhook_settings.webhook_url:
+                        should_send = (
+                            (not score_result['is_spam'] and webhook_settings.send_non_spam) or
+                            (score_result['is_spam'] and webhook_settings.send_spam)
+                        )
+                        if should_send:
+                            payload = {
+                                'name': field_dict.get('full_name', ''),
+                                'email': email,
+                                'phone': phone,
+                                'message': field_dict.get('message', ''),
+                                'timestamp': datetime.utcnow().isoformat() + 'Z',
+                            }
+                            logger.info(f"Attempting to POST to webhook: {webhook_settings.webhook_url} with payload: {payload}")
+                            try:
+                                response = requests.post(
+                                    webhook_settings.webhook_url,
+                                    json=payload,
+                                    timeout=5
+                                )
+                                logger.info(f"Webhook POST response: {response.status_code} {response.text}")
+                                if response.status_code >= 200 and response.status_code < 300:
+                                    messages.success(request, f'Successfully sent lead to webhook')
+                                else:
+                                    messages.error(request, f'Failed to send lead to webhook. Webhook responded with status {response.status_code}: {response.text}')
+                            except Exception as webhook_exc:
+                                logger.warning(f"Failed to POST to webhook for user {page_connection.user}: {webhook_exc}")
                 except WebhookSettings.DoesNotExist:
                     pass
             
