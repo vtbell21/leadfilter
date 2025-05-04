@@ -247,26 +247,30 @@ def facebook_webhook(request):
                     is_valid_phone=is_valid_phone
                 )
 
-                # Only try to send to Gmail if enabled and credentials exist
+                # Webhook: send non-spam leads if enabled
                 try:
-                    routing_settings = LeadRoutingSettings.objects.get(user=page_connection.user)
-                    if routing_settings.send_to_gmail:
-                        has_gmail = GmailCredentials.objects.filter(user=page_connection.user).exists()
-                        if has_gmail:
-                            to_email = page_connection.user.email
-                            subject = routing_settings.spam_lead_subject if score_result['is_spam'] else routing_settings.good_lead_subject
-                            body_text = f"Lead details:\n\n" + "\n".join(f"{k}: {v}" for k, v in field_dict.items())
-                            send_gmail_message(
-                                page_connection.user,
-                                to_email,
-                                subject,
-                                body_text,
-                                is_spam=(score_result['is_spam'] and routing_settings.spam_labeling_enabled),
-                                lead_details=field_dict
+                    webhook_settings = WebhookSettings.objects.get(user=page_connection.user)
+                    if (
+                        webhook_settings.webhook_url and
+                        not score_result['is_spam'] and
+                        webhook_settings.send_non_spam
+                    ):
+                        payload = {
+                            'name': field_dict.get('full_name', ''),
+                            'email': email,
+                            'phone': phone,
+                            'message': field_dict.get('message', ''),
+                            'timestamp': datetime.utcnow().isoformat() + 'Z',
+                        }
+                        try:
+                            requests.post(
+                                webhook_settings.webhook_url,
+                                json=payload,
+                                timeout=5
                             )
-                        else:
-                            logger.warning(f"No Gmail credentials found for user {page_connection.user}. Skipping email send.")
-                except LeadRoutingSettings.DoesNotExist:
+                        except Exception as webhook_exc:
+                            logger.warning(f"Failed to POST to webhook for user {page_connection.user}: {webhook_exc}")
+                except WebhookSettings.DoesNotExist:
                     pass
             
             return HttpResponse("Event received", status=200)
