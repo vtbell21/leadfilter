@@ -148,6 +148,10 @@ def validate_phone_twilio(phone_number):
             logger.error("Twilio credentials not found in environment variables")
             return False
         
+        # Ensure phone is in E.164 format (prepend +1 for US numbers if missing)
+        if not phone_number.startswith('+'):
+            phone_number = '+1' + phone_number
+        
         # Create basic auth header
         auth_string = f"{account_sid}:{auth_token}"
         auth_bytes = auth_string.encode('ascii')
