@@ -1,7 +1,7 @@
 from django.urls import path
 from . import views
 from . import views_pipedrive
-from leads.views_stripe import create_checkout_session, subscription_success, subscription_cancel
+from leads.views_stripe import create_checkout_session, subscription_success, subscription_cancel, stripe_webhook
 from leads.views_hubspot import hubspot_connect, hubspot_callback, hubspot_connected_success, hubspot_disconnect
 from leads.views import integrations_view
 from django.contrib.auth import views as auth_views
@@ -52,4 +52,5 @@ urlpatterns = [
     path('pipedrive/connect/', views_pipedrive.pipedrive_connect, name='pipedrive_connect'),
     path('pipedrive/callback/', views_pipedrive.pipedrive_callback, name='pipedrive_callback'),
     path('pipedrive/disconnect/', views_pipedrive.pipedrive_disconnect, name='pipedrive_disconnect'),
+    path('stripe/webhook/', stripe_webhook, name='stripe_webhook'),
 ] 
