@@ -209,8 +209,13 @@ def facebook_webhook(request):
                 logger.error(f"No page connection found for page_id: {page_id}")
                 return HttpResponse("Page not connected", status=404)
             
-            # Get full lead data using the page's access token
-            lead_data = get_lead_data(leadgen_id, page_connection.page_access_token)
+            # Try to get full lead data from Facebook, fall back to payload if it fails
+            try:
+                lead_data = get_lead_data(leadgen_id, page_connection.page_access_token)
+            except Exception as e:
+                logger.warning(f"Failed to fetch lead from Facebook, using payload data: {e}")
+                lead_data = body['entry'][0]['changes'][0]['value']
+            
             if lead_data:
                 print("\n=== Lead Data ===")
                 pprint.pprint(lead_data)
