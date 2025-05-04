@@ -8,6 +8,9 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     hubspot_access_token = models.TextField(blank=True, null=True)
     hubspot_refresh_token = models.TextField(blank=True, null=True)
+    pipedrive_access_token = models.TextField(blank=True, null=True)
+    pipedrive_refresh_token = models.TextField(blank=True, null=True)
+    pipedrive_token_expires_at = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
         return f"{self.user.username}'s profile"
@@ -57,6 +60,10 @@ class FacebookLead(models.Model):
         # If this is a new lead and it's not spam, send to HubSpot
         if is_new and not self.is_spam and self.user and hasattr(self.user, 'hubspot_access_token'):
             create_hubspot_contact(self.user, self)
+        # If this is a new lead and it's not spam, send to Pipedrive if connected
+        if is_new and not self.is_spam and hasattr(self.user, 'profile') and self.user.profile.pipedrive_access_token:
+            from leads.services.pipedrive import send_lead_to_pipedrive
+            send_lead_to_pipedrive(self.user, self)
 
 class FacebookPageConnection(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='facebook_pages')
