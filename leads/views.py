@@ -215,6 +215,7 @@ def facebook_webhook(request):
             except Exception as e:
                 logger.warning(f"Failed to fetch lead from Facebook, using payload data: {e}")
                 lead_data = body['entry'][0]['changes'][0]['value']
+                logger.info(f"Using payload data: {lead_data}")
             
             if lead_data:
                 print("\n=== Lead Data ===")
