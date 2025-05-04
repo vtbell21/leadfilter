@@ -205,6 +205,7 @@ def facebook_webhook(request):
             # Look up the page connection
             try:
                 page_connection = FacebookPageConnection.objects.get(page_id=page_id)
+                logger.info(f"Found page connection for user: {page_connection.user.id}")
             except FacebookPageConnection.DoesNotExist:
                 logger.error(f"No page connection found for page_id: {page_id}")
                 return HttpResponse("Page not connected", status=404)
