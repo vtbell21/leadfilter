@@ -91,8 +91,12 @@ def score_lead(lead_data):
     numverify_result = None
     phone_spam_penalty = 0.0
     if phone_number:
-        numverify_result = validate_phone_with_numverify(phone_number)
-        logger.info(f"NumVerify result for {phone_number}: {numverify_result}")
+        normalized = normalize_phone_number(phone_number)
+        if normalized:
+            numverify_result = validate_phone_with_numverify(normalized)
+        else:
+            numverify_result = {'valid': False, 'is_us_number': False, 'line_type': None}
+        logger.info(f"NumVerify debug — raw: {phone_number}, normalized: {normalized}, result: {numverify_result}")
         if not numverify_result['valid'] or numverify_result.get('line_type') == 'voip':
             phone_spam_penalty += 0.4
         if not numverify_result.get('is_us_number', False):
