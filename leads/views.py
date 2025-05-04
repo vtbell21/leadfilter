@@ -215,9 +215,25 @@ def facebook_webhook(request):
                 lead_data = get_lead_data(leadgen_id, page_connection.page_access_token)
             except Exception as e:
                 logger.warning(f"Failed to fetch lead from Facebook, using payload data: {e}")
-                lead_data = body['entry'][0]['changes'][0]['value']
-                logger.info(f"Using payload data: {lead_data}")
-            
+                try:
+                    # Extract lead data from the payload
+                    lead_data = body['entry'][0]['changes'][0]['value']
+                    # For test data, ensure required fields exist
+                    if 'field_data' not in lead_data:
+                        lead_data['field_data'] = []
+                        # Add any fields from the payload root level
+                        for field in ['full_name', 'name', 'email', 'phone', 'message']:
+                            if field in lead_data:
+                                lead_data['field_data'].append({
+                                    'name': field,
+                                    'values': [lead_data[field]]
+                                })
+                    logger.info(f"Processed payload data into lead_data: {lead_data}")
+                except Exception as payload_error:
+                    logger.error(f"Error processing payload data: {payload_error}")
+                    logger.error(f"Raw payload: {body}")
+                    return HttpResponse("Invalid payload structure", status=400)
+
             if lead_data:
                 print("\n=== Lead Data ===")
                 pprint.pprint(lead_data)
@@ -230,6 +246,10 @@ def facebook_webhook(request):
                 # Extract field data
                 field_dict = score_result['field_data']
                 custom_fields = score_result['custom_fields']
+                
+                # Log the extracted fields
+                logger.info(f"Extracted fields: {field_dict}")
+                logger.info(f"Custom fields: {custom_fields}")
                 
                 # Validate email and phone
                 email = field_dict.get('email', '')
