@@ -275,6 +275,13 @@ def facebook_webhook(request):
 
             # Save the lead using the parsed fields
             try:
+                # Restrict by subscription and quota
+                profile = page_connection.user.profile
+                if profile.subscription_status != 'active':
+                    return JsonResponse({'error': 'You must subscribe to a plan to use lead filtering.'}, status=403)
+                if profile.lead_filter_count >= profile.lead_filter_quota:
+                    return JsonResponse({'error': 'You have reached your monthly lead filtering limit.'}, status=403)
+                
                 full_name = parsed_fields.get('full_name') or parsed_fields.get('name', '')
                 email = parsed_fields.get('email', '')
                 phone = parsed_fields.get('phone_number', parsed_fields.get('phone', ''))
@@ -310,6 +317,9 @@ def facebook_webhook(request):
                     is_valid_email=is_valid_email,
                     is_valid_phone=is_valid_phone,
                 )
+                # Increment lead filter count
+                profile.lead_filter_count += 1
+                profile.save()
                 logger.warning(f"Lead saved with ID: {lead.id} (source: {data_source})")
             except Exception as save_error:
                 logger.error(f"Error saving lead: {save_error}")
