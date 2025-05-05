@@ -95,13 +95,17 @@ class FacebookPageConnection(models.Model):
         verbose_name_plural = 'Facebook Page Connections'
 
 class LeadRoutingSettings(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='lead_routing_settings')
-    send_to_gmail = models.BooleanField(default=False)
-    spam_labeling_enabled = models.BooleanField(default=True)
-    good_lead_subject = models.CharField(max_length=100, default="New Lead")
-    spam_lead_subject = models.CharField(max_length=100, default="Spam Lead")
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='lead_routing_settings')
+    send_non_spam_to_inbox = models.BooleanField(default=True)
+    send_spam_to_inbox = models.BooleanField(default=True)
+    non_spam_subject = models.CharField(max_length=100, default="✅ New Qualified Lead")
+    spam_subject = models.CharField(max_length=100, default="🚫 New Spam Lead Detected")
+    notification_email = models.EmailField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    # Optionally, add daily_summary and include_lead_details fields for future use
+    # daily_summary = models.BooleanField(default=False)
+    # include_lead_details = models.BooleanField(default=True)
 
     def __str__(self):
         return f"LeadRoutingSettings for {self.user.username}"

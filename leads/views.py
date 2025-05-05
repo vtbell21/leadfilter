@@ -899,14 +899,20 @@ def about_view(request):
 
 @login_required
 def lead_routing_settings_view(request):
+    # Ensure the user has a LeadRoutingSettings object
+    try:
+        settings = request.user.lead_routing_settings
+    except LeadRoutingSettings.DoesNotExist:
+        settings = LeadRoutingSettings.objects.create(user=request.user, notification_email=request.user.email)
+
     if request.method == 'POST':
-        form = LeadRoutingSettingsForm(request.POST, instance=request.user.leadroutingsettings)
+        form = LeadRoutingSettingsForm(request.POST, instance=settings)
         if form.is_valid():
             form.save()
             messages.success(request, 'Lead routing settings updated successfully.')
             return redirect('leads:lead_routing_settings')
     else:
-        form = LeadRoutingSettingsForm(instance=request.user.leadroutingsettings)
+        form = LeadRoutingSettingsForm(instance=settings)
     return render(request, 'leads/lead_routing_settings.html', {'form': form})
 
 @login_required

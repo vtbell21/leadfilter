@@ -6,11 +6,19 @@ from django.contrib.auth.models import User
 class LeadRoutingSettingsForm(forms.ModelForm):
     class Meta:
         model = LeadRoutingSettings
-        fields = ['spam_labeling_enabled', 'good_lead_subject', 'spam_lead_subject']
+        fields = [
+            'send_non_spam_to_inbox',
+            'send_spam_to_inbox',
+            'non_spam_subject',
+            'spam_subject',
+            'notification_email',
+        ]
         widgets = {
-            'spam_labeling_enabled': forms.CheckboxInput(),
-            'good_lead_subject': forms.TextInput(attrs={'class': 'form-control'}),
-            'spam_lead_subject': forms.TextInput(attrs={'class': 'form-control'}),
+            'send_non_spam_to_inbox': forms.CheckboxInput(),
+            'send_spam_to_inbox': forms.CheckboxInput(),
+            'non_spam_subject': forms.TextInput(attrs={'class': 'form-control'}),
+            'spam_subject': forms.TextInput(attrs={'class': 'form-control'}),
+            'notification_email': forms.EmailInput(attrs={'class': 'form-control'}),
         }
 
 class CustomUserCreationForm(UserCreationForm):
