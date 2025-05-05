@@ -11,6 +11,11 @@ class UserProfile(models.Model):
     pipedrive_access_token = models.TextField(blank=True, null=True)
     pipedrive_refresh_token = models.TextField(blank=True, null=True)
     pipedrive_token_expires_at = models.DateTimeField(blank=True, null=True)
+    lead_filter_count = models.IntegerField(default=0)
+    lead_filter_quota = models.IntegerField(default=0)
+    stripe_customer_id = models.CharField(max_length=255, blank=True, null=True)
+    stripe_subscription_id = models.CharField(max_length=255, blank=True, null=True)
+    subscription_status = models.CharField(max_length=50, default='inactive')
 
     def __str__(self):
         return f"{self.user.username}'s profile"
