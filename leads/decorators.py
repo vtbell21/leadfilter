@@ -12,7 +12,7 @@ def login_required_and_subscribed(view_func):
         if is_subscribed is not None:
             subscribed = is_subscribed
         else:
-            subscribed = getattr(profile, 'subscription_status', '') == 'active'
+            subscribed = getattr(profile, 'subscription_status', '') != 'inactive'
         if not subscribed:
             return redirect('leads:pricing')
         return view_func(request, *args, **kwargs)
