@@ -852,7 +852,7 @@ def terms_of_service(request):
     return render(request, 'leads/terms.html')
 
 def pricing_view(request):
-    return render(request, 'pricing.html')
+    return render(request, 'leads/pricing.html')
 
 @login_required_and_subscribed
 def integrations_view(request):
