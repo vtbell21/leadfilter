@@ -23,5 +23,5 @@ class SubscriptionMiddleware:
             if not subscribed:
                 # Allow access to allowed paths
                 if not any(request.path.startswith(path) for path in self.allowed_paths):
-                    return redirect(reverse('leads:subscribe'))
+                    return redirect(reverse('subscribe'))
         return self.get_response(request) 
