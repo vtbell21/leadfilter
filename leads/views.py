@@ -26,6 +26,7 @@ from .forms import LeadRoutingSettingsForm, CustomUserCreationForm, EmailUpdateF
 from leads.services.gmail import send_gmail_message
 from django.contrib.admin.views.decorators import staff_member_required
 from leads.utils.phone_validation import validate_phone_with_numverify, normalize_phone_number
+from leads.decorators import login_required_and_subscribed
 
 logger = logging.getLogger(__name__)
 
@@ -365,7 +366,7 @@ def logout_view(request):
     messages.info(request, 'Logged out successfully!')
     return redirect('leads:homepage')
 
-@login_required(login_url='leads:login')
+@login_required_and_subscribed
 def lead_dashboard(request):
     """Display a dashboard of valid and spam leads for the authenticated user."""
     try:
@@ -856,7 +857,7 @@ def pricing_view(request):
     }
     return render(request, 'leads/pricing.html', context)
 
-@login_required
+@login_required_and_subscribed
 def integrations_view(request):
     # Get or create the user's profile
     profile, created = UserProfile.objects.get_or_create(user=request.user)
@@ -1049,3 +1050,7 @@ def validate_phone_view(request):
     from leads.utils.phone_validation import validate_phone_with_numverify
     result = validate_phone_with_numverify(phone)
     return JsonResponse(result)
+
+@login_required
+def subscribe(request):
+    return render(request, 'subscribe.html')
