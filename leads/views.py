@@ -852,10 +852,7 @@ def terms_of_service(request):
     return render(request, 'leads/terms.html')
 
 def pricing_view(request):
-    context = {
-        'stripe_publishable_key': settings.STRIPE_PUBLISHABLE_KEY
-    }
-    return render(request, 'leads/pricing.html', context)
+    return render(request, 'pricing.html')
 
 @login_required_and_subscribed
 def integrations_view(request):
