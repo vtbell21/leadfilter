@@ -2,8 +2,10 @@ import os
 import sys
 import django
 import dj_database_url
+import shutil
 from django.db import connections
 from django.conf import settings
+from django.core.management import call_command
 
 def reset_migrations(database_url):
     # Configure Django settings
@@ -13,6 +15,7 @@ def reset_migrations(database_url):
     # Override database configuration
     settings.DATABASES['default'] = dj_database_url.parse(database_url)
     
+    # Reset database
     with connections['default'].cursor() as cursor:
         # Drop all leads tables
         cursor.execute("""
@@ -24,7 +27,20 @@ def reset_migrations(database_url):
             DROP TABLE IF EXISTS leads_webhooksettings CASCADE;
             DELETE FROM django_migrations WHERE app = 'leads';
         """)
-        print("Successfully reset migrations and dropped tables.")
+        print("Successfully reset database tables and migration history.")
+
+    # Clean up migration files
+    migrations_dir = os.path.join('leads', 'migrations')
+    for filename in os.listdir(migrations_dir):
+        if filename != '__init__.py':
+            file_path = os.path.join(migrations_dir, filename)
+            if os.path.isfile(file_path):
+                os.remove(file_path)
+    print("Successfully cleaned up migration files.")
+
+    # Create fresh migration
+    call_command('makemigrations', 'leads')
+    print("Successfully created fresh migration.")
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
