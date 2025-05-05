@@ -27,5 +27,5 @@ class SubscriptionMiddleware:
                     try:
                         return redirect(reverse('subscribe'))
                     except NoReverseMatch:
-                        return HttpResponse("Subscribe URL not configured.", status=500)
+                        return redirect('/pricing/')
         return self.get_response(request) 
