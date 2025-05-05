@@ -251,6 +251,18 @@ def facebook_webhook(request):
             try:
                 page_connection = FacebookPageConnection.objects.get(page_id=page_id)
                 logger.warning(f"Found page connection for user: {page_connection.user.id}")
+                
+                # Add detailed logging for quota check
+                profile = page_connection.user.profile
+                logger.warning(f"User profile details - subscription_status: {profile.subscription_status}, lead_filter_count: {profile.lead_filter_count}, lead_filter_quota: {profile.lead_filter_quota}")
+                
+                if profile.subscription_status != 'active':
+                    logger.warning(f"Subscription check failed - status: {profile.subscription_status}")
+                    return JsonResponse({'error': 'You must subscribe to a plan to use lead filtering.'}, status=403)
+                if profile.lead_filter_count >= profile.lead_filter_quota:
+                    logger.warning(f"Quota check failed - count: {profile.lead_filter_count}, quota: {profile.lead_filter_quota}")
+                    return JsonResponse({'error': 'You have reached your monthly lead filtering limit.'}, status=403)
+                
             except FacebookPageConnection.DoesNotExist:
                 logger.error(f"No page connection found for page_id: {page_id}")
                 return HttpResponse("Page not connected", status=404)
