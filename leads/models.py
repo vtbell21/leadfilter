@@ -3,6 +3,12 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from .hubspot_utils import create_hubspot_contact
+from django.utils import timezone
+from django.core.validators import MinValueValidator, MaxValueValidator
+import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
@@ -16,6 +22,9 @@ class UserProfile(models.Model):
     stripe_customer_id = models.CharField(max_length=255, blank=True, null=True)
     stripe_subscription_id = models.CharField(max_length=255, blank=True, null=True)
     subscription_status = models.CharField(max_length=50, default='inactive')
+    subscription_id = models.CharField(max_length=100, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.user.username}'s profile"
@@ -85,20 +94,6 @@ class FacebookPageConnection(models.Model):
         verbose_name = 'Facebook Page Connection'
         verbose_name_plural = 'Facebook Page Connections'
 
-class GmailCredentials(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='gmail_credentials')
-    token = models.TextField()
-    refresh_token = models.TextField()
-    token_uri = models.CharField(max_length=255)
-    client_id = models.CharField(max_length=255)
-    client_secret = models.CharField(max_length=255)
-    scopes = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return f"GmailCredentials for {self.user.username}"
-
 class LeadRoutingSettings(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='lead_routing_settings')
     send_to_gmail = models.BooleanField(default=False)
@@ -119,3 +114,77 @@ class WebhookSettings(models.Model):
 
     def __str__(self):
         return f"WebhookSettings for {self.user.username}"
+
+class HubSpotCredentials(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    access_token = models.TextField()
+    refresh_token = models.TextField()
+    expires_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.user.email} - HubSpot Credentials"
+
+class PipedriveCredentials(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    access_token = models.TextField()
+    refresh_token = models.TextField()
+    expires_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.user.email} - Pipedrive Credentials"
+
+class StripeCustomer(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    customer_id = models.CharField(max_length=100)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.user.email} - {self.customer_id}"
+
+class Subscription(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    stripe_subscription_id = models.CharField(max_length=100)
+    status = models.CharField(max_length=20)
+    current_period_start = models.DateTimeField()
+    current_period_end = models.DateTimeField()
+    cancel_at_period_end = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.user.email} - {self.status}"
+
+class Price(models.Model):
+    stripe_price_id = models.CharField(max_length=100)
+    product_name = models.CharField(max_length=100)
+    amount = models.IntegerField()
+    currency = models.CharField(max_length=3)
+    interval = models.CharField(max_length=20)
+    lead_filter_quota = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.product_name} - {self.amount} {self.currency}"
+
+class LeadFilterCount(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    count = models.IntegerField(default=0)
+    last_reset = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.email} - {self.count}"
+
+    def reset_if_new_month(self):
+        now = timezone.now()
+        if now.month != self.last_reset.month or now.year != self.last_reset.year:
+            self.count = 0
+            self.last_reset = now
+            self.save()
+            return True
+        return False

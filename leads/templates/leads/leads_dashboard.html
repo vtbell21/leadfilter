@@ -4,11 +4,6 @@
 {% block content %}
 <div class="container-fluid py-4">
     <div class="d-flex justify-content-end mb-3">
-        {% if not request.user.gmail_credentials.exists %}
-            <a href="{% url 'leads:gmail_oauth_start' %}" class="btn btn-primary me-2"><i class="bi bi-envelope"></i> Connect Gmail</a>
-        {% else %}
-            <span class="badge bg-success me-2">Gmail Connected</span>
-        {% endif %}
         <a href="{% url 'leads:update_email' %}" class="btn btn-outline-secondary me-2">Change Email</a>
         <a href="{% url 'leads:lead_routing_settings' %}" class="btn btn-outline-secondary me-2">Lead Routing Settings</a>
         <a href="{% url 'leads:webhook_settings' %}" class="btn btn-outline-secondary">Webhook Settings</a>
@@ -306,127 +301,127 @@
 {% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-<style>
-    .nav-tabs .nav-link {
-        color: #495057;
-    }
-    .nav-tabs .nav-link.active {
-        font-weight: bold;
-    }
-    .table th {
-        background-color: #f8f9fa;
-    }
-    .valid-icon {
-        color: #28a745;
-    }
-    .invalid-icon {
-        color: #dc3545;
-    }
-    .spam-row {
-        background-color: #fff3f3;
-    }
-    .spam-row:hover {
-        background-color: #ffe6e6;
-    }
-    .pagination {
-        margin-top: 20px;
-    }
-    .high-risk {
-        background-color: #ffebee !important;
-    }
-    .high-risk:hover {
-        background-color: #ffe0e3 !important;
-    }
-    .spam-badge {
-        font-size: 0.8em;
-        padding: 0.3em 0.6em;
-        margin-left: 0.5em;
-    }
-    .gpt-score {
-        font-weight: bold;
-    }
-    .gpt-reason {
-        font-size: 0.85em;
-        color: #666;
-        margin-top: 0.2em;
-    }
-    .message-text {
-        font-size: 0.9em;
-        color: #333;
-        white-space: pre-line;
-    }
-    .custom-fields {
-        font-size: 0.85em;
-        color: #666;
-        margin-top: 0.5em;
-    }
-    .custom-fields-toggle {
-        cursor: pointer;
-        color: #0d6efd;
-        text-decoration: underline;
-        font-size: 0.85em;
-    }
-    .custom-fields-content {
-        background-color: #f8f9fa;
-        padding: 0.5em;
-        border-radius: 4px;
-        margin-top: 0.3em;
-    }
-    .navbar {
-        margin-bottom: 20px;
-    }
-    .user-info {
-        margin-right: 15px;
-    }
-    .connect-btn {
-        margin-right: 15px;
-    }
-    .table-container {
-        background-color: white;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        padding: 20px;
-        margin-top: 20px;
-    }
-    .badge-spam {
-        background-color: #dc3545;
-        color: white;
-    }
-    .badge-valid {
-        background-color: #198754;
-        color: white;
-    }
-    .badge-invalid {
-        background-color: #6c757d;
-        color: white;
-    }
-    .table th {
-        background-color: #f8f9fa;
-        font-weight: 600;
-    }
-    .table td {
-        vertical-align: middle;
-    }
-    .lead-link {
-        color: #0d6efd;
-        text-decoration: none;
-    }
-    .lead-link:hover {
-        text-decoration: underline;
-    }
-    .download-btn {
-        margin-left: 10px;
-    }
-    .date-filters {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 15px;
-    }
-    .date-input {
-        width: 150px;
-    }
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <style>
+        .nav-tabs .nav-link {
+            color: #495057;
+        }
+        .nav-tabs .nav-link.active {
+            font-weight: bold;
+        }
+        .table th {
+            background-color: #f8f9fa;
+        }
+        .valid-icon {
+            color: #28a745;
+        }
+        .invalid-icon {
+            color: #dc3545;
+        }
+        .spam-row {
+            background-color: #fff3f3;
+        }
+        .spam-row:hover {
+            background-color: #ffe6e6;
+        }
+        .pagination {
+            margin-top: 20px;
+        }
+        .high-risk {
+            background-color: #ffebee !important;
+        }
+        .high-risk:hover {
+            background-color: #ffe0e3 !important;
+        }
+        .spam-badge {
+            font-size: 0.8em;
+            padding: 0.3em 0.6em;
+            margin-left: 0.5em;
+        }
+        .gpt-score {
+            font-weight: bold;
+        }
+        .gpt-reason {
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 0.2em;
+        }
+        .message-text {
+            font-size: 0.9em;
+            color: #333;
+            white-space: pre-line;
+        }
+        .custom-fields {
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 0.5em;
+        }
+        .custom-fields-toggle {
+            cursor: pointer;
+            color: #0d6efd;
+            text-decoration: underline;
+            font-size: 0.85em;
+        }
+        .custom-fields-content {
+            background-color: #f8f9fa;
+            padding: 0.5em;
+            border-radius: 4px;
+            margin-top: 0.3em;
+        }
+        .navbar {
+            margin-bottom: 20px;
+        }
+        .user-info {
+            margin-right: 15px;
+        }
+        .connect-btn {
+            margin-right: 15px;
+        }
+        .table-container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .badge-spam {
+            background-color: #dc3545;
+            color: white;
+        }
+        .badge-valid {
+            background-color: #198754;
+            color: white;
+        }
+        .badge-invalid {
+            background-color: #6c757d;
+            color: white;
+        }
+        .table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+        .table td {
+            vertical-align: middle;
+        }
+        .lead-link {
+            color: #0d6efd;
+            text-decoration: none;
+        }
+        .lead-link:hover {
+            text-decoration: underline;
+        }
+        .download-btn {
+            margin-left: 10px;
+        }
+        .date-filters {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .date-input {
+            width: 150px;
+        }
     .footer-links {
         position: fixed;
         bottom: 0;
@@ -475,54 +470,54 @@
     }
     .status-disconnected {
         color: #dc3545;
-    }
-</style>
+        }
+    </style>
 {% endblock %}
 
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
         try {
-            // Initialize date pickers
+        // Initialize date pickers
             if (document.getElementById('startDate')) {
-                flatpickr("#startDate", {
-                    dateFormat: "Y-m-d",
-                    allowInput: true
-                });
+        flatpickr("#startDate", {
+            dateFormat: "Y-m-d",
+            allowInput: true
+        });
             }
-            
+        
             if (document.getElementById('endDate')) {
-                flatpickr("#endDate", {
-                    dateFormat: "Y-m-d",
-                    allowInput: true
-                });
+        flatpickr("#endDate", {
+            dateFormat: "Y-m-d",
+            allowInput: true
+        });
             }
-            
-            // Handle export button click
+        
+        // Handle export button click
             const exportBtn = document.getElementById('exportBtn');
             if (exportBtn) {
                 exportBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
+            e.preventDefault();
                     const startDate = document.getElementById('startDate')?.value || '';
                     const endDate = document.getElementById('endDate')?.value || '';
-                    
-                    let url = "{% url 'leads:export_clean_leads' %}";
-                    const params = new URLSearchParams();
-                    
-                    if (startDate) params.append('start_date', startDate);
-                    if (endDate) params.append('end_date', endDate);
-                    
-                    if (params.toString()) {
-                        url += '?' + params.toString();
-                    }
-                    
-                    window.location.href = url;
+            
+            let url = "{% url 'leads:export_clean_leads' %}";
+            const params = new URLSearchParams();
+            
+            if (startDate) params.append('start_date', startDate);
+            if (endDate) params.append('end_date', endDate);
+            
+            if (params.toString()) {
+                url += '?' + params.toString();
+            }
+            
+            window.location.href = url;
                 });
             }
         } catch (error) {
             console.error('Error initializing dashboard:', error);
         }
-    });
-</script>
+        });
+    </script>
 {% endblock %} 

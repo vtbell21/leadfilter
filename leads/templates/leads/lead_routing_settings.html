@@ -5,12 +5,8 @@
     <form method="post">
         {% csrf_token %}
         <div class="mb-3">
-            {{ form.send_to_gmail.label_tag }} {{ form.send_to_gmail }}<br>
-            <small class="text-muted">Send leads to your Gmail account</small>
-        </div>
-        <div class="mb-3">
             {{ form.spam_labeling_enabled.label_tag }} {{ form.spam_labeling_enabled }}<br>
-            <small class="text-muted">Label spam leads in Gmail</small>
+            <small class="text-muted">Label spam leads</small>
         </div>
         <div class="mb-3">
             {{ form.good_lead_subject.label_tag }} {{ form.good_lead_subject }}<br>

@@ -202,3 +202,7 @@ NUMVERIFY_API_KEY = os.environ.get('NUMVERIFY_API_KEY')
 PIPEDRIVE_CLIENT_ID = os.getenv('PIPEDRIVE_CLIENT_ID')
 PIPEDRIVE_CLIENT_SECRET = os.getenv('PIPEDRIVE_CLIENT_SECRET')
 PIPEDRIVE_REDIRECT_URI = 'https://spamguardai.com/pipedrive/callback/'  # update for production
+
+# SendGrid Settings
+SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
+DEFAULT_FROM_EMAIL = "vtbell21@gmail.com"
