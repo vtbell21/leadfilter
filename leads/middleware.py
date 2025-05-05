@@ -1,5 +1,6 @@
 from django.shortcuts import redirect
-from django.urls import reverse
+from django.urls import reverse, NoReverseMatch
+from django.http import HttpResponse
 
 class SubscriptionMiddleware:
     def __init__(self, get_response):
@@ -23,5 +24,8 @@ class SubscriptionMiddleware:
             if not subscribed:
                 # Allow access to allowed paths
                 if not any(request.path.startswith(path) for path in self.allowed_paths):
-                    return redirect(reverse('subscribe'))
+                    try:
+                        return redirect(reverse('subscribe'))
+                    except NoReverseMatch:
+                        return HttpResponse("Subscribe URL not configured.", status=500)
         return self.get_response(request) 
