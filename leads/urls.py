@@ -6,7 +6,7 @@ from leads.views_hubspot import hubspot_connect, hubspot_callback, hubspot_conne
 from leads.views import integrations_view
 from django.contrib.auth import views as auth_views
 
-app_name = 'leads'
+# app_name = 'leads'
 
 urlpatterns = [
     path('', views.homepage, name='homepage'),
@@ -55,4 +55,5 @@ urlpatterns = [
     path('stripe/webhook/', stripe_webhook, name='stripe_webhook'),
     path('subscription/cancel-manual/', cancel_subscription, name='cancel_subscription'),
     path('billing-portal/', billing_portal, name='billing_portal'),
+    path('subscribe/', views.subscribe, name='subscribe'),
 ] 
