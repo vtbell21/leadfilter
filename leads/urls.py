@@ -6,8 +6,6 @@ from leads.views_hubspot import hubspot_connect, hubspot_callback, hubspot_conne
 from leads.views import integrations_view
 from django.contrib.auth import views as auth_views
 
-# app_name = 'leads'
-
 urlpatterns = [
     path('', views.homepage, name='homepage'),
     path('dashboard/', views.lead_dashboard, name='dashboard'),
