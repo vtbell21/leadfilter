@@ -65,6 +65,13 @@
                             <i class="bi bi-tag"></i> Pricing
                         </a>
                     </li>
+                    {% if request.path == '/' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'leads:solutions' %}">
+                            <i class="bi bi-lightbulb"></i> Solutions
+                        </a>
+                    </li>
+                    {% endif %}
                 </ul>
                 <ul class="navbar-nav">
                     {% if user.is_authenticated %}
