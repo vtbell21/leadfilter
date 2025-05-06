@@ -205,4 +205,4 @@ PIPEDRIVE_REDIRECT_URI = 'https://spamguardai.com/pipedrive/callback/'  # update
 
 # SendGrid Settings
 SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
-DEFAULT_FROM_EMAIL = "vtbell21@gmail.com"
+DEFAULT_FROM_EMAIL = "info@spamguardai.com"
