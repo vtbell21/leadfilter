@@ -32,50 +32,13 @@
         <button type="submit" class="btn btn-primary">Save Settings</button>
     </form>
 
-    <!-- How-to Articles Section -->
+    <!-- How-to Article Links -->
     <div class="mt-5">
-        <h3>How to Automatically Send SpamGuard Emails to a Specific Folder</h3>
-        <p>Want to keep your inbox clean? Here's how to automatically sort your SpamGuard emails — like spam lead alerts — into a custom folder.</p>
-        <strong>✅ For Gmail Users:</strong>
-        <ol>
-            <li>Open Gmail and click the ⚙️ gear icon in the top right, then choose "See all settings".</li>
-            <li>Go to the "Filters and Blocked Addresses" tab.</li>
-            <li>Click "Create a new filter".</li>
-            <li>In the "Subject" field, enter:<br><code>Lead Type: Spam</code></li>
-            <li>Click "Create filter".</li>
-            <li>Check:<ul><li>"Skip the Inbox (Archive it)"</li><li>"Apply the label" → then create or choose a label like <strong>Spam Leads</strong></li></ul></li>
-            <li>Click "Create filter" to save.</li>
-        </ol>
-        <p>Now, any email with that subject will go directly into your custom folder.</p>
-        <strong>✅ For Outlook Users:</strong>
-        <ol>
-            <li>Open Outlook and click the "Rules" button under the Home tab.</li>
-            <li>Choose "Manage Rules &amp; Alerts", then click "New Rule".</li>
-            <li>Select "Apply rule on messages I receive".</li>
-            <li>Click Next, then check:<ul><li>"With specific words in the subject" → Add: <code>Lead Type: Spam</code></li></ul></li>
-            <li>Click Next, then choose:<ul><li>"Move it to the specified folder" → Choose or create a folder like <strong>Spam Leads</strong></li></ul></li>
-            <li>Finish the rule to start organizing automatically.</li>
-        </ol>
-        <p><strong>🧠 Tip:</strong> We include "Lead Type: Spam" in the subject line of flagged leads so you can sort them easily.</p>
-    </div>
-    <div class="mt-5">
-        <h3>How to Make Sure SpamGuard Emails Show Up in Your Inbox</h3>
-        <p>If you're not seeing emails from SpamGuard — especially if they're landing in your spam folder — here's how to fix it:</p>
-        <strong>✅ For Gmail:</strong>
-        <ol>
-            <li>Check your spam folder</li>
-            <li>If you find a SpamGuard email, click it.</li>
-            <li>Click the "Not spam" button at the top.</li>
-            <li>Then:<ul><li>Click the three dots (⋮) on the top right of the message</li><li>Select "Filter messages like this"</li><li>In the "From" field, you should see <code>info@spamguardai.com</code></li><li>Click "Create filter", then check: "Never send it to Spam"</li><li>Optionally, apply a label or star</li><li>Click "Create filter" again to finish.</li></ul></li>
-        </ol>
-        <strong>✅ For Outlook:</strong>
-        <ol>
-            <li>Open Outlook</li>
-            <li>Go to your Junk Email folder and find the SpamGuard email</li>
-            <li>Right-click it and choose: "Never Block Sender"</li>
-            <li>Or go to Settings &gt; Junk Email &gt; Safe Senders, and add: <code>info@spamguardai.com</code></li>
-        </ol>
-        <p><strong>🔒 Bonus Tip:</strong> Make sure to add <code>info@spamguardai.com</code> to your contacts to prevent future filtering.</p>
+        <h4>Need help?</h4>
+        <ul>
+            <li><a href="{% url 'how_to_folder' %}" target="_blank">How to Automatically Send SpamGuard Emails to a Specific Folder</a></li>
+            <li><a href="{% url 'how_to_inbox' %}" target="_blank">How to Make Sure SpamGuard Emails Show Up in Your Inbox</a></li>
+        </ul>
     </div>
 </div>
 {% endblock %} 

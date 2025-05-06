@@ -1006,3 +1006,9 @@ def validate_phone_view(request):
 @login_required
 def subscribe(request):
     return render(request, 'subscribe.html')
+
+def how_to_folder_view(request):
+    return render(request, 'leads/how_to_folder.html')
+
+def how_to_inbox_view(request):
+    return render(request, 'leads/how_to_inbox.html')

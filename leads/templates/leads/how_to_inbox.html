@@ -1,0 +1,31 @@
+{% extends "leads/base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h2>How to Make Sure SpamGuard Emails Show Up in Your Inbox</h2>
+    <p>If you're not seeing emails from SpamGuard — especially if they're landing in your spam folder — here's how to fix it:</p>
+    <strong>✅ For Gmail:</strong>
+    <ol>
+        <li>Check your spam folder</li>
+        <li>If you find a SpamGuard email, click it.</li>
+        <li>Click the "Not spam" button at the top.</li>
+        <li>Then:
+            <ul>
+                <li>Click the three dots (⋮) on the top right of the message</li>
+                <li>Select "Filter messages like this"</li>
+                <li>In the "From" field, you should see <code>info@spamguardai.com</code></li>
+                <li>Click "Create filter", then check: "Never send it to Spam"</li>
+                <li>Optionally, apply a label or star</li>
+                <li>Click "Create filter" again to finish.</li>
+            </ul>
+        </li>
+    </ol>
+    <strong>✅ For Outlook:</strong>
+    <ol>
+        <li>Open Outlook</li>
+        <li>Go to your Junk Email folder and find the SpamGuard email</li>
+        <li>Right-click it and choose: "Never Block Sender"</li>
+        <li>Or go to Settings &gt; Junk Email &gt; Safe Senders, and add: <code>info@spamguardai.com</code></li>
+    </ol>
+    <p><strong>🔒 Bonus Tip:</strong> Make sure to add <code>info@spamguardai.com</code> to your contacts to prevent future filtering.</p>
+</div>
+{% endblock %} 

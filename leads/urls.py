@@ -51,4 +51,6 @@ urlpatterns = [
     path('subscription/cancel-manual/', cancel_subscription, name='cancel_subscription'),
     path('billing-portal/', billing_portal, name='billing_portal'),
     path('subscribe/', views.subscribe, name='subscribe'),
+    path('settings/lead-routing/how-to-folder/', views.how_to_folder_view, name='how_to_folder'),
+    path('settings/lead-routing/how-to-inbox/', views.how_to_inbox_view, name='how_to_inbox'),
 ] 
