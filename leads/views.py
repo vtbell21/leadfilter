@@ -1030,3 +1030,11 @@ def ghl_settings_view(request):
         form = GHLApiKeyForm(instance=profile)
 
     return render(request, 'leads/ghl_settings.html', {'form': form})
+
+@login_required
+def ghl_disconnect(request):
+    profile, _ = UserProfile.objects.get_or_create(user=request.user)
+    profile.ghl_api_key = None
+    profile.save()
+    messages.success(request, "GoHighLevel disconnected successfully.")
+    return redirect('leads:integrations')
