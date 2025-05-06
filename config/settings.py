@@ -208,4 +208,8 @@ SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
 DEFAULT_FROM_EMAIL = "info@spamguardai.com"
 
 # Salesforce settings
-SALESFORCE_AUTH_URL = "https://login.salesforce.com/services/oauth2/authorize"
+SALESFORCE_AUTH_URL = os.environ.get('SALESFORCE_AUTH_URL', 'https://login.salesforce.com/services/oauth2/authorize')
+SALESFORCE_CLIENT_ID = os.environ.get('SALESFORCE_CLIENT_ID')
+SALESFORCE_CLIENT_SECRET = os.environ.get('SALESFORCE_CLIENT_SECRET')
+SALESFORCE_CALLBACK_URL = os.environ.get('SALESFORCE_CALLBACK_URL')
+SALESFORCE_TOKEN_URL = os.environ.get('SALESFORCE_TOKEN_URL', 'https://login.salesforce.com/services/oauth2/token')
