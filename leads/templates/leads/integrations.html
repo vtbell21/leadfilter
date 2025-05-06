@@ -173,6 +173,47 @@
                     </div>
                 </div>
             </div>
+
+            <!-- GoHighLevel Integration Card -->
+            <div class="card mb-4 integration-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h4 class="card-title mb-3">
+                                <img src="https://www.gohighlevel.com/images/logo.svg"
+                                     alt="GoHighLevel" class="integration-logo me-2" width="30">
+                                GoHighLevel
+                            </h4>
+                            <p class="card-text text-muted mb-4">
+                                Connect your GoHighLevel account to automatically sync your leads and create contacts and opportunities.
+                            </p>
+                            <ul class="feature-list mb-4">
+                                <li><i class="bi bi-check-circle-fill text-success"></i> Automatic lead syncing</li>
+                                <li><i class="bi bi-check-circle-fill text-success"></i> Contact creation</li>
+                                <li><i class="bi bi-check-circle-fill text-success"></i> Opportunity creation</li>
+                                <li><i class="bi bi-check-circle-fill text-success"></i> Real-time updates</li>
+                            </ul>
+                        </div>
+                        <div class="text-end" style="min-width: 200px;">
+                            {% if user.profile.ghl_api_key %}
+                                <div class="connection-status connected mb-3">
+                                    <i class="bi bi-check-circle-fill"></i> Connected
+                                </div>
+                                <a href="{% url 'leads:ghl_settings' %}" class="btn btn-outline-danger">
+                                    <i class="bi bi-x-lg"></i> Update/Disconnect GHL
+                                </a>
+                            {% else %}
+                                <div class="connection-status disconnected mb-3">
+                                    <i class="bi bi-x-circle-fill"></i> Not Connected
+                                </div>
+                                <a href="{% url 'leads:ghl_settings' %}" class="btn btn-primary">
+                                    <i class="bi bi-plug-fill"></i> Connect GoHighLevel
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
