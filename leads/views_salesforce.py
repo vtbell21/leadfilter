@@ -54,4 +54,13 @@ def salesforce_callback(request):
     profile.salesforce_refresh_token = token_data.get('refresh_token')
     profile.salesforce_instance_url = token_data['instance_url']
     profile.save()
+    return redirect('leads:integrations')
+
+@login_required
+def salesforce_disconnect(request):
+    profile, _ = UserProfile.objects.get_or_create(user=request.user)
+    profile.salesforce_access_token = None
+    profile.salesforce_refresh_token = None
+    profile.salesforce_instance_url = None
+    profile.save()
     return redirect('leads:integrations') 

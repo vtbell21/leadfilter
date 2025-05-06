@@ -5,7 +5,7 @@ from leads.views_stripe import create_checkout_session, subscription_success, su
 from leads.views_hubspot import hubspot_connect, hubspot_callback, hubspot_connected_success, hubspot_disconnect
 from leads.views import integrations_view
 from django.contrib.auth import views as auth_views
-from leads.views_salesforce import salesforce_connect, salesforce_callback
+from leads.views_salesforce import salesforce_connect, salesforce_callback, salesforce_disconnect
 
 urlpatterns = [
     path('', views.homepage, name='homepage'),
@@ -57,4 +57,5 @@ urlpatterns = [
     path('solutions/', views.solutions_view, name='solutions'),
     path('salesforce/connect/', salesforce_connect, name='salesforce_connect'),
     path('salesforce/callback/', salesforce_callback, name='salesforce_callback'),
+    path('salesforce/disconnect/', salesforce_disconnect, name='salesforce_disconnect'),
 ] 

@@ -117,6 +117,9 @@
                                 <div class="connection-status connected mb-3">
                                     <i class="bi bi-check-circle-fill"></i> Connected
                                 </div>
+                                <a href="{% url 'leads:salesforce_disconnect' %}" class="btn btn-outline-danger">
+                                    <i class="bi bi-x-lg"></i> Disconnect Salesforce
+                                </a>
                             {% else %}
                                 <div class="connection-status disconnected mb-3">
                                     <i class="bi bi-x-circle-fill"></i> Not Connected
