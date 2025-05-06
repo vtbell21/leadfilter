@@ -92,28 +92,33 @@
                 </div>
             </div>
 
-            <!-- Coming Soon Integrations -->
-            <div class="card mb-4 integration-card disabled">
+            <!-- Salesforce Integration Card -->
+            <div class="card mb-4 integration-card">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
                             <h4 class="card-title mb-3">
                                 <img src="https://www.salesforce.com/content/dam/sfdc-docs/www/logos/logo-salesforce.svg" 
-                                     alt="Salesforce" class="integration-logo me-2" width="30">
+                                    alt="Salesforce" class="integration-logo me-2" width="30">
                                 Salesforce
                             </h4>
                             <p class="card-text text-muted mb-4">
-                                Coming Soon: Connect your Salesforce account to sync leads and manage your sales pipeline 
-                                directly from your CRM.
+                                Connect Salesforce to automatically push clean leads from Spam Guard.
                             </p>
                         </div>
                         <div class="text-end" style="min-width: 200px;">
-                            <div class="connection-status coming-soon mb-3">
-                                <i class="bi bi-clock-fill"></i> Coming Soon
-                            </div>
-                            <button class="btn btn-secondary" disabled>
-                                <i class="bi bi-hourglass-split"></i> Coming Soon
-                            </button>
+                            {% if user.profile.salesforce_access_token %}
+                                <div class="connection-status connected mb-3">
+                                    <i class="bi bi-check-circle-fill"></i> Connected
+                                </div>
+                            {% else %}
+                                <div class="connection-status disconnected mb-3">
+                                    <i class="bi bi-x-circle-fill"></i> Not Connected
+                                </div>
+                                <a href="{% url 'salesforce_connect' %}" class="btn btn-primary">
+                                    <i class="bi bi-plug-fill"></i> Connect Salesforce
+                                </a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
