@@ -206,3 +206,6 @@ PIPEDRIVE_REDIRECT_URI = 'https://spamguardai.com/pipedrive/callback/'  # update
 # SendGrid Settings
 SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
 DEFAULT_FROM_EMAIL = "info@spamguardai.com"
+
+# Salesforce settings
+SALESFORCE_AUTH_URL = "https://login.salesforce.com/services/oauth2/authorize"
