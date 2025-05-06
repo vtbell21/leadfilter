@@ -214,3 +214,7 @@ SALESFORCE_CLIENT_SECRET = os.environ.get('SALESFORCE_CLIENT_SECRET')
 SALESFORCE_CALLBACK_URL = os.environ.get('SALESFORCE_CALLBACK_URL')
 SALESFORCE_TOKEN_URL = os.environ.get('SALESFORCE_TOKEN_URL', 'https://login.salesforce.com/services/oauth2/token')
 SALESFORCE_REDIRECT_URI = SALESFORCE_CALLBACK_URL
+
+ZOHO_CLIENT_ID = os.environ.get('ZOHO_CLIENT_ID')
+ZOHO_CLIENT_SECRET = os.environ.get('ZOHO_CLIENT_SECRET')
+ZOHO_REDIRECT_URI = os.environ.get('ZOHO_REDIRECT_URI', 'https://spamguardai.com/zoho/callback/')
