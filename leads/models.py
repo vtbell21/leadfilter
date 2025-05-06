@@ -23,6 +23,9 @@ class UserProfile(models.Model):
     stripe_subscription_id = models.CharField(max_length=255, blank=True, null=True)
     subscription_status = models.CharField(max_length=50, default='inactive')
     subscription_id = models.CharField(max_length=100, null=True, blank=True)
+    salesforce_access_token = models.TextField(blank=True, null=True)
+    salesforce_refresh_token = models.TextField(blank=True, null=True)
+    salesforce_instance_url = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -192,3 +195,14 @@ class LeadFilterCount(models.Model):
             self.save()
             return True
         return False
+
+class SalesforceCredentials(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    access_token = models.TextField()
+    refresh_token = models.TextField()
+    instance_url = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.user.email} - Salesforce Credentials"
