@@ -81,6 +81,10 @@ class FacebookLead(models.Model):
         if is_new and not self.is_spam and hasattr(self.user, 'profile') and self.user.profile.pipedrive_access_token:
             from leads.services.pipedrive import send_lead_to_pipedrive
             send_lead_to_pipedrive(self.user, self)
+        # If this is a new lead and it's not spam, send to Salesforce if connected
+        if is_new and not self.is_spam and hasattr(self.user, 'profile') and self.user.profile.salesforce_access_token:
+            from leads.services.salesforce import send_lead_to_salesforce
+            send_lead_to_salesforce(self.user, self)
 
 class FacebookPageConnection(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='facebook_pages')
