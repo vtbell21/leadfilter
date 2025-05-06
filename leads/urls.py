@@ -6,6 +6,7 @@ from leads.views_hubspot import hubspot_connect, hubspot_callback, hubspot_conne
 from leads.views import integrations_view
 from django.contrib.auth import views as auth_views
 from leads.views_salesforce import salesforce_connect, salesforce_callback, salesforce_disconnect
+from leads.views_zoho import zoho_connect, zoho_callback, zoho_disconnect
 
 urlpatterns = [
     path('', views.homepage, name='homepage'),
@@ -58,4 +59,7 @@ urlpatterns = [
     path('salesforce/connect/', salesforce_connect, name='salesforce_connect'),
     path('salesforce/callback/', salesforce_callback, name='salesforce_callback'),
     path('salesforce/disconnect/', salesforce_disconnect, name='salesforce_disconnect'),
+    path('zoho/connect/', zoho_connect, name='zoho_connect'),
+    path('zoho/callback/', zoho_callback, name='zoho_callback'),
+    path('zoho/disconnect/', zoho_disconnect, name='zoho_disconnect'),
 ] 

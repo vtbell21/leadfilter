@@ -132,6 +132,47 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Zoho Integration Card -->
+            <div class="card mb-4 integration-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h4 class="card-title mb-3">
+                                <img src="https://www.zohowebstatic.com/sites/default/files/zoho-logo-new.png" 
+                                     alt="Zoho" class="integration-logo me-2" width="30">
+                                Zoho CRM
+                            </h4>
+                            <p class="card-text text-muted mb-4">
+                                Connect your Zoho CRM to automatically sync your leads and manage your sales pipeline efficiently.
+                            </p>
+                            <ul class="feature-list mb-4">
+                                <li><i class="bi bi-check-circle-fill text-success"></i> Automatic lead syncing</li>
+                                <li><i class="bi bi-check-circle-fill text-success"></i> Contact management</li>
+                                <li><i class="bi bi-check-circle-fill text-success"></i> Deal/opportunity creation</li>
+                                <li><i class="bi bi-check-circle-fill text-success"></i> Real-time updates</li>
+                            </ul>
+                        </div>
+                        <div class="text-end" style="min-width: 200px;">
+                            {% if user.profile.zoho_access_token %}
+                                <div class="connection-status connected mb-3">
+                                    <i class="bi bi-check-circle-fill"></i> Connected
+                                </div>
+                                <a href="{% url 'leads:zoho_disconnect' %}" class="btn btn-outline-danger">
+                                    <i class="bi bi-x-lg"></i> Disconnect Zoho
+                                </a>
+                            {% else %}
+                                <div class="connection-status disconnected mb-3">
+                                    <i class="bi bi-x-circle-fill"></i> Not Connected
+                                </div>
+                                <a href="{% url 'leads:zoho_connect' %}" class="btn btn-primary">
+                                    <i class="bi bi-plug-fill"></i> Connect Zoho
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
