@@ -20,7 +20,7 @@ from datetime import datetime
 from django.utils.dateparse import parse_date
 import os
 from leads.services.gpt import score_lead_with_gpt
-from .forms import LeadRoutingSettingsForm, CustomUserCreationForm, EmailUpdateForm, WebhookSettingsForm
+from .forms import LeadRoutingSettingsForm, CustomUserCreationForm, EmailUpdateForm, WebhookSettingsForm, GHLApiKeyForm
 from django.contrib.admin.views.decorators import staff_member_required
 from leads.utils.phone_validation import validate_phone_with_numverify, normalize_phone_number
 from leads.decorators import login_required_and_subscribed
@@ -1015,3 +1015,18 @@ def how_to_inbox_view(request):
 
 def solutions_view(request):
     return render(request, 'leads/solutions.html')
+
+@login_required
+def ghl_settings_view(request):
+    profile, _ = UserProfile.objects.get_or_create(user=request.user)
+
+    if request.method == 'POST':
+        form = GHLApiKeyForm(request.POST, instance=profile)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "GHL API Key saved successfully.")
+            return redirect('leads:integrations')
+    else:
+        form = GHLApiKeyForm(instance=profile)
+
+    return render(request, 'leads/ghl_settings.html', {'form': form})

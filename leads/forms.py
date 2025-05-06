@@ -1,5 +1,5 @@
 from django import forms
-from .models import LeadRoutingSettings, WebhookSettings
+from .models import LeadRoutingSettings, WebhookSettings, UserProfile
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
@@ -51,4 +51,12 @@ class WebhookSettingsForm(forms.ModelForm):
             'webhook_url': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'https://your-webhook-url.com/'}),
             'send_non_spam': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'send_spam': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
+
+class GHLApiKeyForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ['ghl_api_key']
+        widgets = {
+            'ghl_api_key': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter your GoHighLevel API key'}),
         } 

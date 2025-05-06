@@ -26,6 +26,10 @@ class UserProfile(models.Model):
     salesforce_access_token = models.TextField(blank=True, null=True)
     salesforce_refresh_token = models.TextField(blank=True, null=True)
     salesforce_instance_url = models.TextField(blank=True, null=True)
+    zoho_access_token = models.TextField(blank=True, null=True)
+    zoho_refresh_token = models.TextField(blank=True, null=True)
+    zoho_token_expires_at = models.DateTimeField(blank=True, null=True)
+    ghl_api_key = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -85,6 +89,14 @@ class FacebookLead(models.Model):
         if is_new and not self.is_spam and hasattr(self.user, 'profile') and self.user.profile.salesforce_access_token:
             from leads.services.salesforce import send_lead_to_salesforce
             send_lead_to_salesforce(self.user, self)
+        # If this is a new lead and it's not spam, send to Zoho if connected
+        if is_new and not self.is_spam and hasattr(self.user, 'profile') and self.user.profile.zoho_access_token:
+            from leads.services.zoho import send_lead_to_zoho
+            send_lead_to_zoho(self.user, self)
+        # If this is a new lead and it's not spam, send to GoHighLevel if connected
+        if is_new and not self.is_spam and self.user and hasattr(self.user, 'profile') and self.user.profile.ghl_api_key:
+            from leads.services.gohighlevel import send_lead_to_ghl
+            send_lead_to_ghl(self.user, self)
 
 class FacebookPageConnection(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='facebook_pages')

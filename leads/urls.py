@@ -62,4 +62,5 @@ urlpatterns = [
     path('zoho/connect/', zoho_connect, name='zoho_connect'),
     path('zoho/callback/', zoho_callback, name='zoho_callback'),
     path('zoho/disconnect/', zoho_disconnect, name='zoho_disconnect'),
+    path('ghl/settings/', views.ghl_settings_view, name='ghl_settings'),
 ] 
