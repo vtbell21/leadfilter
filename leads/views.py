@@ -1012,3 +1012,6 @@ def how_to_folder_view(request):
 
 def how_to_inbox_view(request):
     return render(request, 'leads/how_to_inbox.html')
+
+def solutions_view(request):
+    return render(request, 'leads/solutions.html')
