@@ -8,19 +8,35 @@
         <div class="row justify-content-center text-center">
             <div class="col-lg-8">
                 <h1 class="display-3 fw-bold mb-4">
-                    <i class="bi bi-shield-check text-primary"></i>
-                    Stop Spam, Get Real Leads
+                    <i class="bi bi-shield-x text-danger"></i>
+                    Stop Spam Leads at the Source
                 </h1>
                 <p class="lead mb-5">
-                    Protect your Facebook leads from spam and invalid submissions with our intelligent filtering system.
+                    SpamGuard filters out fake or junk Facebook leads before they ever hit your CRM — so your sales team never wastes time on garbage.
                 </p>
                 <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
                     <a href="{% url 'leads:signup' %}" class="btn btn-primary btn-lg px-4 gap-3">
                         Start Free Trial
                     </a>
-                    <a href="{% url 'leads:about' %}" class="btn btn-outline-secondary btn-lg px-4">
-                        Learn More
+                    <a href="{% url 'leads:how_to_folder' %}" class="btn btn-outline-secondary btn-lg px-4">
+                        How It Works
                     </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Problem + Solution Section -->
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4 text-center">
+                    <h2 class="h3 mb-3"><i class="bi bi-exclamation-triangle text-warning"></i> The Problem</h2>
+                    <p class="mb-4">Running Facebook lead ads? You're probably getting a flood of fake names, junk emails, and bots — and paying for every single one. Your CRM fills up with garbage, and your sales team wastes hours chasing dead ends.</p>
+                    <h2 class="h3 mb-3"><i class="bi bi-lightbulb text-primary"></i> The Solution</h2>
+                    <p>SpamGuard sits between Facebook and your CRM, automatically filtering out spam, fake, and low-quality leads before they ever reach your pipeline. Only real, qualified leads make it through — so your team can focus on closing, not cleaning.</p>
                 </div>
             </div>
         </div>
@@ -30,50 +46,36 @@
 <!-- Features Section -->
 <div class="container py-5">
     <div class="row g-4">
-        <!-- Feature 1 -->
         <div class="col-md-4">
             <div class="card h-100 border-0 shadow-sm">
                 <div class="card-body text-center p-4">
                     <div class="feature-icon bg-primary bg-gradient text-white rounded-circle mb-3">
-                        <i class="bi bi-robot fs-1"></i>
+                        <i class="bi bi-cpu fs-1"></i>
                     </div>
-                    <h3 class="h4 mb-3">AI-Powered Spam Detection</h3>
-                    <p class="text-muted">
-                        Our advanced AI system analyzes and scores every lead in real-time. 
-                        Stop wasting time on fake submissions and focus on genuine opportunities.
-                    </p>
+                    <h3 class="h4 mb-3">AI + Rule-Based Filtering</h3>
+                    <p class="text-muted">Our smart filters catch obvious spam and subtle fakes using a blend of AI and custom rules. No more bots, no more junk.</p>
                 </div>
             </div>
         </div>
-        
-        <!-- Feature 2 -->
-        <div class="col-md-4">
-            <div class="card h-100 border-0 shadow-sm">
-                <div class="card-body text-center p-4">
-                    <div class="feature-icon bg-primary bg-gradient text-white rounded-circle mb-3">
-                        <i class="bi bi-check-circle fs-1"></i>
-                    </div>
-                    <h3 class="h4 mb-3">Instant Lead Validation</h3>
-                    <p class="text-muted">
-                        Automatically verify emails, phone numbers, and names using trusted validation APIs. 
-                        Get instant feedback on lead quality before they reach your team.
-                    </p>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Feature 3 -->
         <div class="col-md-4">
             <div class="card h-100 border-0 shadow-sm">
                 <div class="card-body text-center p-4">
                     <div class="feature-icon bg-primary bg-gradient text-white rounded-circle mb-3">
                         <i class="bi bi-diagram-3 fs-1"></i>
                     </div>
-                    <h3 class="h4 mb-3">CRM Integration Ready</h3>
-                    <p class="text-muted">
-                        Seamlessly connect with your favorite CRM platforms including HubSpot and Salesforce. 
-                        Automate your lead management workflow with our powerful integrations.
-                    </p>
+                    <h3 class="h4 mb-3">CRM Integration</h3>
+                    <p class="text-muted">Connect SpamGuard to your CRM in minutes. Only real leads get through — the rest are filtered out automatically.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center p-4">
+                    <div class="feature-icon bg-primary bg-gradient text-white rounded-circle mb-3">
+                        <i class="bi bi-envelope-check fs-1"></i>
+                    </div>
+                    <h3 class="h4 mb-3">Email Notifications</h3>
+                    <p class="text-muted">Get instant alerts for every qualified lead. No more digging through spam — you'll know the moment a real prospect comes in.</p>
                 </div>
             </div>
         </div>
@@ -81,66 +83,30 @@
 </div>
 
 <!-- Testimonials Section -->
-<div class="container-fluid bg-light py-5">
-    <div class="container">
-        <h2 class="text-center mb-5">What Our Clients Say</h2>
-        <div class="row g-4">
-            <!-- Testimonial 1 -->
-            <div class="col-md-6">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-body p-4">
-                        <div class="d-flex align-items-center mb-3">
-                            <div class="flex-shrink-0">
-                                <div class="avatar bg-primary text-white rounded-circle">
-                                    <i class="bi bi-person-fill"></i>
-                                </div>
-                            </div>
-                            <div class="flex-grow-1 ms-3">
-                                <h5 class="mb-0">John Smith</h5>
-                                <p class="text-muted mb-0">Marketing Director, TechCorp</p>
-                            </div>
-                        </div>
-                        <p class="card-text">
-                            "Spam Guard has transformed our lead generation process. We're now spending 80% less time dealing with fake leads and our conversion rates have improved significantly."
-                        </p>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Testimonial 2 -->
-            <div class="col-md-6">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-body p-4">
-                        <div class="d-flex align-items-center mb-3">
-                            <div class="flex-shrink-0">
-                                <div class="avatar bg-primary text-white rounded-circle">
-                                    <i class="bi bi-person-fill"></i>
-                                </div>
-                            </div>
-                            <div class="flex-grow-1 ms-3">
-                                <h5 class="mb-0">Sarah Johnson</h5>
-                                <p class="text-muted mb-0">CEO, GrowthLabs</p>
-                            </div>
-                        </div>
-                        <p class="card-text">
-                            "The AI-powered filtering is incredible. We're getting higher quality leads and our sales team is more productive than ever. The ROI has been outstanding."
-                        </p>
-                    </div>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <blockquote class="blockquote mb-4">
+                        <p class="mb-0">"SpamGuard was dead simple to set up and immediately caught dozens of bad leads I would've paid for. Worth it."</p>
+                        <footer class="blockquote-footer mt-2">Alex B., <cite title="Source Title">Marketing Freelancer</cite></footer>
+                    </blockquote>
+                    <blockquote class="blockquote">
+                        <p class="mb-0">"Our sales reps were drowning in junk leads. SpamGuard let us clean up the pipeline and recover hours of wasted time."</p>
+                        <footer class="blockquote-footer mt-2">Emily D., <cite title="Source Title">Sales Manager</cite></footer>
+                    </blockquote>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- CTA Section -->
+<!-- Final CTA Section -->
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-lg-8 text-center">
-            <h2 class="display-5 fw-bold mb-4">Ready to Transform Your Lead Generation?</h2>
-            <p class="lead mb-4">
-                Join hundreds of businesses that trust Spam Guard to protect their Facebook lead generation.
-                Start your free trial today and see the difference.
-            </p>
+            <h2 class="display-5 fw-bold mb-4">Try SpamGuard free — no credit card required. You'll wonder why you didn't start sooner.</h2>
             <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
                 <a href="{% url 'leads:signup' %}" class="btn btn-primary btn-lg px-4 gap-3">
                     Start Free Trial
