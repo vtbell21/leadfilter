@@ -5,6 +5,7 @@ from leads.views_stripe import create_checkout_session, subscription_success, su
 from leads.views_hubspot import hubspot_connect, hubspot_callback, hubspot_connected_success, hubspot_disconnect
 from leads.views import integrations_view
 from django.contrib.auth import views as auth_views
+from leads.views_salesforce import salesforce_connect, salesforce_callback
 
 urlpatterns = [
     path('', views.homepage, name='homepage'),
@@ -54,4 +55,6 @@ urlpatterns = [
     path('settings/lead-routing/how-to-folder/', views.how_to_folder_view, name='how_to_folder'),
     path('settings/lead-routing/how-to-inbox/', views.how_to_inbox_view, name='how_to_inbox'),
     path('solutions/', views.solutions_view, name='solutions'),
+    path('salesforce/connect/', salesforce_connect, name='salesforce_connect'),
+    path('salesforce/callback/', salesforce_callback, name='salesforce_callback'),
 ] 
