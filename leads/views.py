@@ -26,6 +26,8 @@ from leads.utils.phone_validation import validate_phone_with_numverify, normaliz
 from leads.decorators import login_required_and_subscribed
 from leads.services.email_notifications import send_spam_lead_notification_email, send_non_spam_lead_notification_email
 from collections import defaultdict
+from leads.models import FacebookLead
+from leads.services import hubspot, salesforce, zoho, pipedrive, gohighlevel
 
 logger = logging.getLogger(__name__)
 
@@ -1086,3 +1088,39 @@ def ghl_disconnect(request):
 def settings_view(request):
     facebook_page = FacebookPageConnection.objects.filter(user=request.user).first()
     return render(request, 'leads/settings.html', {'facebook_page': facebook_page})
+
+@login_required
+@require_POST
+def send_to_crm_view(request, lead_id):
+    lead = get_object_or_404(FacebookLead, pk=lead_id, user=request.user)
+    user = request.user
+    profile = user.profile
+    result = None
+    # Try each CRM in order of connection
+    if getattr(profile, 'hubspot_access_token', None):
+        result = hubspot.send_lead_to_hubspot(user, lead)
+    elif getattr(profile, 'salesforce_access_token', None) and getattr(profile, 'salesforce_instance_url', None):
+        result = salesforce.send_lead_to_salesforce(user, lead)
+    elif getattr(profile, 'zoho_access_token', None):
+        result = zoho.send_lead_to_zoho(user, lead)
+    elif getattr(profile, 'pipedrive_access_token', None):
+        result = pipedrive.send_lead_to_pipedrive(user, lead)
+    elif getattr(profile, 'ghl_api_key', None):
+        result = gohighlevel.send_lead_to_ghl(user, lead)
+    else:
+        return JsonResponse({'success': False, 'error': 'No CRM integration connected.'}, status=400)
+    # Interpret result
+    if isinstance(result, dict):
+        if result.get('success'):
+            return JsonResponse({'success': True})
+        else:
+            return JsonResponse({'success': False, 'error': result.get('error', 'Unknown error')}, status=400)
+    elif hasattr(result, 'ok') and hasattr(result, 'status_code'):
+        if result.ok:
+            return JsonResponse({'success': True})
+        else:
+            return JsonResponse({'success': False, 'error': getattr(result, 'text', 'Unknown error')}, status=400)
+    elif result is None:
+        return JsonResponse({'success': True})
+    else:
+        return JsonResponse({'success': False, 'error': str(result)}, status=400)

@@ -65,4 +65,5 @@ urlpatterns = [
     path('ghl/settings/', views.ghl_settings_view, name='ghl_settings'),
     path('ghl/disconnect/', views.ghl_disconnect, name='ghl_disconnect'),
     path('settings/', views.settings_view, name='settings'),
+    path('send-to-crm/<int:lead_id>/', views.send_to_crm_view, name='send_to_crm'),
 ] 

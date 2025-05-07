@@ -141,6 +141,13 @@
                             </button>
                         </form>
                     </div>
+
+                    {% if is_spam %}
+                        <button class="btn btn-outline-primary send-to-crm-btn" data-lead-id="{{ lead.pk }}">
+                            <span class="send-to-crm-text">Send to CRM</span>
+                            <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                        </button>
+                    {% endif %}
                 </div>
 
                 <div class="col-md-6">
@@ -184,5 +191,60 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    // Send to CRM AJAX logic for detail page
+    document.querySelectorAll('.send-to-crm-btn').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            var leadId = btn.getAttribute('data-lead-id');
+            var spinner = btn.querySelector('.spinner-border');
+            var text = btn.querySelector('.send-to-crm-text');
+            spinner.classList.remove('d-none');
+            text.textContent = 'Sending...';
+            btn.disabled = true;
+            fetch(`/leads/send-to-crm/${leadId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Accept': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                spinner.classList.add('d-none');
+                if (data.success) {
+                    text.textContent = 'Sent!';
+                    btn.classList.remove('btn-outline-primary');
+                    btn.classList.add('btn-success');
+                } else {
+                    text.textContent = 'Send to CRM';
+                    btn.disabled = false;
+                    alert('Failed to send to CRM: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(err => {
+                spinner.classList.add('d-none');
+                text.textContent = 'Send to CRM';
+                btn.disabled = false;
+                alert('Failed to send to CRM: ' + err);
+            });
+        });
+    });
+    // Helper to get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    </script>
 </body>
 </html> 
