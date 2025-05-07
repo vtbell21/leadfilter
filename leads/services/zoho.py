@@ -3,9 +3,11 @@ from django.utils import timezone
 from django.conf import settings
 
 def send_lead_to_zoho(user, lead):
-    access_token = getattr(user.profile, 'zoho_access_token', None)
+    profile = user.profile
+    refresh_zoho_token_if_expired(profile)
+    access_token = getattr(profile, 'zoho_access_token', None)
     if not access_token:
-        return None
+        return {"success": False, "error": "No Zoho access token."}
     url = 'https://www.zohoapis.com/crm/v2/Leads'
     headers = {
         'Authorization': f'Zoho-oauthtoken {access_token}',
