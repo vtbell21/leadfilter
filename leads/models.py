@@ -67,6 +67,7 @@ class FacebookLead(models.Model):
     is_valid_email = models.BooleanField(default=False)
     is_valid_phone = models.BooleanField(default=False)
     received_at = models.DateTimeField(auto_now_add=True)
+    is_filtered_out = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.full_name} ({self.leadgen_id})"
@@ -120,6 +121,7 @@ class LeadRoutingSettings(models.Model):
     non_spam_subject = models.CharField(max_length=100, default="✅ New Qualified Lead")
     spam_subject = models.CharField(max_length=100, default="🚫 New Spam Lead Detected")
     notification_email = models.EmailField(blank=True, null=True)
+    advanced_filters = models.JSONField(default=dict, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     # Optionally, add daily_summary and include_lead_details fields for future use

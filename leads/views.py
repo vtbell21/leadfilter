@@ -301,6 +301,33 @@ def facebook_webhook(request):
                 logger.info(f"NumVerify result for {normalized_phone}: {numverify_result}")
                 is_valid_phone = numverify_result['valid'] if numverify_result else False
                 phone_to_save = normalized_phone if normalized_phone else phone
+                # --- Advanced filter logic ---
+                is_filtered_out = False
+                try:
+                    settings = page_connection.user.lead_routing_settings
+                    filters = settings.advanced_filters or {}
+                    for field, keywords in filters.items():
+                        if not isinstance(keywords, list) or not keywords:
+                            continue
+                        match = False
+                        if field in ["full_name", "email", "phone", "message"]:
+                            value = locals().get(field, "")
+                            for kw in keywords:
+                                if value and kw.lower() in value.lower():
+                                    match = True
+                                    break
+                        else:
+                            value = custom_fields.get(field, "")
+                            for kw in keywords:
+                                if value and kw.lower() in str(value).lower():
+                                    match = True
+                                    break
+                        if not match:
+                            is_filtered_out = True
+                            break
+                except LeadRoutingSettings.DoesNotExist:
+                    pass
+                # --- End advanced filter logic ---
                 lead = FacebookLead.objects.create(
                     user=page_connection.user,
                     leadgen_id=leadgen_id,
@@ -314,6 +341,7 @@ def facebook_webhook(request):
                     is_spam=score_result['is_spam'],
                     is_valid_email=is_valid_email,
                     is_valid_phone=is_valid_phone,
+                    is_filtered_out=is_filtered_out,
                 )
                 logger.warning(f"Lead saved with ID: {lead.id} (source: {data_source})")
 
@@ -392,7 +420,7 @@ def lead_dashboard(request):
         
         # Get all leads for the current user ordered by received_at (newest first)
         try:
-            all_leads = FacebookLead.objects.filter(user=request.user).order_by('-received_at')
+            all_leads = FacebookLead.objects.filter(user=request.user, is_filtered_out=False).order_by('-received_at')
             # --- Date filter logic ---
             start_date = request.GET.get('start_date')
             end_date = request.GET.get('end_date')
@@ -405,25 +433,7 @@ def lead_dashboard(request):
                 if end_date_parsed:
                     all_leads = all_leads.filter(received_at__date__lte=end_date_parsed)
             # --- Advanced filter logic ---
-            try:
-                settings = request.user.lead_routing_settings
-                filters = settings.advanced_filters or {}
-                for field, keywords in filters.items():
-                    if not keywords:
-                        continue
-                    q = None
-                    if field in ["full_name", "email", "phone", "message"]:
-                        for kw in keywords:
-                            cond = Q(**{f"{field}__icontains": kw})
-                            q = cond if q is None else q | cond
-                    else:
-                        for kw in keywords:
-                            cond = Q(**{f"custom_fields__{field}__icontains": kw})
-                            q = cond if q is None else q | cond
-                    if q is not None:
-                        all_leads = all_leads.filter(q)
-            except LeadRoutingSettings.DoesNotExist:
-                pass
+            # (Removed: now handled at lead creation)
             # --- End advanced filter logic ---
             valid_leads = all_leads.filter(is_spam=False)
             spam_leads = all_leads.filter(is_spam=True)

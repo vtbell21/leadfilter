@@ -32,6 +32,14 @@ class LeadRoutingSettingsForm(forms.ModelForm):
             'notification_email': forms.EmailInput(attrs={'class': 'form-control'}),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.advanced_filters:
+            import json
+            self.fields['advanced_filters'].initial = json.dumps(self.instance.advanced_filters, indent=2)
+        else:
+            self.fields['advanced_filters'].initial = '{}'
+
     def clean_advanced_filters(self):
         data = self.cleaned_data['advanced_filters']
         if not data:

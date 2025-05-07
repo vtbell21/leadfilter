@@ -40,7 +40,17 @@
             {% endif %}
         </div>
         <button type="submit" class="btn btn-primary">Save Settings</button>
+        <button type="button" class="btn btn-secondary ms-2" onclick="clearAdvancedFilters()">Clear Filter</button>
     </form>
+    <script>
+    function clearAdvancedFilters() {
+        const textarea = document.querySelector('textarea[name="advanced_filters"]');
+        if (textarea) {
+            textarea.value = '{}';
+            textarea.form.submit();
+        }
+    }
+    </script>
 
     <!-- How-to Article Links -->
     <div class="mt-5">
