@@ -25,6 +25,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from leads.utils.phone_validation import validate_phone_with_numverify, normalize_phone_number
 from leads.decorators import login_required_and_subscribed
 from leads.services.email_notifications import send_spam_lead_notification_email, send_non_spam_lead_notification_email
+from collections import defaultdict
 
 logger = logging.getLogger(__name__)
 
@@ -430,6 +431,18 @@ def lead_dashboard(request):
             # Get the page objects
             valid_leads_page = valid_paginator.get_page(valid_page)
             spam_leads_page = spam_paginator.get_page(spam_page)
+
+            # --- Analytics aggregation ---
+            analytics = defaultdict(lambda: {'valid': 0, 'spam': 0})
+            for lead in all_leads:
+                date_str = lead.received_at.strftime('%Y-%m-%d')
+                if lead.is_spam:
+                    analytics[date_str]['spam'] += 1
+                else:
+                    analytics[date_str]['valid'] += 1
+            analytics_labels = sorted(analytics.keys())
+            analytics_valid_counts = [analytics[date]['valid'] for date in analytics_labels]
+            analytics_spam_counts = [analytics[date]['spam'] for date in analytics_labels]
         except Exception as e:
             logger.error(f"Error getting leads data: {str(e)}")
             valid_leads_page = []
@@ -451,6 +464,9 @@ def lead_dashboard(request):
             'end_date': end_date or '',
             'facebook_connected': facebook_connected,
             'facebook_disconnected': facebook_disconnected,
+            'analytics_labels': analytics_labels,
+            'analytics_valid_counts': analytics_valid_counts,
+            'analytics_spam_counts': analytics_spam_counts,
         }
         
         return render(request, 'leads/leads_dashboard.html', context)
@@ -470,6 +486,9 @@ def lead_dashboard(request):
             'end_date': '',
             'facebook_connected': False,
             'facebook_disconnected': False,
+            'analytics_labels': [],
+            'analytics_valid_counts': [],
+            'analytics_spam_counts': [],
         }
         return render(request, 'leads/leads_dashboard.html', context)
 

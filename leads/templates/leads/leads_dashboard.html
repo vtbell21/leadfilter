@@ -78,6 +78,11 @@
                 Spam Leads ({{ spam_count }})
             </button>
         </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="analytics-tab" data-bs-toggle="tab" data-bs-target="#analytics" type="button" role="tab">
+                Analytics
+            </button>
+        </li>
     </ul>
 
     <!-- Tab Content -->
@@ -268,6 +273,15 @@
                 {% endif %}
             </div>
         </div>
+        <!-- Analytics Tab -->
+        <div class="tab-pane fade" id="analytics" role="tabpanel">
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h3 class="h5 mb-4">Leads Over Time</h3>
+                    <canvas id="leadsAnalyticsChart" height="100"></canvas>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
@@ -448,67 +462,121 @@
 
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
         try {
-        // Initialize date pickers
+            // Initialize date pickers
             if (document.getElementById('startDate')) {
-        flatpickr("#startDate", {
-            dateFormat: "Y-m-d",
-            allowInput: true
-        });
+                flatpickr("#startDate", {
+                    dateFormat: "Y-m-d",
+                    allowInput: true
+                });
             }
-        
+            
             if (document.getElementById('endDate')) {
-        flatpickr("#endDate", {
-            dateFormat: "Y-m-d",
-            allowInput: true
-        });
+                flatpickr("#endDate", {
+                    dateFormat: "Y-m-d",
+                    allowInput: true
+                });
             }
-        
-        // Handle export button click
+            
+            // Handle export button click
             const exportBtn = document.getElementById('exportBtn');
             if (exportBtn) {
                 exportBtn.addEventListener('click', function(e) {
-            e.preventDefault();
+                    e.preventDefault();
                     const startDate = document.getElementById('startDate')?.value || '';
                     const endDate = document.getElementById('endDate')?.value || '';
             
-            let url = "{% url 'leads:export_clean_leads' %}";
-            const params = new URLSearchParams();
+                    let url = "{% url 'leads:export_clean_leads' %}";
+                    const params = new URLSearchParams();
             
-            if (startDate) params.append('start_date', startDate);
-            if (endDate) params.append('end_date', endDate);
+                    if (startDate) params.append('start_date', startDate);
+                    if (endDate) params.append('end_date', endDate);
             
-            if (params.toString()) {
-                url += '?' + params.toString();
-            }
+                    if (params.toString()) {
+                        url += '?' + params.toString();
+                    }
             
-            window.location.href = url;
+                    window.location.href = url;
                 });
             }
-        // Browser notification for Facebook connect/disconnect
-        if (window.Notification && Notification.permission !== "denied") {
-            Notification.requestPermission().then(function(permission) {
-                if (permission === "granted") {
-                    // Example: Trigger notification based on context variable
-                    {% if facebook_connected %}
-                        new Notification("Facebook Page Connected", {
-                            body: "Your Facebook page is now connected to Spam Guard.",
-                            icon: "https://static.xx.fbcdn.net/rsrc.php/yo/r/iRmz9lCMBD2.ico"
-                        });
-                    {% elif facebook_disconnected %}
-                        new Notification("Facebook Page Disconnected", {
-                            body: "Your Facebook page has been disconnected from Spam Guard.",
-                            icon: "https://static.xx.fbcdn.net/rsrc.php/yo/r/iRmz9lCMBD2.ico"
-                        });
-                    {% endif %}
-                }
-            });
-        }
+            // Browser notification for Facebook connect/disconnect
+            if (window.Notification && Notification.permission !== "denied") {
+                Notification.requestPermission().then(function(permission) {
+                    if (permission === "granted") {
+                        // Example: Trigger notification based on context variable
+                        {% if facebook_connected %}
+                            new Notification("Facebook Page Connected", {
+                                body: "Your Facebook page is now connected to Spam Guard.",
+                                icon: "https://static.xx.fbcdn.net/rsrc.php/yo/r/iRmz9lCMBD2.ico"
+                            });
+                        {% elif facebook_disconnected %}
+                            new Notification("Facebook Page Disconnected", {
+                                body: "Your Facebook page has been disconnected from Spam Guard.",
+                                icon: "https://static.xx.fbcdn.net/rsrc.php/yo/r/iRmz9lCMBD2.ico"
+                            });
+                        {% endif %}
+                    }
+                });
+            }
+            // Chart.js Analytics
+            var analyticsLabels = {{ analytics_labels|safe }};
+            var analyticsValidCounts = {{ analytics_valid_counts|safe }};
+            var analyticsSpamCounts = {{ analytics_spam_counts|safe }};
+            var ctx = document.getElementById('leadsAnalyticsChart');
+            if (ctx) {
+                var leadsAnalyticsChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: analyticsLabels,
+                        datasets: [
+                            {
+                                label: 'Valid Leads',
+                                data: analyticsValidCounts,
+                                backgroundColor: 'rgba(25, 135, 84, 0.7)',
+                                borderColor: 'rgba(25, 135, 84, 1)',
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'Spam Leads',
+                                data: analyticsSpamCounts,
+                                backgroundColor: 'rgba(220, 53, 69, 0.7)',
+                                borderColor: 'rgba(220, 53, 69, 1)',
+                                borderWidth: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { position: 'top' },
+                            title: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Date'
+                                }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Number of Leads'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
         } catch (error) {
             console.error('Error initializing dashboard:', error);
         }
-        });
-    </script>
+    });
+</script>
 {% endblock %} 
