@@ -29,6 +29,16 @@
             {{ form.notification_email }}
             <small class="text-muted">Send lead notifications to this email address</small>
         </div>
+        <div class="mb-3">
+            {{ form.advanced_filters.label_tag }}
+            {{ form.advanced_filters }}
+            {% if form.advanced_filters.help_text %}
+                <small class="text-muted">{{ form.advanced_filters.help_text }}</small>
+            {% endif %}
+            {% if form.advanced_filters.errors %}
+                <div class="text-danger">{{ form.advanced_filters.errors }}</div>
+            {% endif %}
+        </div>
         <button type="submit" class="btn btn-primary">Save Settings</button>
     </form>
 
