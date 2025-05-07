@@ -2,7 +2,7 @@
 {% block content %}
 <div class="container mt-5">
     <h2>Lead Routing Settings</h2>
-    <form method="post">
+    <form method="post" id="lead-routing-settings-form">
         {% csrf_token %}
         <div class="form-check mb-3">
             {{ form.send_non_spam_to_inbox }}
@@ -41,7 +41,6 @@
     <script>
     // --- Dynamic Filter Builder ---
     let filters = {};
-    // Try to load initial filters from the hidden input
     try {
         filters = JSON.parse(document.querySelector('input[name="advanced_filters"]').value || '{}');
     } catch (e) {
@@ -135,13 +134,16 @@
     }
     renderFilterBuilder();
     // On form submit, serialize filters to hidden input
-    document.querySelector('form').addEventListener('submit', function(e) {
+    const form = document.getElementById('lead-routing-settings-form');
+    form.addEventListener('submit', function(e) {
         // Remove empty fields/values
         Object.keys(filters).forEach(f => {
             filters[f] = (filters[f] || []).filter(v => v && v.trim() !== '');
             if (!filters[f].length) delete filters[f];
         });
         try {
+            console.log("Filters before save:", filters);
+            console.log("Serialized filters:", JSON.stringify(filters));
             document.querySelector('input[name="advanced_filters"]').value = JSON.stringify(filters);
             document.getElementById('filter-builder-error').textContent = '';
         } catch (err) {
@@ -153,7 +155,7 @@
         filters = {};
         renderFilterBuilder();
         document.querySelector('input[name="advanced_filters"]').value = '{}';
-        document.querySelector('form').submit();
+        form.submit();
     }
     </script>
 
