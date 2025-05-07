@@ -3,16 +3,17 @@
 
 {% block content %}
 <div class="container-fluid py-4">
-    <h1 class="mb-4">Spam Guard Dashboard</h1>
-    
     {% if messages %}
-        {% for message in messages %}
+        <div class="messages mb-4">
+            {% for message in messages %}
             <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
                 {{ message }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
-        {% endfor %}
+            {% endfor %}
+        </div>
     {% endif %}
+    <h1 class="mb-4">Spam Guard Dashboard</h1>
     
     <!-- Facebook Connection Status -->
     <div class="facebook-status">
