@@ -38,6 +38,16 @@
         <button type="submit" class="btn btn-primary">Save Settings</button>
         <button type="button" class="btn btn-secondary ms-2" onclick="clearAdvancedFilters()">Clear Filter</button>
     </form>
+    {% if form.instance.advanced_filters %}
+    <div class="mt-4">
+      <h5>Current Saved Filters:</h5>
+      <ul>
+        {% for field, values in form.instance.advanced_filters.items %}
+          <li><strong>{{ field }}</strong>: {{ values|join:", " }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
     <script>
     // --- Dynamic Filter Builder ---
     let filters = {};
