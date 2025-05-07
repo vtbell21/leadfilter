@@ -396,6 +396,18 @@ def lead_dashboard(request):
         # Get all leads for the current user ordered by received_at (newest first)
         try:
             all_leads = FacebookLead.objects.filter(user=request.user).order_by('-received_at')
+            # --- Date filter logic ---
+            start_date = request.GET.get('start_date')
+            end_date = request.GET.get('end_date')
+            if start_date:
+                start_date_parsed = parse_date(start_date)
+                if start_date_parsed:
+                    all_leads = all_leads.filter(received_at__date__gte=start_date_parsed)
+            if end_date:
+                end_date_parsed = parse_date(end_date)
+                if end_date_parsed:
+                    all_leads = all_leads.filter(received_at__date__lte=end_date_parsed)
+            # --- End date filter logic ---
             valid_leads = all_leads.filter(is_spam=False)
             spam_leads = all_leads.filter(is_spam=True)
             
@@ -433,6 +445,8 @@ def lead_dashboard(request):
             'valid_count': valid_count,
             'spam_count': spam_count,
             'spam_rate': spam_rate,
+            'start_date': start_date or '',
+            'end_date': end_date or '',
         }
         
         return render(request, 'leads/leads_dashboard.html', context)
@@ -448,6 +462,8 @@ def lead_dashboard(request):
             'valid_count': 0,
             'spam_count': 0,
             'spam_rate': 0,
+            'start_date': '',
+            'end_date': '',
         }
         return render(request, 'leads/leads_dashboard.html', context)
 

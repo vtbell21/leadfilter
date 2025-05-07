@@ -64,6 +64,16 @@
         </div>
     </div>
 
+    <!-- Date Filter Form (applies to both tabs) -->
+    <form method="get" class="mb-4 d-flex align-items-center gap-2" id="dateFilterForm">
+        <input type="text" class="form-control date-input" id="startDate" name="start_date" placeholder="Start Date" value="{{ start_date }}">
+        <input type="text" class="form-control date-input" id="endDate" name="end_date" placeholder="End Date" value="{{ end_date }}">
+        <button type="submit" class="btn btn-primary">Filter</button>
+        <a href="#" class="btn btn-success download-btn" id="exportBtn">
+            <i class="bi bi-download"></i> Download Valid Leads (CSV)
+        </a>
+    </form>
+
     <!-- Tabs Navigation -->
     <ul class="nav nav-tabs mb-4" id="leadsTab" role="tablist">
         <li class="nav-item" role="presentation">
@@ -84,13 +94,6 @@
         <div class="tab-pane fade show active" id="valid" role="tabpanel">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h3 class="h5 mb-0">Valid Leads</h3>
-                <div class="date-filters">
-                    <input type="text" class="form-control date-input" id="startDate" placeholder="Start Date">
-                    <input type="text" class="form-control date-input" id="endDate" placeholder="End Date">
-                    <a href="#" class="btn btn-success download-btn" id="exportBtn">
-                        <i class="bi bi-download"></i> Download Valid Leads (CSV)
-                    </a>
-                </div>
             </div>
             <div class="table-container">
                 <table class="table table-hover">
