@@ -3,11 +3,6 @@
 
 {% block content %}
 <div class="container-fluid py-4">
-    <div class="d-flex justify-content-end mb-3">
-        <a href="{% url 'leads:update_email' %}" class="btn btn-outline-secondary me-2">Change Email</a>
-        <a href="{% url 'leads:lead_routing_settings' %}" class="btn btn-outline-secondary me-2">Lead Routing Settings</a>
-        <a href="{% url 'leads:webhook_settings' %}" class="btn btn-outline-secondary">Webhook Settings</a>
-    </div>
     <h1 class="mb-4">Spam Guard Dashboard</h1>
     
     {% if messages %}
