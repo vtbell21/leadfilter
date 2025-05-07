@@ -64,4 +64,5 @@ urlpatterns = [
     path('zoho/disconnect/', zoho_disconnect, name='zoho_disconnect'),
     path('ghl/settings/', views.ghl_settings_view, name='ghl_settings'),
     path('ghl/disconnect/', views.ghl_disconnect, name='ghl_disconnect'),
+    path('settings/', views.settings_view, name='settings'),
 ] 

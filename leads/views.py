@@ -1038,3 +1038,7 @@ def ghl_disconnect(request):
     profile.save()
     messages.success(request, "GoHighLevel disconnected successfully.")
     return redirect('leads:integrations')
+
+@login_required
+def settings_view(request):
+    return render(request, 'leads/settings.html')

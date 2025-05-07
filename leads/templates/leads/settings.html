@@ -1,0 +1,41 @@
+{% extends 'leads/base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4"><i class="bi bi-sliders"></i> Settings</h2>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <div>
+                        <h5 class="card-title"><i class="bi bi-envelope"></i> Change Email</h5>
+                        <p class="card-text text-muted">Update your account email address.</p>
+                    </div>
+                    <a href="{% url 'leads:update_email' %}" class="btn btn-outline-primary mt-3">Change Email</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <div>
+                        <h5 class="card-title"><i class="bi bi-diagram-3"></i> Lead Routing Settings</h5>
+                        <p class="card-text text-muted">Configure how leads are routed and notified.</p>
+                    </div>
+                    <a href="{% url 'leads:lead_routing_settings' %}" class="btn btn-outline-primary mt-3">Lead Routing Settings</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <div>
+                        <h5 class="card-title"><i class="bi bi-link-45deg"></i> Webhook Settings</h5>
+                        <p class="card-text text-muted">Manage your webhook integration for real-time lead delivery.</p>
+                    </div>
+                    <a href="{% url 'leads:webhook_settings' %}" class="btn btn-outline-primary mt-3">Webhook Settings</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
