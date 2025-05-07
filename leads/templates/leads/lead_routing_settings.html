@@ -136,11 +136,17 @@
     // On form submit, serialize filters to hidden input
     const form = document.getElementById('lead-routing-settings-form');
     form.addEventListener('submit', function(e) {
-        // Remove empty fields/values
+        // Remove empty values, but do not delete fields
+        let hasEmptyField = false;
         Object.keys(filters).forEach(f => {
             filters[f] = (filters[f] || []).filter(v => v && v.trim() !== '');
-            if (!filters[f].length) delete filters[f];
+            if (!filters[f].length) hasEmptyField = true;
         });
+        if (hasEmptyField) {
+            e.preventDefault();
+            document.getElementById('filter-builder-error').textContent = 'Each field must have at least one value.';
+            return;
+        }
         try {
             console.log("Filters before save:", filters);
             console.log("Serialized filters:", JSON.stringify(filters));
