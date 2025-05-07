@@ -6,12 +6,7 @@ from django.contrib.auth.models import User
 class LeadRoutingSettingsForm(forms.ModelForm):
     advanced_filters = forms.CharField(
         required=False,
-        widget=forms.Textarea(attrs={
-            'class': 'form-control',
-            'rows': 4,
-            'placeholder': '{\n  "Make": ["Toyota", "Ford"],\n  "email": ["@gmail.com"]\n}'
-        }),
-        help_text="Enter filter rules as JSON. Example: {\"Make\": [\"Toyota\", \"Ford\"], \"email\": [\"@gmail.com\"]}"
+        widget=forms.HiddenInput(),
     )
 
     class Meta:

@@ -30,25 +30,130 @@
             <small class="text-muted">Send lead notifications to this email address</small>
         </div>
         <div class="mb-3">
-            {{ form.advanced_filters.label_tag }}
+            <label for="filter-builder" class="form-label">Advanced filters:</label>
+            <div id="filter-builder"></div>
             {{ form.advanced_filters }}
-            {% if form.advanced_filters.help_text %}
-                <small class="text-muted">{{ form.advanced_filters.help_text }}</small>
-            {% endif %}
-            {% if form.advanced_filters.errors %}
-                <div class="text-danger">{{ form.advanced_filters.errors }}</div>
-            {% endif %}
+            <div id="filter-builder-error" class="text-danger"></div>
         </div>
         <button type="submit" class="btn btn-primary">Save Settings</button>
         <button type="button" class="btn btn-secondary ms-2" onclick="clearAdvancedFilters()">Clear Filter</button>
     </form>
     <script>
-    function clearAdvancedFilters() {
-        const textarea = document.querySelector('textarea[name="advanced_filters"]');
-        if (textarea) {
-            textarea.value = '{}';
-            textarea.form.submit();
+    // --- Dynamic Filter Builder ---
+    let filters = {};
+    // Try to load initial filters from the hidden input
+    try {
+        filters = JSON.parse(document.querySelector('input[name="advanced_filters"]').value || '{}');
+    } catch (e) {
+        filters = {};
+    }
+    function renderFilterBuilder() {
+        const builder = document.getElementById('filter-builder');
+        builder.innerHTML = '';
+        Object.entries(filters).forEach(([field, values], fieldIdx) => {
+            const fieldDiv = document.createElement('div');
+            fieldDiv.className = 'mb-2 p-2 border rounded';
+            // Field name input
+            const fieldInput = document.createElement('input');
+            fieldInput.type = 'text';
+            fieldInput.value = field;
+            fieldInput.placeholder = 'Field name (e.g. Make, email)';
+            fieldInput.className = 'form-control d-inline-block me-2 mb-1';
+            fieldInput.style.width = '200px';
+            fieldInput.onchange = (e) => {
+                const newField = e.target.value;
+                if (newField && newField !== field) {
+                    filters[newField] = filters[field];
+                    delete filters[field];
+                    renderFilterBuilder();
+                }
+            };
+            fieldDiv.appendChild(fieldInput);
+            // Remove field button
+            const removeFieldBtn = document.createElement('button');
+            removeFieldBtn.type = 'button';
+            removeFieldBtn.className = 'btn btn-danger btn-sm ms-2 mb-1';
+            removeFieldBtn.textContent = 'Remove Field';
+            removeFieldBtn.onclick = () => {
+                delete filters[field];
+                renderFilterBuilder();
+            };
+            fieldDiv.appendChild(removeFieldBtn);
+            // Values
+            (values || []).forEach((val, valIdx) => {
+                const valInput = document.createElement('input');
+                valInput.type = 'text';
+                valInput.value = val;
+                valInput.placeholder = 'Value';
+                valInput.className = 'form-control d-inline-block ms-2 mb-1';
+                valInput.style.width = '180px';
+                valInput.onchange = (e) => {
+                    filters[field][valIdx] = e.target.value;
+                };
+                fieldDiv.appendChild(valInput);
+                // Remove value button
+                const removeValBtn = document.createElement('button');
+                removeValBtn.type = 'button';
+                removeValBtn.className = 'btn btn-outline-danger btn-sm ms-1 mb-1';
+                removeValBtn.textContent = '×';
+                removeValBtn.onclick = () => {
+                    filters[field].splice(valIdx, 1);
+                    if (filters[field].length === 0) delete filters[field];
+                    renderFilterBuilder();
+                };
+                fieldDiv.appendChild(removeValBtn);
+            });
+            // Add value button
+            const addValBtn = document.createElement('button');
+            addValBtn.type = 'button';
+            addValBtn.className = 'btn btn-outline-primary btn-sm ms-2 mb-1';
+            addValBtn.textContent = 'Add Value';
+            addValBtn.onclick = () => {
+                filters[field] = filters[field] || [];
+                filters[field].push('');
+                renderFilterBuilder();
+            };
+            fieldDiv.appendChild(addValBtn);
+            builder.appendChild(fieldDiv);
+        });
+        // Add field button
+        const addFieldBtn = document.createElement('button');
+        addFieldBtn.type = 'button';
+        addFieldBtn.className = 'btn btn-success btn-sm mt-2';
+        addFieldBtn.textContent = 'Add Field';
+        addFieldBtn.onclick = () => {
+            let newField = '';
+            let i = 1;
+            while (!newField || filters[newField]) {
+                newField = 'Field' + i;
+                i++;
+            }
+            filters[newField] = [''];
+            renderFilterBuilder();
+        };
+        builder.appendChild(addFieldBtn);
+    }
+    renderFilterBuilder();
+    // On form submit, serialize filters to hidden input
+    document.querySelector('form').addEventListener('submit', function(e) {
+        // Remove empty fields/values
+        Object.keys(filters).forEach(f => {
+            filters[f] = (filters[f] || []).filter(v => v && v.trim() !== '');
+            if (!filters[f].length) delete filters[f];
+        });
+        try {
+            document.querySelector('input[name="advanced_filters"]').value = JSON.stringify(filters);
+            document.getElementById('filter-builder-error').textContent = '';
+        } catch (err) {
+            e.preventDefault();
+            document.getElementById('filter-builder-error').textContent = 'Error serializing filters: ' + err;
         }
+    });
+    function clearAdvancedFilters() {
+        filters = {};
+        renderFilterBuilder();
+        document.querySelector('input[name="advanced_filters"]').value = '{}';
+        document.querySelector('form').submit();
     }
     </script>
 
