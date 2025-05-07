@@ -253,15 +253,8 @@ def facebook_webhook(request):
             try:
                 page_connection = FacebookPageConnection.objects.get(page_id=page_id)
                 logger.warning(f"Found page connection for user: {page_connection.user.id}")
-                
-                # Add detailed logging for subscription check
                 profile = page_connection.user.profile
                 logger.warning(f"User profile details - subscription_status: {profile.subscription_status}")
-                
-                if profile.subscription_status != 'active':
-                    logger.warning(f"Subscription check failed - status: {profile.subscription_status}")
-                    return JsonResponse({'error': 'You must subscribe to a plan to use Spam Guard filtering.'}, status=403)
-                
             except FacebookPageConnection.DoesNotExist:
                 logger.error(f"No page connection found for page_id: {page_id}")
                 return HttpResponse("Page not connected", status=404)
@@ -287,11 +280,6 @@ def facebook_webhook(request):
 
             # Save the lead using the parsed fields
             try:
-                # Restrict by subscription only
-                profile = page_connection.user.profile
-                if profile.subscription_status != 'active':
-                    return JsonResponse({'error': 'You must subscribe to a plan to use Spam Guard filtering.'}, status=403)
-                
                 full_name = parsed_fields.get('full_name') or parsed_fields.get('name', '')
                 email = parsed_fields.get('email', '')
                 phone = parsed_fields.get('phone_number', parsed_fields.get('phone', ''))
