@@ -31,7 +31,7 @@ class LeadRoutingSettingsForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         if self.instance and self.instance.advanced_filters:
             import json
-            self.fields['advanced_filters'].initial = json.dumps(self.instance.advanced_filters, indent=2)
+            self.fields['advanced_filters'].initial = json.dumps(self.instance.advanced_filters)
         else:
             self.fields['advanced_filters'].initial = '{}'
 
