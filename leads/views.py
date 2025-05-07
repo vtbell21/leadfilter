@@ -302,7 +302,7 @@ def facebook_webhook(request):
                 is_valid_phone = numverify_result['valid'] if numverify_result else False
                 phone_to_save = normalized_phone if normalized_phone else phone
                 # --- Advanced filter logic ---
-                is_filtered_out = False
+                filter_matched = True
                 try:
                     settings = page_connection.user.lead_routing_settings
                     filters = settings.advanced_filters or {}
@@ -323,7 +323,7 @@ def facebook_webhook(request):
                                     match = True
                                     break
                         if not match:
-                            is_filtered_out = True
+                            filter_matched = False
                             break
                 except LeadRoutingSettings.DoesNotExist:
                     pass
@@ -338,10 +338,10 @@ def facebook_webhook(request):
                     custom_fields=custom_fields,
                     gpt_score=score_result['gpt_score'],
                     gpt_reason=score_result['gpt_reason'],
-                    is_spam=score_result['is_spam'],
+                    is_spam=(not filter_matched) or score_result['is_spam'],
                     is_valid_email=is_valid_email,
                     is_valid_phone=is_valid_phone,
-                    is_filtered_out=is_filtered_out,
+                    is_filtered_out=False,
                 )
                 logger.warning(f"Lead saved with ID: {lead.id} (source: {data_source})")
 
@@ -375,7 +375,6 @@ def signup(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            messages.success(request, 'Account created successfully!')
             return redirect('leads:dashboard')
     else:
         form = CustomUserCreationForm()
@@ -420,7 +419,7 @@ def lead_dashboard(request):
         
         # Get all leads for the current user ordered by received_at (newest first)
         try:
-            all_leads = FacebookLead.objects.filter(user=request.user, is_filtered_out=False).order_by('-received_at')
+            all_leads = FacebookLead.objects.filter(user=request.user).order_by('-received_at')
             # --- Date filter logic ---
             start_date = request.GET.get('start_date')
             end_date = request.GET.get('end_date')
