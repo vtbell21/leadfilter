@@ -1092,33 +1092,38 @@ def settings_view(request):
 @login_required
 @require_POST
 def send_to_crm_view(request, lead_id):
-    lead = get_object_or_404(FacebookLead, pk=lead_id, user=request.user)
-    user = request.user
-    profile = user.profile
-    result = None
-    # Try each CRM in order of connection (HubSpot removed)
-    if getattr(profile, 'salesforce_access_token', None) and getattr(profile, 'salesforce_instance_url', None):
-        result = salesforce.send_lead_to_salesforce(user, lead)
-    elif getattr(profile, 'zoho_access_token', None):
-        result = zoho.send_lead_to_zoho(user, lead)
-    elif getattr(profile, 'pipedrive_access_token', None):
-        result = pipedrive.send_lead_to_pipedrive(user, lead)
-    elif getattr(profile, 'ghl_api_key', None):
-        result = gohighlevel.send_lead_to_ghl(user, lead)
-    else:
-        return JsonResponse({'success': False, 'error': 'No CRM integration connected.'}, status=400)
-    # Interpret result
-    if isinstance(result, dict):
-        if result.get('success'):
+    try:
+        lead = get_object_or_404(FacebookLead, pk=lead_id, user=request.user)
+        user = request.user
+        profile = user.profile
+        result = None
+        # Try each CRM in order of connection
+        if getattr(profile, 'salesforce_access_token', None) and getattr(profile, 'salesforce_instance_url', None):
+            result = salesforce.send_lead_to_salesforce(user, lead)
+        elif getattr(profile, 'zoho_access_token', None):
+            result = zoho.send_lead_to_zoho(user, lead)
+        elif getattr(profile, 'pipedrive_access_token', None):
+            result = pipedrive.send_lead_to_pipedrive(user, lead)
+        elif getattr(profile, 'ghl_api_key', None):
+            result = gohighlevel.send_lead_to_ghl(user, lead)
+        else:
+            return JsonResponse({'success': False, 'error': 'No CRM integration connected.'}, status=400)
+        # Interpret result
+        if isinstance(result, dict):
+            if result.get('success'):
+                return JsonResponse({'success': True})
+            else:
+                return JsonResponse({'success': False, 'error': result.get('error', 'Unknown error')}, status=400)
+        elif hasattr(result, 'ok') and hasattr(result, 'status_code'):
+            if result.ok:
+                return JsonResponse({'success': True})
+            else:
+                return JsonResponse({'success': False, 'error': getattr(result, 'text', 'Unknown error')}, status=400)
+        elif result is None:
             return JsonResponse({'success': True})
         else:
-            return JsonResponse({'success': False, 'error': result.get('error', 'Unknown error')}, status=400)
-    elif hasattr(result, 'ok') and hasattr(result, 'status_code'):
-        if result.ok:
-            return JsonResponse({'success': True})
-        else:
-            return JsonResponse({'success': False, 'error': getattr(result, 'text', 'Unknown error')}, status=400)
-    elif result is None:
-        return JsonResponse({'success': True})
-    else:
-        return JsonResponse({'success': False, 'error': str(result)}, status=400)
+            return JsonResponse({'success': False, 'error': str(result)}, status=400)
+    except Exception as e:
+        import traceback
+        logger.error(f"Error in send_to_crm_view: {e}\n{traceback.format_exc()}")
+        return JsonResponse({'success': False, 'error': f'Internal server error: {str(e)}'}, status=500)
