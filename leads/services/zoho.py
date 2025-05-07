@@ -23,25 +23,6 @@ def send_lead_to_zoho(user, lead):
         ]
     }
     response = requests.post(url, headers=headers, json=data)
-    if response.status_code == 200:
-        # --- Create a contact in Zoho CRM ---
-        contact_data = {
-            "data": [
-                {
-                    "Last_Name": lead.full_name.split()[-1] if lead.full_name else "Contact",
-                    "First_Name": lead.full_name.split()[0] if lead.full_name and len(lead.full_name.split()) > 1 else "",
-                    "Email": lead.email,
-                    "Phone": lead.phone,
-                }
-            ]
-        }
-        contact_response = requests.post(
-            'https://www.zohoapis.com/crm/v2/Contacts',
-            headers=headers,
-            json=contact_data
-        )
-        # Optionally, handle contact_response for errors/logging
-        return response
     return response
 
 def refresh_zoho_token_if_expired(profile):
