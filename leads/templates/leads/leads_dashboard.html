@@ -15,31 +15,6 @@
     {% endif %}
     <h1 class="mb-4">Spam Guard Dashboard</h1>
     
-    <!-- Facebook Connection Status -->
-    <div class="facebook-status">
-        {% if facebook_page %}
-            <div class="status-text">
-                <span class="status-icon status-connected">✅</span>
-                <span>Connected to <span class="page-name">{{ facebook_page.page_name }}</span></span>
-            </div>
-            <form action="{% url 'leads:disconnect_page' facebook_page.page_id %}" method="post" style="display: inline;">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-outline-danger btn-sm disconnect-btn" 
-                        onclick="return confirm('Are you sure you want to disconnect this Facebook Page? This will stop receiving new leads from this page.')">
-                    Disconnect Page
-                </button>
-            </form>
-        {% else %}
-            <div class="status-text">
-                <span class="status-icon status-disconnected">❌</span>
-                <span>No Facebook Page connected</span>
-            </div>
-            <a href="{% url 'leads:facebook_connect' %}" class="btn btn-primary btn-sm">
-                Connect Facebook Page
-            </a>
-        {% endif %}
-    </div>
-    
     <!-- Stats Cards -->
     <div class="row mb-4">
         <div class="col-md-3">

@@ -1041,4 +1041,5 @@ def ghl_disconnect(request):
 
 @login_required
 def settings_view(request):
-    return render(request, 'leads/settings.html')
+    facebook_page = FacebookPageConnection.objects.filter(user=request.user).first()
+    return render(request, 'leads/settings.html', {'facebook_page': facebook_page})

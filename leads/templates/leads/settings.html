@@ -36,6 +36,32 @@
                 </div>
             </div>
         </div>
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <div>
+                        <h5 class="card-title"><i class="bi bi-facebook"></i> Facebook Page Connection</h5>
+                        {% if facebook_page %}
+                            <p class="card-text text-success"><i class="bi bi-check-circle-fill"></i> Connected to <strong>{{ facebook_page.page_name }}</strong></p>
+                        {% else %}
+                            <p class="card-text text-danger"><i class="bi bi-x-circle-fill"></i> No Facebook Page connected</p>
+                        {% endif %}
+                    </div>
+                    {% if facebook_page %}
+                        <form action="{% url 'leads:disconnect_page' facebook_page.page_id %}" method="post" class="mt-3">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-danger w-100" onclick="return confirm('Are you sure you want to disconnect this Facebook Page? This will stop receiving new leads from this page.')">
+                                <i class="bi bi-x-lg"></i> Disconnect Page
+                            </button>
+                        </form>
+                    {% else %}
+                        <a href="{% url 'leads:facebook_connect' %}" class="btn btn-primary w-100 mt-3">
+                            <i class="bi bi-plug-fill"></i> Connect Facebook Page
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %} 
