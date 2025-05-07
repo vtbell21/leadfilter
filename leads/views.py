@@ -382,7 +382,7 @@ def logout_view(request):
     messages.info(request, 'Logged out successfully!')
     return redirect('leads:homepage')
 
-@login_required_and_subscribed
+@login_required
 def lead_dashboard(request):
     """Display a dashboard of valid and spam leads for the authenticated user."""
     facebook_connected = request.session.pop('facebook_connected', False)
@@ -935,7 +935,7 @@ def terms_of_service(request):
 def pricing_view(request):
     return render(request, 'leads/pricing.html')
 
-@login_required_and_subscribed
+@login_required
 def integrations_view(request):
     # Get or create the user's profile
     profile, created = UserProfile.objects.get_or_create(user=request.user)
