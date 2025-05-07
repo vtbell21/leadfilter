@@ -28,6 +28,7 @@ from leads.services.email_notifications import send_spam_lead_notification_email
 from collections import defaultdict
 from leads.models import FacebookLead
 from leads.services import salesforce, zoho, pipedrive, gohighlevel
+from django.db.models import Q
 
 logger = logging.getLogger(__name__)
 
@@ -412,7 +413,27 @@ def lead_dashboard(request):
                 end_date_parsed = parse_date(end_date)
                 if end_date_parsed:
                     all_leads = all_leads.filter(received_at__date__lte=end_date_parsed)
-            # --- End date filter logic ---
+            # --- Advanced filter logic ---
+            try:
+                settings = request.user.lead_routing_settings
+                filters = settings.advanced_filters or {}
+                for field, keywords in filters.items():
+                    if not keywords:
+                        continue
+                    q = None
+                    if field in ["full_name", "email", "phone", "message"]:
+                        for kw in keywords:
+                            cond = Q(**{f"{field}__icontains": kw})
+                            q = cond if q is None else q | cond
+                    else:
+                        for kw in keywords:
+                            cond = Q(**{f"custom_fields__{field}__icontains": kw})
+                            q = cond if q is None else q | cond
+                    if q is not None:
+                        all_leads = all_leads.filter(q)
+            except LeadRoutingSettings.DoesNotExist:
+                pass
+            # --- End advanced filter logic ---
             valid_leads = all_leads.filter(is_spam=False)
             spam_leads = all_leads.filter(is_spam=True)
             
