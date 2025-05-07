@@ -387,6 +387,9 @@ def lead_dashboard(request):
     """Display a dashboard of valid and spam leads for the authenticated user."""
     facebook_connected = request.session.pop('facebook_connected', False)
     facebook_disconnected = request.session.pop('facebook_disconnected', False)
+    analytics_labels = []
+    analytics_valid_counts = []
+    analytics_spam_counts = []
     try:
         # Get Facebook page connection status first
         try:
