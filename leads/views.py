@@ -27,7 +27,7 @@ from leads.decorators import login_required_and_subscribed
 from leads.services.email_notifications import send_spam_lead_notification_email, send_non_spam_lead_notification_email
 from collections import defaultdict
 from leads.models import FacebookLead
-from leads.services import hubspot, salesforce, zoho, pipedrive, gohighlevel
+from leads.services import salesforce, zoho, pipedrive, gohighlevel
 
 logger = logging.getLogger(__name__)
 
@@ -1096,10 +1096,8 @@ def send_to_crm_view(request, lead_id):
     user = request.user
     profile = user.profile
     result = None
-    # Try each CRM in order of connection
-    if getattr(profile, 'hubspot_access_token', None):
-        result = hubspot.send_lead_to_hubspot(user, lead)
-    elif getattr(profile, 'salesforce_access_token', None) and getattr(profile, 'salesforce_instance_url', None):
+    # Try each CRM in order of connection (HubSpot removed)
+    if getattr(profile, 'salesforce_access_token', None) and getattr(profile, 'salesforce_instance_url', None):
         result = salesforce.send_lead_to_salesforce(user, lead)
     elif getattr(profile, 'zoho_access_token', None):
         result = zoho.send_lead_to_zoho(user, lead)
