@@ -574,7 +574,6 @@ def facebook_callback(request):
         
         # Log the successful connection
         logger.info(f"User {request.user.id} successfully connected page {page_name} ({page_id})")
-        messages.success(request, f'Successfully connected to {page_name}')
         
         return redirect('leads:dashboard')
         
