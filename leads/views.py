@@ -381,6 +381,8 @@ def logout_view(request):
 @login_required_and_subscribed
 def lead_dashboard(request):
     """Display a dashboard of valid and spam leads for the authenticated user."""
+    facebook_connected = request.session.pop('facebook_connected', False)
+    facebook_disconnected = request.session.pop('facebook_disconnected', False)
     try:
         # Get Facebook page connection status first
         try:
@@ -447,6 +449,8 @@ def lead_dashboard(request):
             'spam_rate': spam_rate,
             'start_date': start_date or '',
             'end_date': end_date or '',
+            'facebook_connected': facebook_connected,
+            'facebook_disconnected': facebook_disconnected,
         }
         
         return render(request, 'leads/leads_dashboard.html', context)
@@ -464,6 +468,8 @@ def lead_dashboard(request):
             'spam_rate': 0,
             'start_date': '',
             'end_date': '',
+            'facebook_connected': False,
+            'facebook_disconnected': False,
         }
         return render(request, 'leads/leads_dashboard.html', context)
 
@@ -591,6 +597,7 @@ def facebook_callback(request):
         # Log the successful connection
         logger.info(f"User {request.user.id} successfully connected page {page_name} ({page_id})")
         
+        request.session['facebook_connected'] = True
         return redirect('leads:dashboard')
         
     except requests.RequestException as e:
@@ -692,6 +699,7 @@ def save_facebook_page(request):
             # Log the successful subscription
             logger.info(f"Successfully subscribed page {page_name} ({page_id}) to webhook")
             
+            request.session['facebook_connected'] = True
             messages.success(request, f'Successfully connected to {page_name}')
             return redirect('leads:dashboard')
             
@@ -768,6 +776,7 @@ def disconnect_page_view(request, page_id):
         # Log the successful disconnection
         logger.info(f"Successfully disconnected page {page_name} ({page_id})")
         
+        request.session['facebook_disconnected'] = True
         messages.success(request, f'Successfully disconnected {page_name}')
         return redirect('leads:dashboard')
         

@@ -14,15 +14,7 @@
         </div>
     {% endif %}
     {% if not facebook_page %}
-        <div class="alert alert-info d-flex align-items-center justify-content-between mb-4" role="alert">
-            <div>
-                <i class="bi bi-facebook me-2"></i>
-                <strong>Connect your Facebook Page to Spam Guard</strong> to start filtering leads automatically.
-            </div>
-            <a href="{% url 'leads:facebook_connect' %}" class="btn btn-primary btn-sm ms-3">
-                <i class="bi bi-plug-fill"></i> Connect Facebook Page
-            </a>
-        </div>
+        <!-- Facebook connection notification removed for browser notification integration -->
     {% endif %}
     <h1 class="mb-4">Spam Guard Dashboard</h1>
     
@@ -495,6 +487,25 @@
             window.location.href = url;
                 });
             }
+        // Browser notification for Facebook connect/disconnect
+        if (window.Notification && Notification.permission !== "denied") {
+            Notification.requestPermission().then(function(permission) {
+                if (permission === "granted") {
+                    // Example: Trigger notification based on context variable
+                    {% if facebook_connected %}
+                        new Notification("Facebook Page Connected", {
+                            body: "Your Facebook page is now connected to Spam Guard.",
+                            icon: "https://static.xx.fbcdn.net/rsrc.php/yo/r/iRmz9lCMBD2.ico"
+                        });
+                    {% elif facebook_disconnected %}
+                        new Notification("Facebook Page Disconnected", {
+                            body: "Your Facebook page has been disconnected from Spam Guard.",
+                            icon: "https://static.xx.fbcdn.net/rsrc.php/yo/r/iRmz9lCMBD2.ico"
+                        });
+                    {% endif %}
+                }
+            });
+        }
         } catch (error) {
             console.error('Error initializing dashboard:', error);
         }
