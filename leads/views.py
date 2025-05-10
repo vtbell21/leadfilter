@@ -276,7 +276,8 @@ def facebook_webhook(request):
                 normalized_phone = normalize_phone_number(phone)
                 logger.info(f"Normalized phone: {normalized_phone}")
                 # numverify_result = validate_phone_with_numverify(normalized_phone) if normalized_phone else None
-                is_valid_phone = True  # Assuming phone is valid without NumVerify
+                twilio_result = validate_phone_twilio(normalized_phone) if normalized_phone else None
+                is_valid_phone = twilio_result.get('valid') if twilio_result else False
                 phone_to_save = normalized_phone if normalized_phone else phone
                 # --- Advanced filter logic ---
                 filter_matched = True
