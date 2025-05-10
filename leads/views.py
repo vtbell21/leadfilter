@@ -29,6 +29,7 @@ from leads.models import FacebookLead
 from leads.services import salesforce, zoho, pipedrive, gohighlevel
 from django.db.models import Q
 from leads.hubspot_utils import create_hubspot_contact
+from leads.utils.phone_validation import validate_phone_twilio, normalize_phone_number
 
 logger = logging.getLogger(__name__)
 
