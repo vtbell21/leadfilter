@@ -202,6 +202,7 @@ def parse_field_data(field_data):
 # Create your views here.
 
 @csrf_exempt
+@check_subscription_limits
 @require_http_methods(["GET", "POST"])
 def facebook_webhook(request):
     logger.warning("facebook_webhook view was called")
@@ -1174,6 +1175,13 @@ def check_subscription_limits(view_func):
         if request.user.is_authenticated:
             profile = getattr(request.user, 'profile', None)
             if profile and profile.lead_filter_quota > 0 and profile.lead_filter_count >= profile.lead_filter_quota:
+                # For webhook requests, return a JSON response
+                if request.path.startswith('/facebook/webhook'):
+                    return JsonResponse({
+                        'error': 'Lead quota exceeded',
+                        'message': 'You have reached your monthly lead limit. Please upgrade your plan to continue.'
+                    }, status=403)
+                # For browser requests, redirect to pricing page
                 messages.warning(request, 'You have reached your monthly lead limit. Please upgrade your plan to continue.')
                 return redirect('leads:pricing')
         return view_func(request, *args, **kwargs)
