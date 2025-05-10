@@ -38,8 +38,8 @@ def create_hubspot_contact(user, lead):
         data = {
             "properties": {
                 "email": lead.email,
-                "firstname": getattr(lead, 'first_name', ''),
-                "lastname": getattr(lead, 'last_name', ''),
+                "firstname": lead.full_name.split()[0] if lead.full_name else "",
+                "lastname": lead.full_name.split()[-1] if lead.full_name and len(lead.full_name.split()) > 1 else "",
                 "phone": lead.phone,
             }
         }
