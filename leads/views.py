@@ -102,8 +102,10 @@ def score_lead(lead_data):
             numverify_result = {'valid': False, 'is_us_number': False, 'line_type': None}
         logger.info(f"NumVerify debug — raw: {phone_number}, normalized: {normalized}, result: {numverify_result}")
         
-        if not numverify_result.get('valid', False) or numverify_result.get('line_type') == 'voip':
+        if not numverify_result.get('valid', False):
             phone_spam_penalty += 0.4
+        if numverify_result.get('line_type') == 'voip':
+            phone_spam_penalty += 0.3
         if not numverify_result.get('is_us_number', False):
             phone_spam_penalty += 0.2
 
