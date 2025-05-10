@@ -358,6 +358,7 @@ def signup(request):
                 user.profile.lead_filter_quota = 50
                 user.profile.subscription_status = 'active'
                 user.profile.save()
+            messages.success(request, 'Welcome to the Free tier! You get 50 leads per month, basic spam filtering, and community support. <a href="/pricing/" class="btn btn-sm btn-primary ms-2">Upgrade Plan</a>')
             login(request, user)
             return redirect('leads:dashboard')
     else:
@@ -927,7 +928,9 @@ def terms_of_service(request):
     return render(request, 'leads/terms.html')
 
 def pricing_view(request):
-    return render(request, 'leads/pricing.html')
+    return render(request, 'leads/pricing.html', {
+        'stripe_publishable_key': settings.STRIPE_PUBLISHABLE_KEY
+    })
 
 @login_required
 def integrations_view(request):
