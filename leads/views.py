@@ -929,7 +929,10 @@ def terms_of_service(request):
 
 def pricing_view(request):
     return render(request, 'leads/pricing.html', {
-        'stripe_publishable_key': settings.STRIPE_PUBLISHABLE_KEY
+        'stripe_publishable_key': settings.STRIPE_PUBLISHABLE_KEY,
+        'starter_price_id': settings.STRIPE_PRICE_ID_STARTER,
+        'growth_price_id': settings.STRIPE_PRICE_ID_GROWTH,
+        'enterprise_price_id': settings.STRIPE_PRICE_ID_ENTERPRISE,
     })
 
 @login_required

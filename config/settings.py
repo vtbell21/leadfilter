@@ -220,3 +220,7 @@ ZOHO_CLIENT_SECRET = os.environ.get('ZOHO_CLIENT_SECRET')
 ZOHO_REDIRECT_URI = os.environ.get('ZOHO_REDIRECT_URI', 'https://spamguardai.com/zoho/callback/')
 
 LOGIN_URL = '/login/'
+
+STRIPE_PRICE_ID_STARTER = os.environ.get('STRIPE_PRICE_ID_STARTER')
+STRIPE_PRICE_ID_GROWTH = os.environ.get('STRIPE_PRICE_ID_GROWTH')
+STRIPE_PRICE_ID_ENTERPRISE = os.environ.get('STRIPE_PRICE_ID_ENTERPRISE')
