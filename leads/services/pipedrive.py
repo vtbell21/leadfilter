@@ -47,9 +47,14 @@ def send_lead_to_pipedrive(user, lead):
     Returns a dict with success status and any error/info messages.
     """
     access_token = getattr(user.profile, 'pipedrive_access_token', None)
-    if not access_token:
-        logger.error(f"User {user.id} does not have a Pipedrive access token.")
-        return {"success": False, "error": "No Pipedrive access token."}
+    expires_at = getattr(user.profile, 'pipedrive_token_expires_at', None)
+    now = timezone.now()
+    if not access_token or not expires_at or expires_at <= now:
+        logger.info(f"Pipedrive access token missing or expired for user {user.id}, attempting refresh.")
+        if not refresh_pipedrive_token(user):
+            logger.error(f"Failed to refresh Pipedrive token for user {user.id}.")
+            return {"success": False, "error": "Failed to refresh Pipedrive token."}
+        access_token = user.profile.pipedrive_access_token
 
     headers = {
         "Authorization": f"Bearer {access_token}",
