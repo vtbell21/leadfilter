@@ -182,46 +182,7 @@ def validate_email_zb(email):
         logger.error(f"Error validating email with ZeroBounce: {str(e)}")
         return False
 
-def validate_phone_twilio(phone_number):
-    """Validate phone number using Twilio Lookup API."""
-    try:
-        # Twilio credentials from environment variables
-        account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
-        auth_token = os.environ.get('TWILIO_AUTH_TOKEN')
-        
-        if not account_sid or not auth_token:
-            logger.error("Twilio credentials not found in environment variables")
-            return False
-        
-        # Ensure phone is in E.164 format (prepend +1 for US numbers if missing)
-        if not phone_number.startswith('+'):
-            phone_number = '+1' + phone_number
-        logger.info(f"Validating phone number with Twilio: {phone_number}")
-        
-        # Create basic auth header
-        auth_string = f"{account_sid}:{auth_token}"
-        auth_bytes = auth_string.encode('ascii')
-        auth_header = f"Basic {b64encode(auth_bytes).decode('ascii')}"
-        
-        # Prepare the API request
-        api_url = f"https://lookups.twilio.com/v1/PhoneNumbers/{phone_number}"
-        headers = {
-            'Authorization': auth_header
-        }
-        
-        response = requests.get(api_url, headers=headers)
-        response.raise_for_status()
-        result = response.json()
-        logger.info(f"Twilio API response: {result}")
-        
-        # Check if phone is valid and possible
-        is_valid = result.get('valid', False) and result.get('phone_number', {}).get('carrier', {}).get('type') != 'voip'
-        logger.info(f"Phone validation result for {phone_number}: {is_valid}")
-        return is_valid
-        
-    except requests.RequestException as e:
-        logger.error(f"Error validating phone with Twilio: {str(e)}")
-        return False
+
 
 # Helper function to parse field_data
 
