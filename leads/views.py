@@ -851,7 +851,19 @@ def toggle_lead_spam(request, pk):
     # Toggle the spam status
     lead.is_spam = not lead.is_spam
     lead.save()
-    
+
+    # If the lead is now valid, send to HubSpot
+    if not lead.is_spam:
+        try:
+            from leads.services.hubspot import send_lead_to_hubspot
+            result = send_lead_to_hubspot(request.user, lead)
+            if not result.get('success'):
+                logger.error(f"Failed to sync lead {lead.id} to HubSpot: {result.get('error')}")
+            else:
+                logger.info(f"Lead {lead.id} synced to HubSpot: {result}")
+        except Exception as e:
+            logger.error(f"Exception while syncing lead {lead.id} to HubSpot: {e}")
+
     # Log the action
     logger.info(f"User {request.user.id} toggled spam status for lead {lead.id} to {lead.is_spam}")
     
