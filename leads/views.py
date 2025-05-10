@@ -29,6 +29,7 @@ from collections import defaultdict
 from leads.models import FacebookLead
 from leads.services import salesforce, zoho, pipedrive, gohighlevel
 from django.db.models import Q
+from leads.hubspot_utils import create_hubspot_contact
 
 logger = logging.getLogger(__name__)
 
