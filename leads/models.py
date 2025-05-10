@@ -18,11 +18,12 @@ class UserProfile(models.Model):
     pipedrive_refresh_token = models.TextField(blank=True, null=True)
     pipedrive_token_expires_at = models.DateTimeField(blank=True, null=True)
     lead_filter_count = models.IntegerField(default=0)
-    lead_filter_quota = models.IntegerField(default=0)
+    lead_filter_quota = models.IntegerField(default=50)  # Default to Free tier
     stripe_customer_id = models.CharField(max_length=255, blank=True, null=True)
     stripe_subscription_id = models.CharField(max_length=255, blank=True, null=True)
-    subscription_status = models.CharField(max_length=50, default='inactive')
-    subscription_id = models.CharField(max_length=100, null=True, blank=True)
+    subscription_status = models.CharField(max_length=20, default='inactive')
+    subscription_id = models.CharField(max_length=255, null=True, blank=True)
+    customer_id = models.CharField(max_length=255, null=True, blank=True)
     salesforce_access_token = models.TextField(blank=True, null=True)
     salesforce_refresh_token = models.TextField(blank=True, null=True)
     salesforce_instance_url = models.TextField(blank=True, null=True)
@@ -30,6 +31,7 @@ class UserProfile(models.Model):
     zoho_refresh_token = models.TextField(blank=True, null=True)
     zoho_token_expires_at = models.DateTimeField(blank=True, null=True)
     ghl_api_key = models.TextField(blank=True, null=True)
+    signup_ip = models.GenericIPAddressField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
