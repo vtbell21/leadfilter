@@ -90,39 +90,26 @@ def score_lead(lead_data):
                 custom_fields[field_name] = value
                 field_dict[field_name] = value  # Include in field_dict for GPT scoring
 
-    # --- Phone validation: Twilio primary, NumVerify fallback ---
+    # --- Phone validation: Twilio only ---
     phone_number = field_dict.get('phone', '')
     twilio_result = None
-    numverify_result = None
     phone_spam_penalty = 0.0
+
     if phone_number:
         normalized = normalize_phone_number(phone_number)
         if normalized:
-            try:
-                # Try Twilio first
-                twilio_valid = validate_phone_twilio(normalized)
-                twilio_result = {'valid': twilio_valid}
-                logger.info(f"Twilio debug — raw: {phone_number}, normalized: {normalized}, result: {twilio_result}")
-            except Exception as e:
-                logger.error(f"Twilio validation failed for {normalized}: {e}")
-                twilio_result = {'valid': False, 'error': str(e)}
-            # If Twilio fails or returns invalid, fall back to NumVerify
-            if not twilio_result.get('valid', False):
-                numverify_result = validate_phone_with_numverify(normalized)
-                logger.info(f"NumVerify fallback — raw: {phone_number}, normalized: {normalized}, result: {numverify_result}")
-                # Use NumVerify's detailed info for penalties
-                if not numverify_result.get('valid', False):
-                    phone_spam_penalty += 0.4
-                if numverify_result.get('line_type') == 'voip':
-                    phone_spam_penalty += 0.3
-                if not numverify_result.get('is_us_number', False):
-                    phone_spam_penalty += 0.2
-            else:
-                # Twilio valid, no penalty
-                pass
+            twilio_result = validate_phone_twilio(normalized)
+            logger.info(f"Twilio debug — raw: {phone_number}, normalized: {normalized}, result: {twilio_result}")
+
+            if not twilio_result.get('valid'):
+                phone_spam_penalty += 0.4
+            elif twilio_result.get('line_type') == 'voip':
+                phone_spam_penalty += 0.3
+            if not twilio_result.get('is_us_number'):
+                phone_spam_penalty += 0.2
         else:
-            numverify_result = {'valid': False, 'is_us_number': False, 'line_type': None}
             phone_spam_penalty += 0.4
+            twilio_result = {'valid': False, 'error': 'Normalization failed'}
 
     try:
         # Get GPT scoring result
@@ -153,8 +140,7 @@ def score_lead(lead_data):
             'field_data': field_dict,
             'custom_fields': custom_fields,
             'twilio_result': twilio_result,
-            'numverify_result': numverify_result,
-            'email_spam_penalty': email_spam_penalty,
+            'phone_spam_penalty': phone_spam_penalty,
         }
         
     except Exception as e:
@@ -167,8 +153,7 @@ def score_lead(lead_data):
             'field_data': field_dict,
             'custom_fields': custom_fields,
             'twilio_result': twilio_result,
-            'numverify_result': numverify_result,
-            'email_spam_penalty': 0.0,
+            'phone_spam_penalty': 0.0,
         }
 
 def validate_email_zb(email):
