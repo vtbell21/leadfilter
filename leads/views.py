@@ -365,6 +365,17 @@ def signup(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
+            # Check IP-based free-tier limit
+            ip_address = request.META.get('HTTP_X_FORWARDED_FOR') or request.META.get('REMOTE_ADDR')
+            ip_address = ip_address.split(',')[0].strip() if ip_address else None
+
+            if ip_address:
+                max_free_accounts = 1
+                existing_free_accounts = UserProfile.objects.filter(signup_ip=ip_address, stripe_subscription_id__isnull=True).count()
+                if existing_free_accounts >= max_free_accounts:
+                    messages.error(request, 'Free-tier limit reached for this IP address. Please upgrade or contact support.')
+                    return redirect('leads:pricing')
+
             user = form.save()
             # Set Free plan defaults and capture IP address
             if hasattr(user, 'profile'):
@@ -372,9 +383,8 @@ def signup(request):
                 profile.lead_filter_quota = 50
                 profile.subscription_status = 'active'
                 # Capture and store IP address
-                ip_address = request.META.get('HTTP_X_FORWARDED_FOR') or request.META.get('REMOTE_ADDR')
                 if ip_address:
-                    profile.signup_ip = ip_address.split(',')[0].strip()
+                    profile.signup_ip = ip_address
                 profile.save()
             messages.success(request, 'Welcome to the Free tier! You get 50 leads per month, basic spam filtering, and community support. <a href="/pricing/" class="btn btn-sm btn-primary ms-2">Upgrade Plan</a>')
             login(request, user)
