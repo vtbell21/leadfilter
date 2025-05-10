@@ -16,37 +16,45 @@ def normalize_phone_number(raw_number, default_region="US"):
     except NumberParseException:
         return None
 
-def validate_phone_with_numverify(phone_number):
-    """
-    Validate a phone number using the NumVerify API.
-    Returns a dict with keys: valid, line_type, carrier, location, country_name, is_us_number
-    """
-    api_url = "http://apilayer.net/api/validate"
-    params = {
-        'access_key': settings.NUMVERIFY_API_KEY,
-        'number': phone_number,
-        'country_code': 'US',
-        'format': 1
-    }
+def validate_phone_twilio(phone_number):
+    """Validate phone number using Twilio Lookup API."""
     try:
-        response = requests.get(api_url, params=params, timeout=10)
+        import requests
+        from base64 import b64encode
+        import os
+
+        account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
+        auth_token = os.environ.get('TWILIO_AUTH_TOKEN')
+        if not account_sid or not auth_token:
+            raise ValueError("Twilio credentials not found in environment variables.")
+
+        if not phone_number.startswith('+'):
+            phone_number = '+1' + phone_number
+
+        auth_str = f"{account_sid}:{auth_token}"
+        headers = {
+            "Authorization": "Basic " + b64encode(auth_str.encode("ascii")).decode("ascii")
+        }
+
+        url = f"https://lookups.twilio.com/v1/PhoneNumbers/{phone_number}?Type=carrier"
+        response = requests.get(url, headers=headers, timeout=10)
         response.raise_for_status()
         data = response.json()
+
         return {
-            'valid': data.get('valid', False),
-            'line_type': data.get('line_type'),
-            'carrier': data.get('carrier'),
-            'location': data.get('location'),
-            'country_name': data.get('country_name'),
-            'is_us_number': data.get('country_code', '').upper() == 'US',
+            "valid": True,
+            "line_type": data.get("carrier", {}).get("type"),
+            "carrier": data.get("carrier", {}).get("name"),
+            "country_code": data.get("country_code"),
+            "is_us_number": data.get("country_code") == "US"
         }
+
     except Exception as e:
         return {
-            'valid': False,
-            'line_type': None,
-            'carrier': None,
-            'location': None,
-            'country_name': None,
-            'is_us_number': False,
-            'error': str(e),
+            "valid": False,
+            "line_type": None,
+            "carrier": None,
+            "country_code": None,
+            "is_us_number": False,
+            "error": str(e),
         } 
