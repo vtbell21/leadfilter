@@ -22,7 +22,7 @@ import os
 from leads.services.gpt import score_lead_with_gpt
 from .forms import LeadRoutingSettingsForm, CustomUserCreationForm, EmailUpdateForm, WebhookSettingsForm, GHLApiKeyForm
 from django.contrib.admin.views.decorators import staff_member_required
-from leads.decorators import login_required_and_subscribed
+from leads.decorators import login_required_and_subscribed, check_subscription_limits
 from leads.services.email_notifications import send_spam_lead_notification_email, send_non_spam_lead_notification_email
 from collections import defaultdict
 from leads.models import FacebookLead
