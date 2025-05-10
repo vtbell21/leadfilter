@@ -202,7 +202,6 @@ def parse_field_data(field_data):
 # Create your views here.
 
 @csrf_exempt
-@check_subscription_limits
 @require_http_methods(["GET", "POST"])
 def facebook_webhook(request):
     logger.warning("facebook_webhook view was called")
@@ -235,6 +234,15 @@ def facebook_webhook(request):
                 logger.warning(f"Found page connection for user: {page_connection.user.id}")
                 profile = page_connection.user.profile
                 logger.warning(f"User profile details - subscription_status: {profile.subscription_status}")
+                
+                # Check quota limits
+                if profile.lead_filter_quota > 0 and profile.lead_filter_count >= profile.lead_filter_quota:
+                    logger.warning(f"User {page_connection.user.id} has reached their lead quota")
+                    return JsonResponse({
+                        'error': 'Lead quota exceeded',
+                        'message': 'You have reached your monthly lead limit. Please upgrade your plan to continue.'
+                    }, status=403)
+                
             except FacebookPageConnection.DoesNotExist:
                 logger.error(f"No page connection found for page_id: {page_id}")
                 return HttpResponse("Page not connected", status=404)
