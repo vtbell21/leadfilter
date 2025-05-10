@@ -322,6 +322,10 @@ def facebook_webhook(request):
                     is_valid_phone=is_valid_phone,
                     is_filtered_out=False,
                 )
+                # Increment lead_filter_count if the lead is not spam
+                if not lead.is_spam and hasattr(lead.user, 'profile'):
+                    lead.user.profile.lead_filter_count += 1
+                    lead.user.profile.save()
                 logger.warning(f"Lead saved with ID: {lead.id} (source: {data_source})")
 
                 # Send email notification based on lead status
