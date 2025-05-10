@@ -22,7 +22,6 @@ import os
 from leads.services.gpt import score_lead_with_gpt
 from .forms import LeadRoutingSettingsForm, CustomUserCreationForm, EmailUpdateForm, WebhookSettingsForm, GHLApiKeyForm
 from django.contrib.admin.views.decorators import staff_member_required
-from leads.utils.phone_validation import validate_phone_with_numverify, normalize_phone_number
 from leads.decorators import login_required_and_subscribed
 from leads.services.email_notifications import send_spam_lead_notification_email, send_non_spam_lead_notification_email
 from collections import defaultdict
@@ -314,9 +313,8 @@ def facebook_webhook(request):
                 logger.info(f"Raw phone before normalization: {phone}")
                 normalized_phone = normalize_phone_number(phone)
                 logger.info(f"Normalized phone: {normalized_phone}")
-                numverify_result = validate_phone_with_numverify(normalized_phone) if normalized_phone else None
-                logger.info(f"NumVerify result for {normalized_phone}: {numverify_result}")
-                is_valid_phone = numverify_result['valid'] if numverify_result else False
+                # numverify_result = validate_phone_with_numverify(normalized_phone) if normalized_phone else None
+                is_valid_phone = True  # Assuming phone is valid without NumVerify
                 phone_to_save = normalized_phone if normalized_phone else phone
                 # --- Advanced filter logic ---
                 filter_matched = True
@@ -1095,8 +1093,8 @@ def validate_phone_view(request):
     phone = request.GET.get('phone', '')
     if not phone:
         return JsonResponse({'error': 'Missing phone parameter'}, status=400)
-    from leads.utils.phone_validation import validate_phone_with_numverify
-    result = validate_phone_with_numverify(phone)
+    # from leads.utils.phone_validation import validate_phone_with_numverify
+    result = validate_phone_twilio(phone)
     return JsonResponse(result)
 
 @login_required
