@@ -202,6 +202,7 @@ def parse_field_data(field_data):
 # Create your views here.
 
 @csrf_exempt
+@check_subscription_limits
 @require_http_methods(["GET", "POST"])
 def facebook_webhook(request):
     logger.warning("facebook_webhook view was called")
