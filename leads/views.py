@@ -865,6 +865,7 @@ def toggle_lead_spam(request, pk):
     
     # Toggle the spam status
     lead.is_spam = not lead.is_spam
+    logger.info(f"Manual spam toggle — Lead {lead.id} marked as {'SPAM' if lead.is_spam else 'NOT SPAM'} by user {request.user.id}. GPT score: {lead.gpt_score}, reason: {lead.gpt_reason}")
     lead.save()
 
     # If the lead is now valid, send to HubSpot
