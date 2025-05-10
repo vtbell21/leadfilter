@@ -80,7 +80,7 @@ class FacebookLead(models.Model):
         super().save(*args, **kwargs)
         
         # If this is a new lead and it's not spam, send to HubSpot
-        if is_new and not self.is_spam and self.user and hasattr(self.user, 'hubspot_access_token'):
+        if is_new and not self.is_spam and self.user and hasattr(self.user, 'profile') and self.user.profile.hubspot_access_token:
             create_hubspot_contact(self.user, self)
         # If this is a new lead and it's not spam, send to Pipedrive if connected
         if is_new and not self.is_spam and hasattr(self.user, 'profile') and self.user.profile.pipedrive_access_token:
