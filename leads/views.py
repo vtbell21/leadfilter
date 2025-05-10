@@ -1152,6 +1152,11 @@ def send_to_crm_view(request, lead_id):
                 return JsonResponse({'success': True})
             else:
                 return JsonResponse({'success': False, 'error': result.get('error', 'Unknown error')}, status=400)
+        elif isinstance(result, bool):
+            if result:
+                return JsonResponse({'success': True})
+            else:
+                return JsonResponse({'success': False, 'error': 'Failed to send to HubSpot.'}, status=400)
         elif hasattr(result, 'ok') and hasattr(result, 'status_code'):
             if result.ok:
                 return JsonResponse({'success': True})
