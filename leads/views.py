@@ -30,6 +30,7 @@ from leads.services import salesforce, zoho, pipedrive, gohighlevel
 from django.db.models import Q
 from leads.hubspot_utils import create_hubspot_contact
 from leads.utils.phone_validation import normalize_phone_number, validate_phone_twilio
+from functools import wraps
 
 logger = logging.getLogger(__name__)
 
@@ -352,6 +353,11 @@ def signup(request):
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
+            # Set Free plan defaults
+            if hasattr(user, 'profile'):
+                user.profile.lead_filter_quota = 50
+                user.profile.subscription_status = 'active'
+                user.profile.save()
             login(request, user)
             return redirect('leads:dashboard')
     else:
@@ -927,6 +933,9 @@ def pricing_view(request):
 def integrations_view(request):
     # Get or create the user's profile
     profile, created = UserProfile.objects.get_or_create(user=request.user)
+    if profile.lead_filter_quota == 50:
+        messages.warning(request, 'Upgrade your plan to enable integrations.')
+        return redirect('leads:pricing')
     pipedrive_connected = bool(profile.pipedrive_access_token)
     context = {
         'hubspot_connected': bool(profile.hubspot_access_token),
@@ -1148,3 +1157,14 @@ def send_to_crm_view(request, lead_id):
         import traceback
         logger.error(f"Error in send_to_crm_view: {e}\n{traceback.format_exc()}")
         return JsonResponse({'success': False, 'error': f'Internal server error: {str(e)}'}, status=500)
+
+def check_subscription_limits(view_func):
+    @wraps(view_func)
+    def _wrapped_view(request, *args, **kwargs):
+        if request.user.is_authenticated:
+            profile = getattr(request.user, 'profile', None)
+            if profile and profile.lead_filter_quota > 0 and profile.lead_filter_count >= profile.lead_filter_quota:
+                messages.warning(request, 'You have reached your monthly lead limit. Please upgrade your plan to continue.')
+                return redirect('leads:pricing')
+        return view_func(request, *args, **kwargs)
+    return _wrapped_view

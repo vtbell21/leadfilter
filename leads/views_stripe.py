@@ -76,7 +76,7 @@ def stripe_webhook(request):
             profile, created = UserProfile.objects.get_or_create(user=user)
             profile.stripe_subscription_id = subscription_id
             profile.stripe_customer_id = customer_id
-            profile.subscription_status = 'active'
+            # Determine the price_id for the subscription
             price_id = None
             if 'display_items' in session and session['display_items']:
                 price_id = session['display_items'][0]['price']['id']
@@ -84,13 +84,17 @@ def stripe_webhook(request):
                 price_id = session['items']['data'][0]['price']['id']
             elif 'line_items' in session and session['line_items']['data']:
                 price_id = session['line_items']['data'][0]['price']['id']
-            if price_id == 'price_1RIgLWDEGQhWV7HFHPDbJOX8':
-                profile.lead_filter_quota = 100
-            elif price_id == 'price_1RIgLWDEGQhWV7HFHPDbJOX9':
-                profile.lead_filter_quota = 500
-            elif price_id == 'price_1RIgLWDEGQhWV7HFHPDbJOX0':
-                profile.lead_filter_quota = 999999
-            profile.save()
+            # Only update quota/status if this is a paid plan (not free)
+            paid_price_ids = ['price_1RIgLWDEGQhWV7HFHPDbJOX8', 'price_1RIgLWDEGQhWV7HFHPDbJOX9', 'price_1RIgLWDEGQhWV7HFHPDbJOX0']
+            if price_id in paid_price_ids:
+                profile.subscription_status = 'active'
+                if price_id == 'price_1RIgLWDEGQhWV7HFHPDbJOX8':
+                    profile.lead_filter_quota = 100
+                elif price_id == 'price_1RIgLWDEGQhWV7HFHPDbJOX9':
+                    profile.lead_filter_quota = 500
+                elif price_id == 'price_1RIgLWDEGQhWV7HFHPDbJOX0':
+                    profile.lead_filter_quota = 999999
+                profile.save()
 
     elif event['type'] in ['invoice.payment_failed', 'customer.subscription.deleted']:
         subscription = event['data']['object']
