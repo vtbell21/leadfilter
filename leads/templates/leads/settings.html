@@ -63,8 +63,29 @@
             </div>
         </div>
     </div>
-    <div class="mt-4">
-        <a href="/subscription/cancel-manual/" class="btn btn-danger">Cancel Subscription</a>
+    <div class="card mb-4">
+        <div class="card-header">
+            <h4 class="mb-0">Subscription Management</h4>
+        </div>
+        <div class="card-body">
+            <p><strong>Current Tier:</strong> 
+                {% if user.profile.lead_filter_quota == 50 %}
+                    Free
+                {% elif user.profile.lead_filter_quota == 100 %}
+                    Starter
+                {% elif user.profile.lead_filter_quota == 500 %}
+                    Growth
+                {% elif user.profile.lead_filter_quota >= 999999 %}
+                    Enterprise
+                {% else %}
+                    Custom
+                {% endif %}
+            </p>
+            <p><strong>Leads per Month:</strong> {{ user.profile.lead_filter_quota }}</p>
+            <div class="mt-3">
+                <a href="/subscription/cancel-manual/" class="btn btn-danger">Cancel Subscription</a>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %} 
