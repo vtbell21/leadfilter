@@ -44,8 +44,8 @@ Lead Information:
 {field_text}
 
 Return a JSON object with:
-- score: Number between 0 and 1 (higher = more likely spam)
-- reason: Brief explanation of the evaluation
+- score: Number between 0 and 1 (higher = more likely spam). Strongly penalize leads with fake names, disposable email domains, VOIP numbers, missing fields, or vague/empty messages.
+- reason: Explain the score briefly and clearly.
 
 Example response format:
 {{"score": 0.82, "reason": "Message was nonsensical and phone/email look suspicious"}}
