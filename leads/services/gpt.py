@@ -34,7 +34,7 @@ def score_lead_with_gpt(field_dict: Dict[str, Any]) -> Dict[str, Any]:
         # Construct the analysis prompt
         prompt = f"""Analyze this lead information for spam likelihood. Consider:
 1. Name authenticity and formatting
-2. Email validity and domain reputation
+2. Email validity and domain structure (e.g., temp domains, nonsense names). Do not penalize Gmail, Yahoo, or other common personal domains.
 3. Phone number format and validity
 4. Message quality and coherence
 5. Overall data consistency
