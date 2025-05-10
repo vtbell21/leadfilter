@@ -366,11 +366,16 @@ def signup(request):
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            # Set Free plan defaults
+            # Set Free plan defaults and capture IP address
             if hasattr(user, 'profile'):
-                user.profile.lead_filter_quota = 50
-                user.profile.subscription_status = 'active'
-                user.profile.save()
+                profile = user.profile
+                profile.lead_filter_quota = 50
+                profile.subscription_status = 'active'
+                # Capture and store IP address
+                ip_address = request.META.get('HTTP_X_FORWARDED_FOR') or request.META.get('REMOTE_ADDR')
+                if ip_address:
+                    profile.signup_ip = ip_address.split(',')[0].strip()
+                profile.save()
             messages.success(request, 'Welcome to the Free tier! You get 50 leads per month, basic spam filtering, and community support. <a href="/pricing/" class="btn btn-sm btn-primary ms-2">Upgrade Plan</a>')
             login(request, user)
             return redirect('leads:dashboard')
