@@ -120,7 +120,7 @@
             <script>
                 const stripe = Stripe('{{ stripe_publishable_key }}');
 
-                document.querySelectorAll('button').forEach(function(button) {
+                document.querySelectorAll('button[data-price-id]').forEach(function(button) {
                     button.addEventListener('click', function() {
                         // Show loading state
                         button.disabled = true;
