@@ -605,6 +605,7 @@
                             text.textContent = 'Sent!';
                             btn.classList.remove('btn-outline-primary');
                             btn.classList.add('btn-success');
+                            btn.disabled = true;
                         } else {
                             text.textContent = 'Send to CRM';
                             btn.disabled = false;
