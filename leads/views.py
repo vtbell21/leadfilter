@@ -115,11 +115,21 @@ def score_lead(lead_data):
         gpt_score = float(gpt_result['score'])
         gpt_reason = gpt_result['reason']
         
+        # --- Email spam penalty logic ---
+        email_spam_penalty = 0.0
+        email = field_dict.get('email', '')
+        if email:
+            is_valid_email = validate_email_zb(email)
+            if not is_valid_email:
+                email_spam_penalty += 0.3
+        else:
+            is_valid_email = False
+        
         # Compute final results
-        total_score = gpt_score + phone_spam_penalty
+        total_score = gpt_score + phone_spam_penalty + email_spam_penalty
         total_score = min(total_score, 1.0)  # Cap at 1.0
         is_spam = total_score > 0.7
-        logger.info(f"Scoring debug — phone_spam_penalty: {phone_spam_penalty}, total_score: {total_score}, gpt_score: {gpt_score}, is_spam: {is_spam}")
+        logger.info(f"Scoring debug — phone_spam_penalty: {phone_spam_penalty}, email_spam_penalty: {email_spam_penalty}, total_score: {total_score}, gpt_score: {gpt_score}, is_spam: {is_spam}")
         return {
             'total_score': total_score,
             'is_spam': is_spam,
@@ -128,6 +138,7 @@ def score_lead(lead_data):
             'field_data': field_dict,
             'custom_fields': custom_fields,
             'numverify_result': numverify_result,
+            'email_spam_penalty': email_spam_penalty,
         }
         
     except Exception as e:
@@ -140,6 +151,7 @@ def score_lead(lead_data):
             'field_data': field_dict,
             'custom_fields': custom_fields,
             'numverify_result': numverify_result,
+            'email_spam_penalty': 0.0,
         }
 
 def validate_email_zb(email):
