@@ -395,6 +395,7 @@ def logout_view(request):
     messages.info(request, 'Logged out successfully!')
     return redirect('leads:homepage')
 
+@check_subscription_limits
 @login_required
 def lead_dashboard(request):
     """Display a dashboard of valid and spam leads for the authenticated user."""
@@ -825,6 +826,7 @@ def disconnect_page_view(request, page_id):
         messages.error(request, 'An error occurred while disconnecting the page')
         return redirect('leads:dashboard')
 
+@check_subscription_limits
 @login_required
 def lead_detail_view(request, pk):
     """Display detailed information about a specific lead."""
@@ -840,6 +842,7 @@ def lead_detail_view(request, pk):
     
     return render(request, 'leads/lead_detail.html', context)
 
+@check_subscription_limits
 @login_required
 @require_http_methods(["POST"])
 def toggle_lead_spam(request, pk):
@@ -869,6 +872,7 @@ def toggle_lead_spam(request, pk):
     messages.success(request, f'Lead marked as {"spam" if lead.is_spam else "valid"}')
     return redirect('leads:lead_detail', pk=pk)
 
+@check_subscription_limits
 @login_required
 def export_clean_leads(request):
     """Export all non-spam leads for the current user as a CSV file."""
@@ -948,6 +952,7 @@ def pricing_view(request):
         'enterprise_price_id': settings.STRIPE_PRICE_ID_ENTERPRISE,
     })
 
+@check_subscription_limits
 @login_required
 def integrations_view(request):
     # Get or create the user's profile
@@ -982,6 +987,7 @@ def hubspot_connect(request):
 def about_view(request):
     return render(request, 'leads/about.html')
 
+@check_subscription_limits
 @login_required
 def lead_routing_settings_view(request):
     # Ensure the user has a LeadRoutingSettings object
@@ -1012,6 +1018,7 @@ def update_email_view(request):
         form = EmailUpdateForm(instance=request.user)
     return render(request, 'leads/update_email.html', {'form': form})
 
+@check_subscription_limits
 @login_required
 def webhook_settings_view(request):
     try:
