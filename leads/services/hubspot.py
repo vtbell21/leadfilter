@@ -8,6 +8,7 @@ def send_lead_to_hubspot(user, lead):
     Create or update a contact in HubSpot for the given user and lead.
     Returns a dict with success status and any error/info messages.
     """
+    logging.getLogger(__name__).info(f"[HubSpot Sync] Attempting to send lead {lead.id} (email: {lead.email}) for user {user.id} ({user.email}) to HubSpot.")
     def do_sync(access_token):
         headers = {
             "Authorization": f"Bearer {access_token}",
