@@ -1130,8 +1130,11 @@ def send_to_crm_view(request, lead_id):
         user = request.user
         profile = user.profile
         result = None
+
         # Try each CRM in order of connection
-        if getattr(profile, 'salesforce_access_token', None) and getattr(profile, 'salesforce_instance_url', None):
+        if getattr(profile, 'hubspot_access_token', None):
+            result = create_hubspot_contact(user, lead)
+        elif getattr(profile, 'salesforce_access_token', None) and getattr(profile, 'salesforce_instance_url', None):
             result = salesforce.send_lead_to_salesforce(user, lead)
         elif getattr(profile, 'zoho_access_token', None):
             result = zoho.send_lead_to_zoho(user, lead)
@@ -1141,6 +1144,7 @@ def send_to_crm_view(request, lead_id):
             result = gohighlevel.send_lead_to_ghl(user, lead)
         else:
             return JsonResponse({'success': False, 'error': 'No CRM integration connected.'}, status=400)
+
         # Interpret result
         if isinstance(result, dict):
             if result.get('success'):
