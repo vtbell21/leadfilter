@@ -1,0 +1,35 @@
+{% extends "leads/base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <a href="{% url 'leads:settings' %}" class="btn btn-link mb-3">&larr; Back to Settings</a>
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4 class="mb-0">Subscription Management</h4>
+                </div>
+                <div class="card-body">
+                    <p><strong>Current Tier:</strong> 
+                        {% if profile.lead_filter_quota == 50 %}
+                            Free
+                        {% elif profile.lead_filter_quota == 100 %}
+                            Starter
+                        {% elif profile.lead_filter_quota == 500 %}
+                            Growth
+                        {% elif profile.lead_filter_quota >= 999999 %}
+                            Enterprise
+                        {% else %}
+                            Custom
+                        {% endif %}
+                    </p>
+                    <p><strong>Leads per Month:</strong> {{ profile.lead_filter_quota }}</p>
+                    <p><strong>Leads Synced So Far:</strong> {{ profile.lead_filter_count }}</p>
+                    <div class="mt-3">
+                        <a href="/subscription/cancel-manual/" class="btn btn-danger">Cancel Subscription</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

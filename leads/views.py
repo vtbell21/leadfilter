@@ -1171,3 +1171,8 @@ def check_subscription_limits(view_func):
                 return redirect('leads:pricing')
         return view_func(request, *args, **kwargs)
     return _wrapped_view
+
+@login_required
+def subscription_management_view(request):
+    profile = request.user.profile
+    return render(request, 'leads/subscription_management.html', {'profile': profile})
