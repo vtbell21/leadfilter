@@ -205,7 +205,15 @@ PIPEDRIVE_REDIRECT_URI = 'https://spamguardai.com/pipedrive/callback/'  # update
 
 # SendGrid Settings
 SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
-DEFAULT_FROM_EMAIL = "info@spamguardai.com"
+DEFAULT_FROM_EMAIL = "Spam Guard <info@spamguardai.com>"
+
+# Email settings for SendGrid
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'apikey'
+EMAIL_HOST_PASSWORD = os.environ['SENDGRID_API_KEY']
 
 # Salesforce settings
 SALESFORCE_AUTH_URL = os.environ.get('SALESFORCE_AUTH_URL', 'https://login.salesforce.com/services/oauth2/authorize')
