@@ -31,6 +31,7 @@ from django.db.models import Q
 from leads.hubspot_utils import create_hubspot_contact
 from leads.utils.phone_validation import normalize_phone_number, validate_phone_twilio
 from functools import wraps
+from django.contrib.auth.models import User
 
 logger = logging.getLogger(__name__)
 
