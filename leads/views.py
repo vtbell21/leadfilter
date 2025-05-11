@@ -365,13 +365,16 @@ def signup(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
-            # Check free-tier limit (do not mention IP)
-            ip_address = request.META.get('HTTP_X_FORWARDED_FOR') or request.META.get('REMOTE_ADDR')
-            ip_address = ip_address.split(',')[0].strip() if ip_address else None
+            # Extract IP address
+            ip_address = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR'))
+            allowed_ips = ['159.118.202.135']  # Whitelisted IPs
 
-            if ip_address:
+            if ip_address and ip_address not in allowed_ips:
                 max_free_accounts = 1
-                existing_free_accounts = UserProfile.objects.filter(signup_ip=ip_address, stripe_subscription_id__isnull=True).count()
+                existing_free_accounts = UserProfile.objects.filter(
+                    signup_ip=ip_address,
+                    stripe_subscription_id__isnull=True
+                ).count()
                 if existing_free_accounts >= max_free_accounts:
                     messages.error(request, 'You have already created a free account. Please upgrade or contact support.')
                     return redirect('leads:pricing')
