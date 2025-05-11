@@ -370,8 +370,10 @@ def signup(request):
             if User.objects.filter(email=email).exists():
                 messages.error(request, 'An account with this email already exists.')
                 return render(request, 'leads/signup.html', {'form': form})
-            # Extract IP address
+            # Extract and clean IP address (use only the first IP)
             ip_address = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR'))
+            if ip_address:
+                ip_address = ip_address.split(',')[0].strip()
             allowed_ips = ['159.118.202.135']  # Whitelisted IPs
 
             if ip_address and ip_address not in allowed_ips:
