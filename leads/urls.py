@@ -39,17 +39,19 @@ urlpatterns = [
     path('integrations/', integrations_view, name='integrations'),
     path('settings/lead-routing/', views.lead_routing_settings_view, name='lead_routing_settings'),
     path('settings/email/', views.update_email_view, name='update_email'),
-    path(
-        'password_reset/',
-        auth_views.PasswordResetView.as_view(
-            template_name='leads/password_reset_form.html',
-            email_template_name='registration/password_reset_email.html',
-        ),
-        name='password_reset'
-    ),
-    path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(template_name='leads/password_reset_done.html'), name='password_reset_done'),
-    path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name='leads/password_reset_confirm.html'), name='password_reset_confirm'),
-    path('reset/done/', auth_views.PasswordResetCompleteView.as_view(template_name='leads/password_reset_complete.html'), name='password_reset_complete'),
+    path('password_reset/', auth_views.PasswordResetView.as_view(
+        template_name='registration/password_reset_form.html',
+        email_template_name='registration/password_reset_email.txt',
+    ), name='password_reset'),
+    path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(
+        template_name='leads/password_reset_done.html',
+    ), name='password_reset_done'),
+    path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(
+        template_name='leads/password_reset_confirm.html',
+    ), name='password_reset_confirm'),
+    path('reset/done/', auth_views.PasswordResetCompleteView.as_view(
+        template_name='leads/password_reset_complete.html',
+    ), name='password_reset_complete'),
     path('settings/webhook/', views.webhook_settings_view, name='webhook_settings'),
     path('settings/webhook/test/', views.test_webhook, name='test_webhook'),
     path('validate-phone/', views.validate_phone_view, name='validate_phone'),
