@@ -365,6 +365,10 @@ def signup(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
+            email = form.cleaned_data.get('email')
+            if User.objects.filter(email=email).exists():
+                messages.error(request, 'An account with this email already exists.')
+                return render(request, 'leads/signup.html', {'form': form})
             # Extract IP address
             ip_address = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR'))
             allowed_ips = ['159.118.202.135']  # Whitelisted IPs
