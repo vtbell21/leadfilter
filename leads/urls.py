@@ -41,7 +41,7 @@ urlpatterns = [
     path('settings/email/', views.update_email_view, name='update_email'),
     path('password_reset/', auth_views.PasswordResetView.as_view(
         template_name='registration/password_reset_form.html',
-        email_template_name='registration/password_reset_email.txt',
+        email_template_name='registration/password_reset_email.html',
     ), name='password_reset'),
     path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(
         template_name='leads/password_reset_done.html',
