@@ -213,7 +213,7 @@ EMAIL_HOST = 'smtp.sendgrid.net'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'apikey'
-EMAIL_HOST_PASSWORD = os.environ['SENDGRID_API_KEY']
+EMAIL_HOST_PASSWORD = os.environ.get('SENDGRID_API_KEY', '')
 
 # Salesforce settings
 SALESFORCE_AUTH_URL = os.environ.get('SALESFORCE_AUTH_URL', 'https://login.salesforce.com/services/oauth2/authorize')
