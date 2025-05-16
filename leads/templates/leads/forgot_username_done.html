@@ -1,0 +1,8 @@
+{% extends "leads/base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Username Reset Sent</h2>
+    <p>If an account with that email exists, we've sent a link to reset your username. Please check your inbox.</p>
+    <a href="{% url 'leads:login' %}" class="btn btn-link">Back to Login</a>
+</div>
+{% endblock %} 

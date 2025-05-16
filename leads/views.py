@@ -32,6 +32,13 @@ from leads.hubspot_utils import create_hubspot_contact
 from leads.utils.phone_validation import normalize_phone_number, validate_phone_twilio
 from functools import wraps
 from django.contrib.auth.models import User
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+from django.template.loader import render_to_string
+from django.core.mail import send_mail
+from django.urls import reverse
+from django.views import View
 
 logger = logging.getLogger(__name__)
 
@@ -1216,3 +1223,62 @@ def solution_clean_leads(request):
 
 def solution_crm_clean(request):
     return render(request, 'leads/solution_crm_clean.html')
+
+class ForgotUsernameView(View):
+    def get(self, request):
+        return render(request, 'leads/forgot_username_form.html')
+
+    def post(self, request):
+        email = request.POST.get('email')
+        user = User.objects.filter(email=email).first()
+        if user:
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            token = default_token_generator.make_token(user)
+            reset_url = request.build_absolute_uri(
+                reverse('leads:reset_username_confirm', kwargs={'uidb64': uid, 'token': token})
+            )
+            subject = 'Reset your Spam Guard username'
+            message = render_to_string('leads/forgot_username_email.html', {
+                'reset_url': reset_url,
+                'user': user,
+            })
+            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [email])
+        return redirect('leads:forgot_username_done')
+
+class ForgotUsernameDoneView(View):
+    def get(self, request):
+        return render(request, 'leads/forgot_username_done.html')
+
+class UsernameResetConfirmView(View):
+    def get(self, request, uidb64, token):
+        try:
+            uid = force_str(urlsafe_base64_decode(uidb64))
+            user = User.objects.get(pk=uid)
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            user = None
+        if user and default_token_generator.check_token(user, token):
+            return render(request, 'leads/reset_username_confirm.html', {'validlink': True, 'uidb64': uidb64, 'token': token})
+        else:
+            return render(request, 'leads/reset_username_confirm.html', {'validlink': False})
+
+    def post(self, request, uidb64, token):
+        try:
+            uid = force_str(urlsafe_base64_decode(uidb64))
+            user = User.objects.get(pk=uid)
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            user = None
+        if user and default_token_generator.check_token(user, token):
+            new_username = request.POST.get('username')
+            if new_username and not User.objects.filter(username=new_username).exists():
+                user.username = new_username
+                user.save()
+                return redirect('leads:reset_username_complete')
+            else:
+                error = 'Username is required and must be unique.'
+                return render(request, 'leads/reset_username_confirm.html', {'validlink': True, 'uidb64': uidb64, 'token': token, 'error': error})
+        else:
+            return render(request, 'leads/reset_username_confirm.html', {'validlink': False})
+
+class UsernameResetCompleteView(View):
+    def get(self, request):
+        return render(request, 'leads/reset_username_complete.html')

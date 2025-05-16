@@ -1,0 +1,22 @@
+{% extends "leads/base.html" %}
+{% block content %}
+<div class="container mt-5">
+    {% if validlink %}
+        <h2>Set a New Username</h2>
+        <form method="post">
+            {% csrf_token %}
+            {% if error %}
+                <div class="alert alert-danger">{{ error }}</div>
+            {% endif %}
+            <div class="mb-3">
+                <label for="username" class="form-label">New Username</label>
+                <input type="text" class="form-control" id="username" name="username" required>
+            </div>
+            <button type="submit" class="btn btn-primary mt-3">Set Username</button>
+        </form>
+    {% else %}
+        <h2>Invalid or Expired Link</h2>
+        <p>This username reset link is invalid or has expired. Please try again.</p>
+    {% endif %}
+</div>
+{% endblock %} 

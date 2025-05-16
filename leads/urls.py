@@ -7,6 +7,7 @@ from leads.views import integrations_view
 from django.contrib.auth import views as auth_views
 from leads.views_salesforce import salesforce_connect, salesforce_callback, salesforce_disconnect
 from leads.views_zoho import zoho_connect, zoho_callback, zoho_disconnect
+from .views import ForgotUsernameView, ForgotUsernameDoneView, UsernameResetConfirmView, UsernameResetCompleteView
 
 urlpatterns = [
     path('', views.homepage, name='homepage'),
@@ -82,4 +83,8 @@ urlpatterns = [
     path('solutions/high-quality-leads/', views.solution_high_quality_leads, name='solution_high_quality_leads'),
     path('solutions/clean-leads/', views.solution_clean_leads, name='solution_clean_leads'),
     path('solutions/crm-clean/', views.solution_crm_clean, name='solution_crm_clean'),
+    path('forgot-username/', ForgotUsernameView.as_view(), name='forgot_username'),
+    path('forgot-username/done/', ForgotUsernameDoneView.as_view(), name='forgot_username_done'),
+    path('reset-username/<uidb64>/<token>/', UsernameResetConfirmView.as_view(), name='reset_username_confirm'),
+    path('reset-username/complete/', UsernameResetCompleteView.as_view(), name='reset_username_complete'),
 ] 
