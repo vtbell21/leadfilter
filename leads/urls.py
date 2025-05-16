@@ -78,4 +78,8 @@ urlpatterns = [
     path('settings/', views.settings_view, name='settings'),
     path('send-to-crm/<int:lead_id>/', views.send_to_crm_view, name='send_to_crm'),
     path('settings/subscription/', views.subscription_management_view, name='subscription_management'),
+    path('solutions/fake-leads/', views.solution_fake_leads, name='solution_fake_leads'),
+    path('solutions/high-quality-leads/', views.solution_high_quality_leads, name='solution_high_quality_leads'),
+    path('solutions/clean-leads/', views.solution_clean_leads, name='solution_clean_leads'),
+    path('solutions/crm-clean/', views.solution_crm_clean, name='solution_crm_clean'),
 ] 

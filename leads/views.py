@@ -1204,3 +1204,15 @@ def check_subscription_limits(view_func):
 def subscription_management_view(request):
     profile = request.user.profile
     return render(request, 'leads/subscription_management.html', {'profile': profile})
+
+def solution_fake_leads(request):
+    return render(request, 'leads/solution_fake_leads.html')
+
+def solution_high_quality_leads(request):
+    return render(request, 'leads/solution_high_quality_leads.html')
+
+def solution_clean_leads(request):
+    return render(request, 'leads/solution_clean_leads.html')
+
+def solution_crm_clean(request):
+    return render(request, 'leads/solution_crm_clean.html')
