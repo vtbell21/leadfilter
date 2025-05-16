@@ -4,7 +4,15 @@
 {% block content %}
 <div class="container-fluid py-4">
     {% if not facebook_page %}
-        <!-- Facebook connection notification removed for browser notification integration -->
+        <div class="alert alert-warning d-flex align-items-center justify-content-between" role="alert">
+            <div>
+                <i class="bi bi-facebook me-2"></i>
+                <strong>Your Facebook page is not connected.</strong> Connect a page to start syncing leads.
+            </div>
+            <a href="{% url 'leads:facebook_connect' %}" class="btn btn-primary ms-3">
+                <i class="bi bi-facebook"></i> Connect Facebook Page
+            </a>
+        </div>
     {% endif %}
     <h1 class="mb-4">Spam Guard Dashboard</h1>
     
