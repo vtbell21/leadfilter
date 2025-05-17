@@ -50,6 +50,30 @@ if not os.path.exists(secret_path):
         with open(secret_path, 'w') as f:
             f.write(secret_json)
 
+FIELD_ALIASES = {
+    'full_name': [
+        'full_name', 'fullname', 'full name', 'name', 'contact_name', 'contact name', 'lead_name', 'lead name', 'first_last', 'first and last name', 'full-name', 'FULL_NAME', 'full name*', 'full_name*', 'name*'
+    ],
+    'email': [
+        'email', 'email_address', 'email address', 'e-mail', 'e-mail address', 'EMAIL', 'email*'
+    ],
+    'phone': [
+        'phone', 'phone_number', 'phone number', 'mobile', 'mobile_number', 'mobile number', 'PHONE', 'phone*', 'mobile*'
+    ],
+    'message': [
+        'message', 'msg', 'comments', 'note', 'inquiry', 'question', 'MESSAGE', 'message*', 'comment*', 'note*'
+    ],
+}
+
+def normalize_field_name(field_name):
+    field_name_norm = field_name.strip().lower().replace('-', ' ').replace('_', ' ')
+    for canonical, aliases in FIELD_ALIASES.items():
+        for alias in aliases:
+            alias_norm = alias.strip().lower().replace('-', ' ').replace('_', ' ')
+            if field_name_norm == alias_norm:
+                return canonical
+    return None
+
 def get_lead_data(leadgen_id, access_token):
     """Fetch lead data from Facebook Graph API using the provided access token."""
     try:
@@ -84,16 +108,8 @@ def score_lead(lead_data):
         if field['values'] and len(field['values']) > 0:
             field_name = field['name']
             value = field['values'][0]
-            
-            # Normalize core field names
-            normalized_name = field_name
-            if field_name == 'phone_number':
-                normalized_name = 'phone'
-            elif field_name in ['name', 'full_name']:
-                normalized_name = 'full_name'
-            
-            # Store in appropriate dictionary
-            if field_name in core_fields:
+            normalized_name = normalize_field_name(field_name)
+            if normalized_name:
                 field_dict[normalized_name] = value
             else:
                 custom_fields[field_name] = value
