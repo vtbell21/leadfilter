@@ -412,14 +412,25 @@ def signup(request):
 
 def login_view(request):
     if request.method == 'POST':
-        username = request.POST.get('username')
+        identifier = request.POST.get('username')  # Can be username or email
         password = request.POST.get('password')
-        user = authenticate(request, username=username, password=password)
+        user = None
+
+        # Try to find user by email if identifier contains '@'
+        if '@' in identifier:
+            try:
+                user_obj = User.objects.get(email__iexact=identifier)
+                user = authenticate(request, username=user_obj.username, password=password)
+            except User.DoesNotExist:
+                user = None
+        else:
+            user = authenticate(request, username=identifier, password=password)
+
         if user is not None:
             login(request, user)
             return redirect('leads:dashboard')
         else:
-            messages.error(request, 'Invalid username or password.')
+            messages.error(request, 'Invalid username/email or password.')
     return render(request, 'leads/login.html')
 
 def logout_view(request):
