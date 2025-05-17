@@ -66,11 +66,13 @@ FIELD_ALIASES = {
 }
 
 def normalize_field_name(field_name):
-    field_name_norm = field_name.strip().lower().replace('-', ' ').replace('_', ' ')
+    # Normalize: lowercase, replace dashes/underscores with spaces, trim
+    def norm(s):
+        return s.strip().lower().replace('-', ' ').replace('_', ' ')
+    field_name_norm = norm(field_name)
     for canonical, aliases in FIELD_ALIASES.items():
         for alias in aliases:
-            alias_norm = alias.strip().lower().replace('-', ' ').replace('_', ' ')
-            if field_name_norm == alias_norm:
+            if field_name_norm == norm(alias):
                 return canonical
     return None
 
