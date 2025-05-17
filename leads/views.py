@@ -276,7 +276,15 @@ def facebook_webhook(request):
             # If field_data is present, use it directly
             if field_data:
                 parsed_fields = parse_field_data(field_data)
-                logger.info(f"Parsed lead fields from field_data: {parsed_fields}")
+                normalized_fields = {}
+                custom_fields = {}
+                for k, v in parsed_fields.items():
+                    norm = normalize_field_name(k)
+                    if norm:
+                        normalized_fields[norm] = v
+                    else:
+                        custom_fields[k] = v
+                logger.info(f"Parsed lead fields from field_data: {normalized_fields}")
                 logger.info("Data source: field_data (manual/test payload)")
                 data_source = 'field_data'
             else:
@@ -288,17 +296,25 @@ def facebook_webhook(request):
                     data_source = 'api'
                     # Facebook API returns field_data as well
                     parsed_fields = parse_field_data(lead_data.get('field_data', []))
+                    normalized_fields = {}
+                    custom_fields = {}
+                    for k, v in parsed_fields.items():
+                        norm = normalize_field_name(k)
+                        if norm:
+                            normalized_fields[norm] = v
+                        else:
+                            custom_fields[k] = v
                 except Exception as e:
                     logger.error(f"Failed to fetch lead from Facebook: {e}")
                     return HttpResponse("Failed to fetch lead from Facebook", status=400)
 
             # Save the lead using the parsed fields
             try:
-                full_name = parsed_fields.get('full_name') or parsed_fields.get('name', '')
-                email = parsed_fields.get('email', '')
-                phone = parsed_fields.get('phone_number', parsed_fields.get('phone', ''))
-                message = parsed_fields.get('message', '')
-                custom_fields = {k: v for k, v in parsed_fields.items() if k not in ['full_name', 'name', 'email', 'phone', 'phone_number', 'message']}
+                full_name = normalized_fields.get('full_name', '')
+                email = normalized_fields.get('email', '')
+                phone = normalized_fields.get('phone', '')
+                message = normalized_fields.get('message', '')
+                custom_fields = {k: v for k, v in custom_fields.items()}
                 # Score the lead
                 if field_data:
                     score_result = score_lead({'field_data': field_data})
