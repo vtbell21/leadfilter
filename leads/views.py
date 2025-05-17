@@ -652,10 +652,34 @@ def facebook_callback(request):
             messages.warning(request, 'No Facebook Pages found. Make sure you have admin access to at least one Facebook Page.')
             return redirect('leads:dashboard')
         
-        # Save the list of pages in the session and redirect to selection view
-        request.session['facebook_pages'] = pages_data['data']
-        request.session.modified = True
-        return redirect('leads:select_facebook_page')
+        # Use the page selected by Facebook (first in the list)
+        page = pages_data['data'][0]
+        page_id = page['id']
+        page_name = page['name']
+        page_access_token = page['access_token']
+
+        # Create or update the page connection
+        page_connection, created = FacebookPageConnection.objects.update_or_create(
+            page_id=page_id,
+            defaults={
+                'user': request.user,
+                'page_name': page_name,
+                'page_access_token': page_access_token
+            }
+        )
+
+        # Subscribe the page to the webhook
+        subscribe_url = f'https://graph.facebook.com/v19.0/{page_id}/subscribed_apps'
+        subscribe_params = {
+            'access_token': page_access_token,
+            'subscribed_fields': 'leadgen'
+        }
+        subscribe_response = requests.post(subscribe_url, params=subscribe_params)
+        subscribe_response.raise_for_status()
+
+        request.session['facebook_connected'] = True
+        messages.success(request, f'Successfully connected to {page_name}')
+        return redirect('leads:dashboard')
         
     except requests.RequestException as e:
         logger.error(f"Error in Facebook OAuth callback: {str(e)}")
