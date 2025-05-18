@@ -70,7 +70,11 @@
                             <i class="bi bi-tag"></i> Pricing
                         </a>
                     </li>
-                    {% if '/dashboard' not in request.path and '/leads' not in request.path and '/settings' not in request.path %}
+                    {% if '/dashboard' not in request.path
+                          and '/leads' not in request.path
+                          and '/settings' not in request.path
+                          and '/integrations' not in request.path
+                          and (not user.is_authenticated or '/pricing' not in request.path) %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'leads:solutions' %}">
                             <i class="bi bi-lightbulb"></i> Solutions
