@@ -119,28 +119,20 @@
 <!-- Final CTA Section -->
 <div class="container-fluid bg-light border-top border-bottom py-5">
     <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-12 d-flex justify-content-center">
-                <div class="cta-card-minimal p-4 bg-white text-center" style="max-width: 440px; width: 100%; margin: 1.5rem 0; border: 1px solid #f0f0f0; box-shadow: none;">
-                    <div class="mb-2">
-                        <span class="d-inline-flex align-items-center justify-content-center text-primary rounded-circle" style="width: 32px; height: 32px; font-size: 1.25rem; background: #f5f8ff;">
-                            <i class="bi bi-shield-check"></i>
-                        </span>
-                    </div>
-                    <h2 class="h2 fw-bold mb-2">
-                        Try SpamGuard free — <span class="text-primary">no credit card required</span>.
-                    </h2>
-                    <div class="mb-3 text-muted" style="font-size: 1.15rem; font-weight: 400;">
-                        You'll wonder why you didn't <span class="fw-semibold">start sooner</span>.
-                    </div>
-                    <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mt-3">
-                        <a href="{% url 'leads:signup' %}" class="btn btn-primary btn-lg px-4 gap-3 minimal-btn">
-                            Start Free Trial
-                        </a>
-                        <a href="{% url 'leads:pricing' %}" class="btn btn-outline-secondary btn-lg px-4 minimal-btn">
-                            View Pricing
-                        </a>
-                    </div>
+        <div class="row justify-content-center text-center">
+            <div class="col-lg-8">
+                <i class="bi bi-shield-check text-primary" style="font-size: 3rem;"></i>
+                <h2 class="display-3 fw-bold mb-3 mt-3">
+                    Try SpamGuard free — <span class="text-primary">no credit card required</span>.
+                </h2>
+                <h3 class="h3 text-muted mb-4">You'll wonder why you didn't start sooner.</h3>
+                <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
+                    <a href="{% url 'leads:signup' %}" class="btn btn-primary btn-lg px-4 gap-3">
+                        Start Free Trial
+                    </a>
+                    <a href="{% url 'leads:pricing' %}" class="btn btn-outline-secondary btn-lg px-4">
+                        View Pricing
+                    </a>
                 </div>
             </div>
         </div>
