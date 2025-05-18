@@ -1,6 +1,215 @@
 {% extends "leads/base.html" %}
 {% block content %}
-<h2>Keep Your CRM Clean and Usable</h2>
-<p>Don't let junk leads clog your pipelines and reports. SpamGuard ensures quality from day one by filtering out spam before it ever reaches your CRM.</p>
-<p>This page covers how SpamGuard integrates with your CRM to maintain clean, actionable data for your sales and marketing teams.</p>
+<style>
+    .hero-section-crm {
+        background: linear-gradient(90deg, #f8fafc 60%, #e9f0fb 100%);
+        padding: 70px 0 60px 0;
+        position: relative;
+        text-align: center;
+    }
+    .hero-section-crm .icon {
+        font-size: 4rem;
+        color: #0d6efd;
+        margin-bottom: 1.5rem;
+    }
+    .section-title {
+        font-size: 2.3rem;
+        font-weight: 700;
+        margin-bottom: 1.2rem;
+    }
+    .section-subtitle {
+        font-size: 1.2rem;
+        color: #555;
+        margin-bottom: 2.2rem;
+    }
+    .cta-btn {
+        font-size: 1.15rem;
+        padding: 0.7rem 2.2rem;
+        border-radius: 2rem;
+        transition: box-shadow 0.2s, background 0.2s;
+        box-shadow: 0 2px 8px rgba(13,110,253,0.08);
+    }
+    .cta-btn:hover {
+        background: #198754;
+        color: #fff;
+        box-shadow: 0 4px 16px rgba(25,135,84,0.12);
+    }
+    .problems-list {
+        font-size: 1.1rem;
+        margin-bottom: 1.5rem;
+    }
+    .crm-illustration {
+        background: #fff;
+        border-radius: 1.2rem;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+        padding: 2rem 1.2rem;
+        min-height: 220px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    .crm-illustration .bi-kanban {
+        font-size: 3rem;
+        color: #0d6efd;
+        margin-bottom: 1rem;
+    }
+    .feature-icon {
+        font-size: 2.2rem;
+        color: #198754;
+        margin-bottom: 0.7rem;
+    }
+    .feature-card {
+        background: #fff;
+        border-radius: 1.2rem;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+        padding: 2rem 1.2rem;
+        margin-bottom: 1.5rem;
+        min-height: 180px;
+        transition: box-shadow 0.2s;
+    }
+    .feature-card:hover {
+        box-shadow: 0 4px 24px rgba(13,110,253,0.10);
+    }
+    .crm-logos {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 2.5rem;
+        flex-wrap: wrap;
+        margin-bottom: 1.2rem;
+    }
+    .crm-logos img {
+        height: 38px;
+        filter: grayscale(0.2) brightness(0.95);
+        background: #fff;
+        border-radius: 0.7rem;
+        padding: 0.3rem 0.7rem;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    }
+    .quote-card {
+        background: linear-gradient(90deg, #e9f0fb 60%, #f8fafc 100%);
+        border-radius: 1.2rem;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+        padding: 2.5rem 1.5rem;
+        margin: 2.5rem 0;
+        font-size: 1.2rem;
+        color: #222;
+        position: relative;
+        text-align: center;
+    }
+    .quote-avatar {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-bottom: 1rem;
+        border: 2px solid #0d6efd;
+    }
+    .quote-author {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #198754;
+        margin-top: 1rem;
+    }
+    .final-cta {
+        background: linear-gradient(90deg, #e9f0fb 60%, #f8fafc 100%);
+        border-radius: 1.2rem;
+        padding: 2rem 1.2rem;
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    @media (max-width: 767px) {
+        .section-title { font-size: 1.5rem; }
+        .hero-section-crm { padding: 40px 0 30px 0; }
+        .feature-card, .crm-illustration { padding: 1.2rem 0.7rem; }
+        .crm-logos { gap: 1.2rem; }
+    }
+</style>
+
+<!-- Hero Section -->
+<div class="hero-section-crm mb-5">
+    <div class="icon"><i class="bi bi-kanban"></i></div>
+    <h1 class="display-5 fw-bold mb-2">Keep Your CRM Clean and Usable</h1>
+    <p class="section-subtitle">Block low-quality leads before they ever touch your pipeline</p>
+    <a href="{% url 'leads:signup' %}" class="btn btn-primary btn-lg cta-btn">Start Free Trial</a>
+</div>
+
+<!-- Why Dirty CRMs Hurt -->
+<div class="container mb-5">
+    <h2 class="section-title text-center">Why Dirty CRMs Hurt</h2>
+    <div class="row g-4 align-items-center">
+        <div class="col-12 col-md-6">
+            <ul class="problems-list">
+                <li>🕒 Wasted time sorting and cleaning junk leads</li>
+                <li>📉 Bad reports and misleading analytics</li>
+                <li>💸 Inflated CRM costs from storing spam</li>
+                <li>😠 Frustrated sales teams and lost deals</li>
+                <li>🔄 Duplicate and incomplete records everywhere</li>
+            </ul>
+        </div>
+        <div class="col-12 col-md-6">
+            <div class="crm-illustration">
+                <i class="bi bi-kanban"></i>
+                <div class="mb-2">Messy CRM vs. Clean CRM</div>
+                <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="CRM Illustration" style="height:60px;opacity:0.7;">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- What SpamGuard Filters -->
+<div class="container mb-5">
+    <h2 class="section-title text-center">What SpamGuard Filters</h2>
+    <div class="row text-center g-4">
+        <div class="col-6 col-md-3">
+            <div class="feature-icon"><i class="bi bi-envelope-check"></i></div>
+            <div>Email Validation</div>
+            <div class="text-muted">Blocks fake, disposable, or invalid emails</div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="feature-icon"><i class="bi bi-telephone-inbound"></i></div>
+            <div>Phone Checks</div>
+            <div class="text-muted">Verifies phone numbers for authenticity</div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="feature-icon"><i class="bi bi-search"></i></div>
+            <div>Message Intent</div>
+            <div class="text-muted">Analyzes content for real buyer intent</div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="feature-icon"><i class="bi bi-cpu"></i></div>
+            <div>AI Spam Score</div>
+            <div class="text-muted">Scores every lead using advanced AI</div>
+        </div>
+    </div>
+</div>
+
+<!-- CRM Integration -->
+<div class="container mb-5">
+    <h2 class="section-title text-center">CRM Integration</h2>
+    <div class="crm-logos mb-3">
+        <img src="https://cdn.worldvectorlogo.com/logos/hubspot-1.svg" alt="HubSpot" title="HubSpot">
+        <img src="https://cdn.worldvectorlogo.com/logos/salesforce-2.svg" alt="Salesforce" title="Salesforce">
+        <img src="https://www.gohighlevel.com/images/logo.svg" alt="GoHighLevel" title="GoHighLevel" style="background:#fff;">
+        <img src="https://cdn.worldvectorlogo.com/logos/zoho.svg" alt="Zoho" title="Zoho">
+        <img src="https://cdn.worldvectorlogo.com/logos/pipedrive.svg" alt="Pipedrive" title="Pipedrive">
+    </div>
+    <div class="text-center section-subtitle">SpamGuard integrates seamlessly — no dev required.</div>
+</div>
+
+<!-- Quote Section -->
+<div class="container">
+    <div class="quote-card mx-auto" style="max-width: 700px;">
+        <img src="https://randomuser.me/api/portraits/men/32.jpg" class="quote-avatar" alt="Customer Avatar">
+        <div>“Our reports actually make sense now. SpamGuard keeps our CRM clean and our team focused on real opportunities.”</div>
+        <div class="quote-author">— Jordan S., Sales Director</div>
+    </div>
+</div>
+
+<!-- Final CTA Section -->
+<div class="final-cta">
+    <div class="section-title mb-3">Clean data = smarter decisions</div>
+    <a href="{% url 'leads:signup' %}" class="btn btn-primary btn-lg cta-btn">Protect My CRM</a>
+</div>
 {% endblock %} 
