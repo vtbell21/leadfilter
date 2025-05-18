@@ -1,6 +1,212 @@
 {% extends "leads/base.html" %}
 {% block content %}
-<h2>Clean Leads Without Lifting a Finger</h2>
-<p>Get real leads in your inbox, not spam. SpamGuard works in the background with zero effort required from your team.</p>
-<p>This page describes how SpamGuard automates lead cleaning and keeps your pipeline free of junk.</p>
+<style>
+    .hero-section-clean {
+        background: linear-gradient(90deg, #f8fafc 60%, #e9f0fb 100%);
+        padding: 70px 0 60px 0;
+        position: relative;
+        text-align: center;
+    }
+    .hero-section-clean .icon {
+        font-size: 4rem;
+        color: #198754;
+        margin-bottom: 1.5rem;
+    }
+    .section-title {
+        font-size: 2.3rem;
+        font-weight: 700;
+        margin-bottom: 1.2rem;
+    }
+    .section-subtitle {
+        font-size: 1.2rem;
+        color: #555;
+        margin-bottom: 2.2rem;
+    }
+    .cta-btn {
+        font-size: 1.15rem;
+        padding: 0.7rem 2.2rem;
+        border-radius: 2rem;
+    }
+    .feature-icon {
+        font-size: 2.2rem;
+        color: #0d6efd;
+        margin-bottom: 0.7rem;
+    }
+    .feature-card {
+        background: #fff;
+        border-radius: 1.2rem;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+        padding: 2rem 1.2rem;
+        margin-bottom: 1.5rem;
+        min-height: 180px;
+        transition: box-shadow 0.2s;
+    }
+    .feature-card:hover {
+        box-shadow: 0 4px 24px rgba(13,110,253,0.10);
+    }
+    .setit-card {
+        background: #f8fafc;
+        border-radius: 1.2rem;
+        box-shadow: 0 2px 8px rgba(13,110,253,0.06);
+        padding: 2rem 1.2rem;
+        margin-bottom: 1.5rem;
+        min-height: 160px;
+    }
+    .testimonial {
+        background: linear-gradient(90deg, #e9f0fb 60%, #f8fafc 100%);
+        border-radius: 1.2rem;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+        padding: 2.5rem 1.5rem;
+        margin: 2.5rem 0;
+        font-size: 1.2rem;
+        font-style: italic;
+        color: #222;
+        position: relative;
+    }
+    .testimonial:before {
+        content: '\201C';
+        font-size: 3rem;
+        color: #0d6efd;
+        position: absolute;
+        left: 20px;
+        top: 10px;
+        opacity: 0.2;
+    }
+    .testimonial-author {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #198754;
+        margin-top: 1rem;
+    }
+    .why-matters-col {
+        background: #fff;
+        border-radius: 1.2rem;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+        padding: 2rem 1.2rem;
+        min-height: 200px;
+    }
+    .why-matters-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+    .clutter {
+        color: #dc3545;
+        font-size: 1.1rem;
+    }
+    .clean {
+        color: #198754;
+        font-size: 1.1rem;
+    }
+    .footer-cta {
+        background: linear-gradient(90deg, #e9f0fb 60%, #f8fafc 100%);
+        border-radius: 1.2rem;
+        padding: 2rem 1.2rem;
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    @media (max-width: 767px) {
+        .section-title { font-size: 1.5rem; }
+        .hero-section-clean { padding: 40px 0 30px 0; }
+        .feature-card, .setit-card, .why-matters-col { padding: 1.2rem 0.7rem; }
+    }
+</style>
+
+<!-- Hero Section -->
+<div class="hero-section-clean mb-5">
+    <div class="icon"><i class="bi bi-robot"></i></div>
+    <h1 class="display-5 fw-bold mb-2">Clean Leads Without Lifting a Finger</h1>
+    <p class="section-subtitle">Fully automated lead filtering that works while you sleep</p>
+    <a href="{% url 'leads:signup' %}" class="btn btn-success btn-lg cta-btn">Try SpamGuard Free</a>
+</div>
+
+<!-- Features Section -->
+<div class="container mb-5">
+    <h2 class="section-title text-center">What SpamGuard Filters</h2>
+    <div class="row text-center g-4">
+        <div class="col-6 col-md-3">
+            <div class="feature-icon"><i class="bi bi-envelope-check"></i></div>
+            <div>Email Validity</div>
+            <div class="text-muted">Detects fake, disposable, or invalid emails</div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="feature-icon"><i class="bi bi-telephone-inbound"></i></div>
+            <div>Phone Check</div>
+            <div class="text-muted">Verifies phone numbers for authenticity</div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="feature-icon"><i class="bi bi-search"></i></div>
+            <div>Intent Detection</div>
+            <div class="text-muted">Analyzes message content for real buyer intent</div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="feature-icon"><i class="bi bi-cpu"></i></div>
+            <div>AI Spam Score</div>
+            <div class="text-muted">Scores every lead using advanced AI</div>
+        </div>
+    </div>
+</div>
+
+<!-- Set It and Forget It Section -->
+<div class="container mb-5">
+    <h2 class="section-title text-center">Set It and Forget It</h2>
+    <div class="row text-center g-4 justify-content-center">
+        <div class="col-12 col-md-4">
+            <div class="setit-card h-100">
+                <div class="feature-icon"><i class="bi bi-sliders"></i></div>
+                <div class="fw-bold mb-2">Set Rules Once</div>
+                <div>Customize your filters and let SpamGuard do the rest.</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-4">
+            <div class="setit-card h-100">
+                <div class="feature-icon"><i class="bi bi-gear"></i></div>
+                <div class="fw-bold mb-2">No Maintenance</div>
+                <div>No ongoing tweaks or manual review needed.</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-4">
+            <div class="setit-card h-100">
+                <div class="feature-icon"><i class="bi bi-shield-check"></i></div>
+                <div class="fw-bold mb-2">24/7 Protection</div>
+                <div>SpamGuard works around the clock—even while you sleep.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Testimonial Quote -->
+<div class="container">
+    <div class="testimonial mx-auto" style="max-width: 700px;">
+        "SpamGuard saves us hours every week and keeps our CRM clean. We just set it up and let it run—no more manual lead review!"
+        <div class="testimonial-author">— Alex M., Agency Owner</div>
+    </div>
+</div>
+
+<!-- Why It Matters Section -->
+<div class="container mb-5">
+    <h2 class="section-title text-center">Why It Matters</h2>
+    <div class="row g-4">
+        <div class="col-12 col-md-6">
+            <div class="why-matters-col text-center">
+                <div class="why-matters-title">Without SpamGuard</div>
+                <div class="clutter">Messy CRM, wasted time, lost deals, and frustrated teams</div>
+                <div class="mt-3"><i class="bi bi-exclamation-triangle" style="font-size:2rem;color:#dc3545;"></i></div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6">
+            <div class="why-matters-col text-center">
+                <div class="why-matters-title">With SpamGuard</div>
+                <div class="clean">Clean CRM, more time for real leads, and a happier team</div>
+                <div class="mt-3"><i class="bi bi-emoji-smile" style="font-size:2rem;color:#198754;"></i></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CTA Footer -->
+<div class="footer-cta">
+    <div class="section-title mb-3">Stop wasting time on spam.</div>
+    <a href="{% url 'leads:signup' %}" class="btn btn-success btn-lg cta-btn">Start Filtering Now</a>
+</div>
 {% endblock %} 
