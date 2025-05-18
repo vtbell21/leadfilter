@@ -1,6 +1,217 @@
 {% extends "leads/base.html" %}
 {% block content %}
-<h2>Deliver Higher-Quality Leads to Clients</h2>
-<p>Automate lead scoring and reduce complaints about bad leads. SpamGuard adds credibility to your service by ensuring only the best leads are delivered to your clients.</p>
-<p>This page explains how our AI-driven scoring and validation process works to improve your lead quality.</p>
+<style>
+    .hero-section-hq {
+        background: linear-gradient(90deg, #f8fafc 60%, #e9f0fb 100%);
+        padding: 70px 0 60px 0;
+        position: relative;
+        text-align: center;
+    }
+    .hero-section-hq .icon {
+        font-size: 4rem;
+        color: #0d6efd;
+        margin-bottom: 1.5rem;
+    }
+    .section-title {
+        font-size: 2.3rem;
+        font-weight: 700;
+        margin-bottom: 1.2rem;
+    }
+    .section-subtitle {
+        font-size: 1.2rem;
+        color: #555;
+        margin-bottom: 2.2rem;
+    }
+    .cta-btn {
+        font-size: 1.15rem;
+        padding: 0.7rem 2.2rem;
+        border-radius: 2rem;
+    }
+    .icon-bullet {
+        font-size: 2rem;
+        color: #198754;
+        margin-bottom: 0.5rem;
+    }
+    .step-num {
+        width: 48px; height: 48px;
+        background: linear-gradient(135deg, #0d6efd 60%, #6ea8fe 100%);
+        color: #fff;
+        font-size: 1.5rem;
+        font-weight: 700;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto 0.7rem auto;
+        box-shadow: 0 2px 8px rgba(13,110,253,0.08);
+    }
+    .who-card {
+        background: #fff;
+        border-radius: 1.2rem;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+        padding: 2rem 1.2rem;
+        margin-bottom: 1.5rem;
+        min-height: 220px;
+        transition: box-shadow 0.2s;
+    }
+    .who-card:hover {
+        box-shadow: 0 4px 24px rgba(13,110,253,0.10);
+    }
+    .before-after {
+        background: linear-gradient(90deg, #f8fafc 60%, #e9f0fb 100%);
+        border-radius: 1.2rem;
+        padding: 2.5rem 1.5rem;
+        margin-bottom: 2.5rem;
+    }
+    .before-after-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+    .before-after-col {
+        text-align: center;
+    }
+    .before {
+        color: #dc3545;
+    }
+    .after {
+        color: #198754;
+    }
+    .trust-icons i {
+        font-size: 2rem;
+        color: #0d6efd;
+        margin: 0 1.2rem;
+    }
+    @media (max-width: 767px) {
+        .section-title { font-size: 1.5rem; }
+        .hero-section-hq { padding: 40px 0 30px 0; }
+        .before-after { padding: 1.2rem 0.5rem; }
+    }
+</style>
+
+<!-- Hero Section -->
+<div class="hero-section-hq mb-5">
+    <div class="icon"><i class="bi bi-inbox"></i></div>
+    <h1 class="display-5 fw-bold mb-2">Deliver Higher-Quality Leads to Clients</h1>
+    <p class="section-subtitle">Filter every lead before it hits your client's inbox</p>
+    <a href="{% url 'leads:signup' %}" class="btn btn-primary btn-lg cta-btn">Start Free Trial</a>
+</div>
+
+<!-- Why Lead Quality Matters -->
+<div class="container mb-5">
+    <h2 class="section-title text-center">Why Lead Quality Matters</h2>
+    <div class="row text-center g-4">
+        <div class="col-6 col-md-3">
+            <div class="icon-bullet"><i class="bi bi-cash-coin"></i></div>
+            <div>Refund requests from bad leads</div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="icon-bullet"><i class="bi bi-person-x"></i></div>
+            <div>Client churn from poor results</div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="icon-bullet"><i class="bi bi-envelope-exclamation"></i></div>
+            <div>Angry emails about lead quality</div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="icon-bullet"><i class="bi bi-hourglass-split"></i></div>
+            <div>Wasted time on manual review</div>
+        </div>
+    </div>
+</div>
+
+<!-- How It Works -->
+<div class="container mb-5">
+    <h2 class="section-title text-center">How It Works</h2>
+    <div class="row text-center g-4 justify-content-center">
+        <div class="col-12 col-md-3">
+            <div class="step-num">1</div>
+            <div class="mb-2 fw-bold">Pre-Screen</div>
+            <p>Every lead is checked for spam, fake data, and duplicates before delivery.</p>
+        </div>
+        <div class="col-12 col-md-3">
+            <div class="step-num">2</div>
+            <div class="mb-2 fw-bold">Route</div>
+            <p>Send only qualified leads to the right client or CRM automatically.</p>
+        </div>
+        <div class="col-12 col-md-3">
+            <div class="step-num">3</div>
+            <div class="mb-2 fw-bold">Customize</div>
+            <p>Set your own filters and rules for what counts as a good lead.</p>
+        </div>
+        <div class="col-12 col-md-3">
+            <div class="step-num">4</div>
+            <div class="mb-2 fw-bold">Preserve Reputation</div>
+            <p>Protect your brand by delivering only high-quality, real leads.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Who It's For -->
+<div class="container mb-5">
+    <h2 class="section-title text-center">Who It's For</h2>
+    <div class="row g-4 justify-content-center">
+        <div class="col-12 col-md-3">
+            <div class="who-card h-100 text-center">
+                <div class="icon-bullet"><i class="bi bi-briefcase"></i></div>
+                <div class="fw-bold mb-2">Agencies</div>
+                <div>Deliver better results and keep clients longer with cleaner leads.</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-3">
+            <div class="who-card h-100 text-center">
+                <div class="icon-bullet"><i class="bi bi-currency-dollar"></i></div>
+                <div class="fw-bold mb-2">Lead Sellers</div>
+                <div>Boost your reputation and command higher prices for quality leads.</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-3">
+            <div class="who-card h-100 text-center">
+                <div class="icon-bullet"><i class="bi bi-person-badge"></i></div>
+                <div class="fw-bold mb-2">Freelancers</div>
+                <div>Impress clients and win more business with reliable lead delivery.</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-3">
+            <div class="who-card h-100 text-center">
+                <div class="icon-bullet"><i class="bi bi-geo-alt"></i></div>
+                <div class="fw-bold mb-2">Local Marketers</div>
+                <div>Help local businesses grow with leads that actually convert.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- What Changes With SpamGuard -->
+<div class="container before-after mb-5">
+    <div class="row">
+        <div class="col-12 col-md-6 before-after-col before">
+            <div class="before-after-title">Before SpamGuard</div>
+            <ul class="list-unstyled">
+                <li>❌ High refund rates</li>
+                <li>❌ Low lead response rate</li>
+                <li>❌ Messy, duplicate-filled CRM</li>
+            </ul>
+        </div>
+        <div class="col-12 col-md-6 before-after-col after">
+            <div class="before-after-title">After SpamGuard</div>
+            <ul class="list-unstyled">
+                <li>✅ Fewer refunds, happier clients</li>
+                <li>✅ Higher response rates</li>
+                <li>✅ Clean, organized CRM</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Final CTA Section -->
+<div class="container text-center mb-5">
+    <h2 class="section-title">Ready to Deliver Higher-Quality Leads?</h2>
+    <a href="{% url 'leads:signup' %}" class="btn btn-primary btn-lg cta-btn mb-3">Start Free Trial</a>
+    <div class="trust-icons my-3">
+        <i class="bi bi-shield-lock" title="Secure"></i>
+        <i class="bi bi-people" title="Trusted by Agencies"></i>
+        <i class="bi bi-graph-up" title="99.9% Uptime"></i>
+        <i class="bi bi-chat-quote" title="Client Testimonials"></i>
+    </div>
+    <div class="text-muted">No credit card required. Cancel anytime.</div>
+</div>
 {% endblock %} 
