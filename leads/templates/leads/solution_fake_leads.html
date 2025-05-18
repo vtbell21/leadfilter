@@ -1,6 +1,152 @@
 {% extends "leads/base.html" %}
 {% block content %}
-<h2>Stop Paying for Fake Leads</h2>
-<p>SpamGuard filters out low-quality Facebook form leads before they hit your CRM — saving ad spend and boosting conversion rates.</p>
-<p>This page provides more details and examples of how SpamGuard protects your ad budget and ensures only real leads reach your sales team.</p>
+<style>
+    .hero-section {
+        background: #fff url('https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/icons/shield-check.svg') no-repeat right 5% top 30%;
+        background-size: 200px;
+        padding: 80px 0 60px 0;
+        position: relative;
+    }
+    .hero-section .watermark {
+        position: absolute;
+        right: 5%;
+        top: 20px;
+        opacity: 0.07;
+        font-size: 16rem;
+        z-index: 0;
+    }
+    .hero-content {
+        position: relative;
+        z-index: 1;
+    }
+    .section-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+    }
+    .section-subtitle {
+        font-size: 1.25rem;
+        color: #555;
+        margin-bottom: 2.5rem;
+    }
+    .icon-col {
+        font-size: 2.5rem;
+        color: #0d6efd;
+        margin-bottom: 1rem;
+    }
+    .step-icon {
+        font-size: 2rem;
+        color: #198754;
+        margin-bottom: 0.5rem;
+    }
+    .step-number {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #0d6efd;
+        margin-bottom: 0.25rem;
+    }
+    .built-for-list {
+        font-size: 1.15rem;
+        margin-bottom: 2rem;
+    }
+    .cta-btn {
+        font-size: 1.25rem;
+        padding: 0.75rem 2.5rem;
+        border-radius: 2rem;
+    }
+    .free-badge {
+        background: #0d6efd;
+        color: #fff;
+        font-weight: 600;
+        border-radius: 1rem;
+        padding: 0.5rem 1.5rem;
+        font-size: 1.1rem;
+        margin-left: 1rem;
+    }
+</style>
+
+<!-- Hero Section -->
+<div class="hero-section text-center mb-5">
+    <div class="container hero-content">
+        <h1 class="display-3 fw-bold mb-3">Stop Paying for Fake Leads</h1>
+        <p class="lead mb-4">SpamGuard filters fake Facebook leads before they waste your ad budget</p>
+        <a href="{% url 'leads:signup' %}" class="btn btn-primary btn-lg cta-btn">Start Filtering For Free</a>
+    </div>
+    <div class="watermark d-none d-md-block">
+        <i class="bi bi-shield-check"></i>
+    </div>
+</div>
+
+<!-- Why It Matters Section -->
+<div class="container mb-5">
+    <h2 class="section-title text-center">Why It Matters</h2>
+    <div class="row text-center g-4">
+        <div class="col-md-4">
+            <div class="icon-col"><i class="bi bi-lightning-charge"></i></div>
+            <h5>Real-Time Filtering</h5>
+            <p>Block fake leads instantly—before they hit your CRM or cost you money.</p>
+        </div>
+        <div class="col-md-4">
+            <div class="icon-col"><i class="bi bi-bar-chart-line"></i></div>
+            <h5>Spam Score Analysis</h5>
+            <p>Every lead is scored for risk using advanced AI and data checks.</p>
+        </div>
+        <div class="col-md-4">
+            <div class="icon-col"><i class="bi bi-diagram-3"></i></div>
+            <h5>CRM Integration</h5>
+            <p>Only real leads are synced to your sales tools—no more junk data.</p>
+        </div>
+    </div>
+</div>
+
+<!-- How It Works Section -->
+<div class="container mb-5">
+    <h2 class="section-title text-center">How It Works</h2>
+    <div class="row text-center g-4 justify-content-center">
+        <div class="col-12 col-md-3">
+            <div class="step-number">1</div>
+            <div class="step-icon"><i class="bi bi-facebook"></i></div>
+            <p>Connect your Facebook Lead Ads in seconds—no code required.</p>
+        </div>
+        <div class="col-12 col-md-3">
+            <div class="step-number">2</div>
+            <div class="step-icon"><i class="bi bi-funnel"></i></div>
+            <p>SpamGuard screens every incoming lead using AI and real-time validation.</p>
+        </div>
+        <div class="col-12 col-md-3">
+            <div class="step-number">3</div>
+            <div class="step-icon"><i class="bi bi-check2-circle"></i></div>
+            <p>Only genuine, high-quality leads are sent to your CRM or email.</p>
+        </div>
+        <div class="col-12 col-md-3">
+            <div class="step-number">4</div>
+            <div class="step-icon"><i class="bi bi-graph-up-arrow"></i></div>
+            <p>See your results: less spam, more ROI, and a cleaner pipeline.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Built For Advertisers Who Are Tired Of... -->
+<div class="container mb-5">
+    <h2 class="section-title text-center">Built for Advertisers Who Are Tired of...</h2>
+    <ul class="built-for-list mx-auto" style="max-width: 600px;">
+        <li>🚫 Wasting budget on fake or duplicate leads</li>
+        <li>🤦‍♂️ Explaining bad leads to clients or sales teams</li>
+        <li>🗑️ Cleaning up junk data in the CRM</li>
+        <li>⏳ Losing time on manual lead review</li>
+        <li>📉 Seeing conversion rates drop from spam</li>
+    </ul>
+</div>
+
+<!-- Try It Now Section -->
+<div class="container text-center mb-5">
+    <h2 class="section-title">Try It Now</h2>
+    <p class="section-subtitle">Start filtering leads in minutes. No credit card required.</p>
+    <a href="{% url 'leads:signup' %}" class="btn btn-primary btn-lg cta-btn">Start Filtering For Free</a>
+    <span class="free-badge">Free Trial</span>
+    <div class="mt-4">
+        <span class="fw-bold">Plans from $0/month</span>
+        <span class="text-muted ms-2">Upgrade anytime</span>
+    </div>
+</div>
 {% endblock %} 
