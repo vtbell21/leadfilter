@@ -121,22 +121,23 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-12 d-flex justify-content-center">
-                <div class="cta-card position-relative p-5 shadow-sm rounded bg-white text-center hover-shadow" style="max-width: 540px; width: 100%; margin: 2rem 0;">
-                    <div class="cta-accent-bar position-absolute top-0 start-50 translate-middle-x" style="height: 6px; width: 80px; background: linear-gradient(90deg, #0d6efd 60%, #6ea8fe 100%); border-radius: 3px 3px 0 0; top: -6px;"></div>
-                    <div class="mb-3">
-                        <span class="cta-trust-icon d-inline-flex align-items-center justify-content-center bg-primary bg-gradient text-white rounded-circle mb-2" style="width: 48px; height: 48px; font-size: 2rem; box-shadow: 0 0.25rem 0.5rem rgba(13,110,253,0.10);">
+                <div class="cta-card-minimal p-4 bg-white text-center" style="max-width: 440px; width: 100%; margin: 1.5rem 0; border: 1px solid #f0f0f0; box-shadow: none;">
+                    <div class="mb-2">
+                        <span class="d-inline-flex align-items-center justify-content-center text-primary rounded-circle" style="width: 32px; height: 32px; font-size: 1.25rem; background: #f5f8ff;">
                             <i class="bi bi-shield-check"></i>
                         </span>
                     </div>
-                    <h2 class="display-6 fw-bold mb-4">
-                        Try SpamGuard free — <span class="text-primary">no credit card required</span>.<br>
-                        <span class="fw-normal">You'll wonder why you didn't <strong>start sooner</strong>.</span>
+                    <h2 class="h2 fw-bold mb-2">
+                        Try SpamGuard free — <span class="text-primary">no credit card required</span>.
                     </h2>
-                    <div class="d-grid gap-3 d-sm-flex justify-content-sm-center mt-4">
-                        <a href="{% url 'leads:signup' %}" class="btn btn-primary btn-lg px-4 gap-3">
+                    <div class="mb-3 text-muted" style="font-size: 1.15rem; font-weight: 400;">
+                        You'll wonder why you didn't <span class="fw-semibold">start sooner</span>.
+                    </div>
+                    <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mt-3">
+                        <a href="{% url 'leads:signup' %}" class="btn btn-primary btn-lg px-4 gap-3 minimal-btn">
                             Start Free Trial
                         </a>
-                        <a href="{% url 'leads:pricing' %}" class="btn btn-outline-secondary btn-lg px-4">
+                        <a href="{% url 'leads:pricing' %}" class="btn btn-outline-secondary btn-lg px-4 minimal-btn">
                             View Pricing
                         </a>
                     </div>
@@ -204,30 +205,43 @@
         color: #0d6efd !important;
     }
 
-    .cta-card {
-        border: 1.5px solid #f0f4fa;
-        box-shadow: 0 2rem 3rem -1rem rgba(13, 110, 253, 0.08), 0 0.5rem 1.5rem rgba(0,0,0,0.04);
+    .cta-card-minimal {
+        border-radius: 0.75rem;
+        box-shadow: none !important;
+        border: 1px solid #f0f0f0;
         background: #fff;
-        margin-top: 2rem;
-        margin-bottom: 2rem;
-        transition: box-shadow 0.2s, transform 0.2s;
+        margin-top: 1.5rem;
+        margin-bottom: 1.5rem;
+        padding: 2rem 1.5rem;
+        transition: none;
     }
-    .cta-card:hover {
-        box-shadow: 0 2.5rem 4rem -1rem rgba(13, 110, 253, 0.13), 0 1rem 2rem rgba(0,0,0,0.07);
-        transform: translateY(-4px) scale(1.01);
+    .cta-card-minimal .btn {
+        border-radius: 0.5rem;
+        box-shadow: none !important;
+        font-weight: 500;
     }
-    .cta-accent-bar {
-        z-index: 2;
+    .cta-card-minimal .btn-primary {
+        background: #0d6efd;
+        border: none;
     }
-    .cta-trust-icon {
-        box-shadow: 0 0.25rem 0.5rem rgba(13,110,253,0.10);
+    .cta-card-minimal .btn-primary:hover {
+        background: #0353c6;
+    }
+    .cta-card-minimal .btn-outline-secondary {
+        border: 1px solid #d1d5db;
+        background: #fff;
+        color: #444;
+    }
+    .cta-card-minimal .btn-outline-secondary:hover {
+        background: #f5f5f5;
+        color: #222;
     }
     @media (max-width: 575px) {
-        .cta-card {
-            padding: 2rem 1rem;
+        .cta-card-minimal {
+            padding: 1.25rem 0.5rem;
         }
-        .display-6 {
-            font-size: 2rem;
+        .h2 {
+            font-size: 1.35rem;
         }
     }
 </style>
