@@ -70,7 +70,7 @@
                             <i class="bi bi-tag"></i> Pricing
                         </a>
                     </li>
-                    {% if request.path == '/' %}
+                    {% if not request.path.startswith('/dashboard') and not request.path.startswith('/leads') and not request.path.startswith('/settings') %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'leads:solutions' %}">
                             <i class="bi bi-lightbulb"></i> Solutions
