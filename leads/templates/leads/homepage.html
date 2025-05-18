@@ -120,10 +120,19 @@
 <div class="container-fluid bg-light border-top border-bottom py-5">
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <div class="p-5 shadow-sm rounded bg-white text-center hover-shadow">
-                    <h2 class="display-5 fw-bold mb-4">Try SpamGuard free — <strong>no credit card required</strong>. You'll wonder why you didn't <strong>start sooner</strong>.</h2>
-                    <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
+            <div class="col-12 d-flex justify-content-center">
+                <div class="cta-card position-relative p-5 shadow-sm rounded bg-white text-center hover-shadow" style="max-width: 540px; width: 100%; margin: 2rem 0;">
+                    <div class="cta-accent-bar position-absolute top-0 start-50 translate-middle-x" style="height: 6px; width: 80px; background: linear-gradient(90deg, #0d6efd 60%, #6ea8fe 100%); border-radius: 3px 3px 0 0; top: -6px;"></div>
+                    <div class="mb-3">
+                        <span class="cta-trust-icon d-inline-flex align-items-center justify-content-center bg-primary bg-gradient text-white rounded-circle mb-2" style="width: 48px; height: 48px; font-size: 2rem; box-shadow: 0 0.25rem 0.5rem rgba(13,110,253,0.10);">
+                            <i class="bi bi-shield-check"></i>
+                        </span>
+                    </div>
+                    <h2 class="display-6 fw-bold mb-4">
+                        Try SpamGuard free — <span class="text-primary">no credit card required</span>.<br>
+                        <span class="fw-normal">You'll wonder why you didn't <strong>start sooner</strong>.</span>
+                    </h2>
+                    <div class="d-grid gap-3 d-sm-flex justify-content-sm-center mt-4">
                         <a href="{% url 'leads:signup' %}" class="btn btn-primary btn-lg px-4 gap-3">
                             Start Free Trial
                         </a>
@@ -193,6 +202,33 @@
 
     .text-primary {
         color: #0d6efd !important;
+    }
+
+    .cta-card {
+        border: 1.5px solid #f0f4fa;
+        box-shadow: 0 2rem 3rem -1rem rgba(13, 110, 253, 0.08), 0 0.5rem 1.5rem rgba(0,0,0,0.04);
+        background: #fff;
+        margin-top: 2rem;
+        margin-bottom: 2rem;
+        transition: box-shadow 0.2s, transform 0.2s;
+    }
+    .cta-card:hover {
+        box-shadow: 0 2.5rem 4rem -1rem rgba(13, 110, 253, 0.13), 0 1rem 2rem rgba(0,0,0,0.07);
+        transform: translateY(-4px) scale(1.01);
+    }
+    .cta-accent-bar {
+        z-index: 2;
+    }
+    .cta-trust-icon {
+        box-shadow: 0 0.25rem 0.5rem rgba(13,110,253,0.10);
+    }
+    @media (max-width: 575px) {
+        .cta-card {
+            padding: 2rem 1rem;
+        }
+        .display-6 {
+            font-size: 2rem;
+        }
     }
 </style>
 {% endblock %} 
